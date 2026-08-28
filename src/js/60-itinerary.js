@@ -28,8 +28,8 @@
     var planned = DD.sum(list, function (p) { return (p.itinerary || []).length; });
     var done = DD.sum(list, function (p) { return (p.itinerary || []).filter(function (i) { return i.done; }).length; });
 
-    host.appendChild(el('div', { class: 'stats', style: { marginBottom: '15px' } }, [
-      DD.stat('Stops', String(list.length), t.kind === 'domestic' ? 'cities' : 'countries'),
+    host.appendChild(DD.statStrip([
+      DD.stat('Stops', String(list.length), t.kind === 'domestic' ? 'cities' : 'countries', 'hero'),
       DD.stat('Days', String(totalDays), t.start ? DD.dateSpan(t.start, S.tripEnd(t)) : 'no start date set'),
       DD.stat('Planned', String(planned), done + ' ticked off'),
       DD.stat('Planned cost', DD.money(DD.sum(list, function (p) {
@@ -46,8 +46,7 @@
 
     list.forEach(function (p) {
       var s = sched[p.id] || {};
-      var bud = S.placeBudget(t, p);
-      var act = S.actuals(t, p.id);
+      var st = S.placeState(t, p);
 
       var head = el('div', { class: 'day-head', style: { borderRadius: 'var(--r-lg) var(--r-lg) 0 0' } }, [
         p.iso2 ? el('span', { text: DD.flagOf(p.iso2), style: { fontSize: '15px' } }) : null,
@@ -55,7 +54,7 @@
         el('span', { class: 'muted', style: { fontWeight: '400' },
           text: s.start ? DD.shortDate(s.start) + ' – ' + DD.shortDate(s.end) : DD.plural(p.days, 'day') }),
         el('span', { class: 'spacer' }),
-        el('span', { class: 'num tiny muted', text: DD.money(act.mine, { compact: true }) + ' / ' + DD.money(bud.mine, { compact: true }) }),
+        el('span', { class: 'num tiny muted', text: DD.money(st.spent, { compact: true }) + ' / ' + DD.money(st.budget, { compact: true }) }),
         el('button', { class: 'btn xs', text: 'Edit', onclick: function () { DD.placeEditor(t, p); } })
       ]);
 

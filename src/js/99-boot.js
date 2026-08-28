@@ -7,7 +7,7 @@
     DD.buildShell();
 
     var hash = (location.hash || '').replace('#', '');
-    DD.go(hash || 'overview');
+    DD.go(hash || 'front');
 
     DD.store.reconnectFile().then(function (granted) {
       paintFileState();
@@ -35,7 +35,7 @@
   }
 
   function paintFileState() {
-    var node = DD.$('#rail-file-state');
+    var node = DD.$('#file-state');
     if (!node) return;
     var s = DD.store.fileStatus();
     var txt = s === 'saved' ? 'Saved to your data file'
@@ -52,14 +52,14 @@
       DD.el('p', {}, [
         'Your spreadsheet is already in here: ',
         DD.el('strong', { text: DD.plural(t.places.length, 'country', 'countries') }),
-        ', ', DD.el('strong', { text: DD.money(b.mine) }),
+        ', ', DD.el('strong', { text: DD.money(b.total) }),
         ' budgeted, ten days apiece. Change any of it — nothing is fixed.'
       ]),
       DD.el('div', { class: 'card list', style: { margin: '14px 0' } }, [
         row('Places', 'Add or remove countries, set the days, pull in photos, keep your Drive albums.'),
+        row('The map', 'Countries fill in as you plan them and deepen as you spend.'),
         row('Log', 'Type what you actually spent, in dong or baht or rupees. It converts.'),
-        row('Sheet', 'Your grid — budget, actual and the variance between them.'),
-        row('Split', 'Add whoever you are travelling with and settle up at the end.')
+        row('The Sheet', 'Your grid — budget, actual and the variance between them.')
       ]),
       DD.el('p', { class: 'small muted', style: { marginBottom: 0 } },
         'Everything saves in this browser as you go. Go to Data to also write it into the repo file so it commits.')

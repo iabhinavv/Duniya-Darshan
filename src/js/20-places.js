@@ -1,103 +1,128 @@
-/* 20-places — the country / city cards and the place editor. */
+/* 20-places — Countries abroad, Cities at home. Each trip's map, its places,
+   and its ledger of spending all live on this one page. */
 'use strict';
 
 (function () {
   var el = DD.el, S = DD.store, icon = DD.icon;
 
-  /* Photo on top, the house gradient underneath — so a broken or slow image
-     leaves a proper card rather than a grey hole. */
-  var GRADIENT = 'linear-gradient(140deg,var(--teal-700),var(--teal-500))';
+  var GRADIENT = 'linear-gradient(160deg,var(--teal-900),var(--teal-700) 60%,var(--teal-600))';
   function photoLayers(url) {
     return 'url("' + String(url).replace(/"/g, '%22') + '"), ' + GRADIENT;
   }
 
   DD.register('places', {
-    title: function () { return S.trip().kind === 'domestic' ? 'Cities' : 'Countries'; },
-    actions: function () {
-      return [el('button', {
-        class: 'btn pri sm', onclick: function () { addDialog(); }
-      }, [icon('plus', 15), S.trip().kind === 'domestic' ? 'Add city' : 'Add country'])];
-    },
+    title: function () { return DD.placesLabel(); },
     render: render
   });
 
   function render(host) {
     var t = S.trip();
+    var isCity = t.kind === 'domestic';
     var list = S.places(t);
+    var noun = isCity ? ['city', 'cities'] : ['country', 'countries'];
 
     if (!list.length) {
-      host.appendChild(DD.emptyState(
-        'No places in ' + t.name,
-        'Add your first stop. You get a photo, a 10-day starter budget and booking links straight away.',
-        t.kind === 'domestic' ? 'Add a city' : 'Add a country', function () { addDialog(); }
-      ));
+      host.appendChild(el('p', { class: 'lede' },
+        'Nothing on ' + t.name + ' yet. Add the ' + noun[1] + ' you mean to visit — each one gets a photo, '
+        + 'a starter budget of ' + DD.plural(t.defaultDays, 'day') + ', and booking links.'));
+      host.appendChild(DD.emptyState('No ' + noun[1] + ' yet', '', 'Add a ' + noun[0], addDialog));
       return;
     }
 
-    var b = S.tripBudget(t);
-    var a = S.actuals(t);
-    host.appendChild(el('div', { class: 'stats', style: { marginBottom: '16px' } }, [
-      DD.stat(t.kind === 'domestic' ? 'Cities' : 'Countries', String(list.length), DD.plural(b.days, 'day') + ' in all'),
-      DD.stat('Budgeted', DD.money(b.mine, { compact: true }), DD.money(b.days ? b.mine / b.days : 0) + ' a day'),
-      DD.stat('Spent', DD.money(a.mine, { compact: true }), DD.pct(a.mine, b.mine) + '% of budget'),
-      DD.stat('Average a place', DD.money(list.length ? b.mine / list.length : 0), '')
+    var b = S.tripBudget(t), a = S.actuals(t);
+    var started = list.filter(function (p) { return S.placeState(t, p).count; }).length;
+
+    host.appendChild(DD.statStrip([
+      DD.stat('Budgeted', DD.money(b.total, { compact: true }),
+        DD.plural(b.days, 'day') + ' · ' + DD.money(b.days ? b.total / b.days : 0) + ' a day', 'hero'),
+      DD.stat('Spent', DD.money(a.total, { compact: true }), DD.pct(a.total, b.total) + '% of budget'),
+      DD.stat(a.total > b.total ? 'Over by' : 'Remaining', DD.money(Math.abs(b.total - a.total), { compact: true }),
+        '', a.total > b.total ? 'neg' : 'pos'),
+      DD.stat(isCity ? 'Cities' : 'Countries', String(list.length), started + ' under way')
     ]));
 
+    /* ---- the trip's own map ---- */
+    var kind = isCity ? 'india' : 'world';
+    host.appendChild(DD.sectionHead(t.name, isCity ? 'The route through India' : 'The route',
+      el('button', { class: 'btn sm pri', onclick: addDialog }, [icon('plus', 14), 'Add ' + noun[0]])));
+    host.appendChild(el('p', { class: 'deck' }, isCity
+      ? 'States you are stopping in are filled; a dot marks each city. Colour deepens once you spend there.'
+      : 'Countries on the itinerary are filled, and deepen as you spend. Click an empty one to add it.'));
+    host.appendChild(DD.map.render({
+      kind: kind,
+      trips: [t],
+      onPick: function (e) { editor(t, e.place); },
+      onBlank: kind === 'world' ? function (key, name) { offerAdd(t, key, name); } : null
+    }));
+
+    /* ---- the places ---- */
+    host.appendChild(DD.sectionHead('In order', isCity ? 'The cities' : 'The countries',
+      el('span', { class: 'chip', text: DD.plural(list.length, noun[0], noun[1]) })));
     var grid = el('div', { class: 'places' });
     list.forEach(function (p, i) { grid.appendChild(card(t, p, i, list.length)); });
     host.appendChild(grid);
 
-    host.appendChild(el('div', { style: { marginTop: '18px', textAlign: 'center' } }, [
-      el('button', { class: 'btn', onclick: function () { addDialog(); } },
-        [icon('plus', 15), t.kind === 'domestic' ? 'Add another city' : 'Add another country'])
+    host.appendChild(el('div', { style: { marginTop: '16px', textAlign: 'center' } }, [
+      el('button', { class: 'btn', onclick: addDialog }, [icon('plus', 14), 'Add another ' + noun[0]])
     ]));
+
+    /* ---- this trip's ledger ---- */
+    host.appendChild(DD.sectionHead('The ledger', 'What ' + t.name + ' actually cost',
+      el('button', { class: 'btn sm pri', onclick: function () { DD.logForm({ trip: t }); } },
+        [icon('plus', 14), 'Log spend'])));
+    host.appendChild(DD.expenseLedger(t));
   }
 
-  /* ------------------------------------------------------------- card */
+  /* --------------------------------------------------------------- card */
   function card(t, p, idx, total) {
     var bud = S.placeBudget(t, p);
-    var act = S.actuals(t, p.id);
+    var st = S.placeState(t, p);
     var img = p.images && p.images[0];
 
     var photo = el('div', {
       class: 'place-photo',
       title: 'Open ' + p.name,
-      style: img ? { backgroundImage: photoLayers(p.images[0].url) } : {},
+      style: img ? { backgroundImage: photoLayers(img.url) } : {},
       onclick: function () { editor(t, p); }
     }, [
-      el('div', { class: 'ord', text: '#' + (idx + 1) }),
-      p.iso2 ? el('div', { class: 'flag', text: DD.flagOf(p.iso2) }) : null,
+      el('div', { class: 'ord', text: String(idx + 1).padStart(2, '0') }),
+      st.count
+        ? el('div', { class: 'state ' + st.state,
+            text: st.state === 'over' ? 'Over budget' : st.state === 'done' ? 'Done' : 'Under way' })
+        : (p.iso2 ? el('div', { class: 'flag', text: DD.flagOf(p.iso2) }) : null),
       el('div', { class: 'cap' }, [
         el('div', { class: 'n', text: p.name }),
         el('div', { class: 'c', text: subtitle(p) })
       ])
     ]);
-
     if (!img) tryPhoto(p, photo);
 
-    var over = act.mine > bud.mine && bud.mine > 0;
     var body = el('div', { class: 'place-body' }, [
       el('div', { class: 'place-nums' }, [
-        el('span', { class: 'big', text: DD.money(bud.mine, { compact: true }) }),
-        el('span', { class: 'muted small', text: 'budget' }),
-        el('span', { class: 'spacer', style: { flex: '1' } }),
-        act.mine > 0 ? el('span', {
-          class: 'num small', style: { fontWeight: '650', color: over ? 'var(--red)' : 'var(--green)' },
-          text: DD.money(act.mine, { compact: true }) + ' spent'
+        el('span', { class: 'big', text: DD.money(bud.total, { compact: true }) }),
+        el('span', { class: 'muted tiny sans', text: 'budget' }),
+        el('span', { style: { flex: '1' } }),
+        st.count ? el('span', {
+          class: 'num', style: { fontWeight: '700', color: st.state === 'over' ? 'var(--red)' : 'var(--teal-800)' },
+          text: DD.money(st.spent, { compact: true })
         }) : null
       ]),
-      DD.progressBar(act.mine, bud.mine),
+      DD.progressBar(st.spent, bud.total),
       el('div', { class: 'place-meta' }, [
         stepper(t, p),
-        el('span', { class: 'chip grey', text: p.currency }),
-        el('span', { class: 'chip grey', text: DD.money(p.days ? bud.mine / p.days : 0) + '/day' })
+        el('span', { class: 'chip', text: p.currency }),
+        el('span', { class: 'chip', text: DD.money(p.days ? bud.total / p.days : 0) + '/day' })
       ]),
       el('div', { class: 'place-acts' }, [
-        el('button', { class: 'btn xs', onclick: function () { DD.links.open('flights', p); } }, [icon('plane', 13), DD.links.label('flights')]),
-        el('button', { class: 'btn xs', onclick: function () { DD.links.open('stays', p); } }, [icon('bed', 13), DD.links.label('stays')]),
-        el('button', { class: 'btn xs', onclick: function () { editor(t, p); } }, [icon('edit', 13), 'Open']),
-        idx > 0 ? el('button', { class: 'btn xs ghost', title: 'Move earlier', onclick: function () { S.movePlace(t, p.id, -1); DD.render(); } }, ['↑']) : null,
-        idx < total - 1 ? el('button', { class: 'btn xs ghost', title: 'Move later', onclick: function () { S.movePlace(t, p.id, 1); DD.render(); } }, ['↓']) : null
+        el('button', { class: 'btn xs pri', onclick: function () { DD.logForm({ trip: t, placeId: p.id }); } },
+          [icon('plus', 12), 'Log']),
+        el('button', { class: 'btn xs', onclick: function () { editor(t, p); } }, 'Open'),
+        el('button', { class: 'btn xs', onclick: function () { DD.links.open('flights', p); } }, DD.links.label('flights')),
+        el('button', { class: 'btn xs', onclick: function () { DD.links.open('stays', p); } }, DD.links.label('stays')),
+        idx > 0 ? el('button', { class: 'btn xs ghost', title: 'Move earlier',
+          onclick: function () { S.movePlace(t, p.id, -1); DD.render(); } }, '↑') : null,
+        idx < total - 1 ? el('button', { class: 'btn xs ghost', title: 'Move later',
+          onclick: function () { S.movePlace(t, p.id, 1); DD.render(); } }, '↓') : null
       ])
     ]);
 
@@ -107,7 +132,7 @@
   /* Whichever of city / region is not already the card's title. */
   function subtitle(p) {
     var extra = [p.city, p.country].filter(function (v) { return v && v !== p.name; })[0];
-    return (extra ? extra + ' \u00b7 ' : '') + DD.plural(p.days, 'day');
+    return (extra ? extra + ' · ' : '') + DD.plural(p.days, 'day');
   }
 
   function stepper(t, p) {
@@ -129,35 +154,42 @@
     });
   }
 
-  /* ------------------------------------------------------- add dialog */
+  function offerAdd(t, key, name) {
+    DD.confirmBox('Add ' + name + '?',
+      'It joins ' + t.name + ' with ' + DD.plural(t.defaultDays, 'day') + ' and an empty budget.',
+      function () {
+        var p = S.addPlace(t, { name: name, country: name, iso2: key, days: t.defaultDays, currency: 'INR' });
+        DD.render();
+        DD.toast(name + ' added');
+        DD.images.ensureLead(p, function (got) { if (got) DD.render(); });
+      }, 'Add it');
+  }
+
+  /* --------------------------------------------------------- add dialog */
   function addDialog() {
     var t = S.trip();
     var isCity = t.kind === 'domestic';
     var nameIn = el('input', { type: 'text', placeholder: isCity ? 'Jaipur' : 'Portugal', autocapitalize: 'words' });
-    var cityIn = el('input', { type: 'text', placeholder: isCity ? 'Rajasthan (optional)' : 'Lisbon (optional)' });
+    var cityIn = el('input', { type: 'text', placeholder: isCity ? 'Rajasthan' : 'Lisbon' });
     var daysIn = el('input', { type: 'number', min: '1', value: String(t.defaultDays) });
-    var curIn = DD.selectOf(currencyOptions(), isCity ? 'INR' : 'INR', null);
+    var curIn = DD.selectOf(currencyOptions(), 'INR', null);
     var isoIn = el('input', { type: 'text', maxlength: '2', placeholder: 'PT', style: { textTransform: 'uppercase' } });
     var iataIn = el('input', { type: 'text', maxlength: '3', placeholder: 'LIS', style: { textTransform: 'uppercase' } });
 
-    var body = el('div', {}, [
-      DD.field(isCity ? 'City' : 'Country', nameIn),
-      DD.field(isCity ? 'State or region' : 'Main city', cityIn),
-      el('div', { class: 'grid2' }, [
-        DD.field('Days', daysIn),
-        DD.field('Currency', curIn)
-      ]),
-      el('div', { class: 'grid2' }, [
-        DD.field(isCity ? 'State code' : 'Country code', isoIn),
-        DD.field('Airport', iataIn)
-      ]),
-      el('p', { class: 'tiny muted', style: { margin: '2px 0 0' } },
-        'The country code gives you a flag; the airport code builds the ' + DD.links.label('flights') + ' link. Both optional.')
-    ]);
-
-    var m = DD.modal({
+    DD.modal({
       title: isCity ? 'Add a city' : 'Add a country',
-      body: body,
+      body: el('div', {}, [
+        DD.field(isCity ? 'City' : 'Country', nameIn),
+        DD.field(isCity ? 'State — used to fill the map' : 'Main city', cityIn),
+        el('div', { class: 'grid2' }, [DD.field('Days', daysIn), DD.field('Currency', curIn)]),
+        el('div', { class: 'grid2' }, [
+          DD.field(isCity ? 'Country code' : 'Country code', isoIn),
+          DD.field('Airport', iataIn)
+        ]),
+        el('p', { class: 'tiny muted', style: { margin: '2px 0 0' } }, isCity
+          ? 'The state name fills that part of the India map. A photo and the city’s coordinates are looked up for you.'
+          : 'The country code fills the map and gives you a flag; the airport code builds the flight link.')
+      ]),
       okLabel: 'Add',
       ok: function (close) {
         var name = nameIn.value.trim();
@@ -166,7 +198,7 @@
           name: name,
           country: isCity ? (cityIn.value.trim() || name) : name,
           city: isCity ? name : cityIn.value.trim(),
-          iso2: isoIn.value.trim().toUpperCase(),
+          iso2: isoIn.value.trim().toUpperCase() || (isCity ? 'IN' : ''),
           iata: iataIn.value.trim().toUpperCase(),
           currency: curIn.value,
           days: Number(daysIn.value) || t.defaultDays
@@ -177,7 +209,6 @@
         DD.images.ensureLead(p, function (got) { if (got) DD.render(); });
       }
     });
-    return m;
   }
 
   function currencyOptions() {
@@ -185,13 +216,13 @@
     return Object.keys(cur).sort().map(function (c) { return [c, c + ' — ' + cur[c].name]; });
   }
 
-  /* ---------------------------------------------------------- editor */
+  /* ------------------------------------------------------------- editor */
   function editor(t, p) {
     var body = el('div', {});
-    var tabs = el('div', { class: 'seg', style: { marginBottom: '14px' } });
+    var tabs = el('div', { class: 'seg', style: { marginBottom: '16px', flexWrap: 'wrap' } });
     var pane = el('div', {});
-
-    var TABS = [['budget', 'Budget'], ['photos', 'Photos'], ['drive', 'Drive'], ['plan', 'Plan'], ['about', 'Details']];
+    var TABS = [['budget', 'Budget'], ['spend', 'Spending'], ['photos', 'Photos'],
+                ['drive', 'Albums'], ['plan', 'Plan'], ['about', 'Details']];
     var activeTab = 'budget';
 
     function paint() {
@@ -203,27 +234,24 @@
         }));
       });
       DD.clear(pane);
-      if (activeTab === 'budget') budgetPane(t, p, pane);
-      else if (activeTab === 'photos') photosPane(t, p, pane);
-      else if (activeTab === 'drive') drivePane(t, p, pane);
-      else if (activeTab === 'plan') planPane(t, p, pane);
-      else aboutPane(t, p, pane);
+      ({ budget: budgetPane, spend: spendPane, photos: photosPane,
+         drive: drivePane, plan: planPane, about: aboutPane })[activeTab](t, p, pane);
     }
-
     body.appendChild(tabs);
     body.appendChild(pane);
     paint();
 
     DD.modal({
       title: p.name + (p.city && p.city !== p.name ? ' · ' + p.city : ''),
-      body: body, wide: true,
-      cancelLabel: 'Done',
+      body: body, wide: true, cancelLabel: 'Done',
       destructive: {
-        label: 'Remove place',
+        label: 'Remove',
         run: function (close) {
           close();
           DD.confirmBox('Remove ' + p.name + '?',
-            'Its budget, photos, plan and ' + DD.plural(t.expenses.filter(function (x) { return x.placeId === p.id; }).length, 'logged expense') + ' go with it.',
+            'Its budget, photos, plan and ' + DD.plural(
+              t.expenses.filter(function (x) { return x.placeId === p.id; }).length, 'logged expense')
+            + ' go with it.',
             function () { S.removePlace(t, p.id); DD.render(); DD.toast(p.name + ' removed'); });
         }
       },
@@ -231,76 +259,95 @@
     });
   }
 
-  /* ----- budget tab ----- */
+  var saveSoon = DD.debounce(function () { S.save(); }, 400);
+
+  /* ----- budget ----- */
   function budgetPane(t, p, host) {
-    var heads = Math.max(1, t.travellerIds.length);
-    var totalNode = el('span', { class: 'num', style: { fontWeight: '700' } });
+    var totalNode = el('span', { class: 'num', style: { fontWeight: '800', fontSize: '21px' } });
     var perDayNode = el('span', { class: 'muted small' });
 
     function recalc() {
       var b = S.placeBudget(t, p);
-      totalNode.textContent = DD.money(b.mine);
-      perDayNode.textContent = DD.money(p.days ? b.mine / p.days : 0) + ' a day'
-        + (heads > 1 ? ' · group ' + DD.money(b.group) : '');
+      totalNode.textContent = DD.money(b.total);
+      perDayNode.textContent = DD.money(p.days ? b.total / p.days : 0) + ' a day';
     }
 
     var tbl = el('table', { class: 'grid', style: { minWidth: '0' } });
     var tb = el('tbody');
-    t.categories.forEach(function (c) {
+    t.categories.forEach(function (c, i) {
       var input = el('input', {
         type: 'number', class: 'cell-in', min: '0', step: '100',
         value: String(Number(p.budget[c.id]) || 0),
         oninput: function () {
           p.budget[c.id] = Math.max(0, Number(input.value) || 0);
-          recalc();
-          saveSoon();
+          recalc(); saveSoon();
         }
       });
       tb.appendChild(el('tr', {}, [
         el('td', {}, [
-          el('span', { class: 'dot', style: { background: DD.charts.colourFor(c.id, t.categories.indexOf(c)), display: 'inline-block', marginRight: '7px' } }),
-          c.label,
-          c.shared ? el('span', { class: 'chip grey tiny', style: { marginLeft: '7px' }, text: 'shared' }) : null
+          el('span', { class: 'dot', style: { background: DD.charts.colourFor(c.id, i),
+            display: 'inline-block', marginRight: '8px' } }),
+          c.label
         ]),
-        el('td', { style: { width: '130px' } }, [input])
+        el('td', { style: { width: '132px' } }, [input])
       ]));
     });
     tbl.appendChild(tb);
 
-    host.appendChild(el('div', { style: { display: 'flex', gap: '10px', alignItems: 'baseline', marginBottom: '10px', flexWrap: 'wrap' } }, [
-      el('span', { class: 'lbl-cap', style: { margin: 0 }, text: 'Total' }),
-      totalNode, perDayNode
+    host.appendChild(el('div', { style: { display: 'flex', gap: '12px', alignItems: 'baseline',
+      marginBottom: '12px', flexWrap: 'wrap' } }, [
+      el('span', { class: 'lbl-cap', style: { margin: 0 }, text: 'Total' }), totalNode, perDayNode
     ]));
     host.appendChild(el('div', { class: 'tbl-wrap' }, [tbl]));
 
-    var daysIn = el('input', {
-      type: 'number', min: '1', value: String(p.days),
-      oninput: function () { p.days = Math.max(1, Number(daysIn.value) || 1); recalc(); saveSoon(); }
-    });
-    host.appendChild(el('div', { class: 'grid2', style: { marginTop: '13px' } }, [
+    var daysIn = el('input', { type: 'number', min: '1', value: String(p.days),
+      oninput: function () { p.days = Math.max(1, Number(daysIn.value) || 1); recalc(); saveSoon(); } });
+    host.appendChild(el('div', { class: 'grid2', style: { marginTop: '14px' } }, [
       DD.field('Days here', daysIn),
-      DD.field('Local currency', DD.selectOf(currencyOptions(), p.currency, function (v) { p.currency = v; S.save(); }))
+      DD.field('Local currency', DD.selectOf(currencyOptions(), p.currency,
+        function (v) { p.currency = v; S.save(); }))
     ]));
 
-    var act = S.actuals(t, p.id);
-    if (act.mine > 0) {
-      host.appendChild(el('div', { class: 'banner info', style: { marginTop: '12px' } }, [
+    var st = S.placeState(t, p);
+    if (st.count) {
+      host.appendChild(el('div', { class: st.state === 'over' ? 'banner' : 'banner info',
+        style: { marginTop: '14px' } }, [
         el('div', {}, [
-          el('strong', { text: DD.money(act.mine) + ' spent here so far. ' }),
-          act.mine > S.placeBudget(t, p).mine
-            ? 'That is ' + DD.money(act.mine - S.placeBudget(t, p).mine) + ' over.'
-            : DD.money(S.placeBudget(t, p).mine - act.mine) + ' still in hand.'
+          el('strong', { text: DD.money(st.spent) + ' spent here. ' }),
+          st.spent > st.budget
+            ? DD.money(st.spent - st.budget) + ' over budget.'
+            : DD.money(st.budget - st.spent) + ' still in hand.'
         ])
       ]));
     }
     recalc();
   }
 
-  var saveSoon = DD.debounce(function () { S.save(); }, 400);
+  /* ----- spending ----- */
+  function spendPane(t, p, host) {
+    var st = S.placeState(t, p);
+    host.appendChild(DD.statStrip([
+      DD.stat('Budget', DD.money(st.budget), ''),
+      DD.stat('Spent', DD.money(st.spent), DD.plural(st.count, 'entry', 'entries')),
+      DD.stat(st.spent > st.budget ? 'Over' : 'Left', DD.money(Math.abs(st.budget - st.spent)), '',
+        st.spent > st.budget ? 'neg' : 'pos')
+    ]));
+    host.appendChild(el('div', { style: { margin: '14px 0' } }, [
+      el('button', { class: 'btn pri block', onclick: function () {
+        DD.logForm({ trip: t, placeId: p.id, after: function () { spendRefresh(t, p, host); } });
+      } }, [icon('plus', 15), 'Log spend in ' + p.name])
+    ]));
+    host.appendChild(DD.expenseLedger(t, { placeId: p.id }));
+  }
 
-  /* ----- photos tab ----- */
+  function spendRefresh(t, p, host) {
+    DD.clear(host);
+    spendPane(t, p, host);
+  }
+
+  /* ----- photos ----- */
   function photosPane(t, p, host) {
-    var gal = el('div', { class: 'gal', style: { marginBottom: '13px' } });
+    var gal = el('div', { class: 'gal', style: { marginBottom: '14px' } });
 
     function paintGal() {
       DD.clear(gal);
@@ -313,9 +360,8 @@
           el('img', { src: im.url, alt: im.credit || p.name, loading: 'lazy',
             onerror: function () { this.parentNode.style.display = 'none'; } }),
           el('figcaption', { text: im.credit || '' }),
-          el('button', { class: 'x', html: '&times;', title: 'Remove', onclick: function () {
-            p.images.splice(i, 1); S.save(); paintGal();
-          } })
+          el('button', { class: 'x', html: '&times;', title: 'Remove',
+            onclick: function () { p.images.splice(i, 1); S.save(); paintGal(); } })
         ]));
       });
     }
@@ -323,7 +369,7 @@
     host.appendChild(gal);
 
     var urlIn = el('input', { type: 'url', placeholder: 'https://…  paste any image link' });
-    host.appendChild(el('div', { class: 'row', style: { marginBottom: '13px' } }, [
+    host.appendChild(el('div', { class: 'row', style: { marginBottom: '14px' } }, [
       urlIn,
       el('button', { class: 'btn', style: { flex: '0 0 auto' }, text: 'Add', onclick: function () {
         var u = urlIn.value.trim();
@@ -334,18 +380,18 @@
     ]));
 
     var status = el('div', { class: 'muted small' });
-    host.appendChild(el('div', { style: { display: 'flex', gap: '9px', alignItems: 'center', flexWrap: 'wrap' } }, [
-      el('button', { class: 'btn', onclick: fetchMore }, [DD.icon('image', 15), 'Find photos of ' + (p.city || p.name)]),
+    host.appendChild(el('div', { style: { display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' } }, [
+      el('button', { class: 'btn', onclick: fetchMore }, [icon('image', 14), 'Find photos of ' + (p.city || p.name)]),
       status
     ]));
-    host.appendChild(el('p', { class: 'tiny muted', style: { marginTop: '10px', marginBottom: 0 } },
+    host.appendChild(el('p', { class: 'tiny muted', style: { marginTop: '11px', marginBottom: 0 } },
       DD.images.needsServer()
-        ? 'Photo search needs an http:// origin — run python3 serve.py and open http://localhost:4190/. Pasting a URL works either way, and photos already saved keep showing.'
-        : 'Photos come from Wikipedia and Wikimedia Commons — freely licensed, credited above. They are stored as links, so you keep them when you commit your data file.'));
+        ? 'Photo search needs an http:// origin — run python3 serve.py and open http://localhost:4190/. Pasting a URL works either way.'
+        : 'Photos come from Wikipedia and Wikimedia Commons — freely licensed, credited above, stored as links.'));
 
     function fetchMore() {
       if (DD.images.needsServer()) {
-        status.textContent = 'Opened from disk — run serve.py to search Wikipedia, or paste a URL above.';
+        status.textContent = 'Opened from disk — run serve.py to search, or paste a URL above.';
         return;
       }
       if (!DD.images.online()) { status.textContent = 'You are offline.'; return; }
@@ -365,9 +411,9 @@
     }
   }
 
-  /* ----- drive tab ----- */
+  /* ----- albums ----- */
   function drivePane(t, p, host) {
-    var list = el('div', { style: { marginBottom: '13px' } });
+    var list = el('div', { style: { marginBottom: '14px' } });
 
     function paint() {
       DD.clear(list);
@@ -377,23 +423,20 @@
       }
       p.driveLinks.forEach(function (d, i) {
         var embed = DD.images.driveEmbed(d.url);
-        var block = el('div', { class: 'card', style: { marginBottom: '11px', overflow: 'hidden' } });
+        var block = el('div', { class: 'card', style: { marginBottom: '12px', overflow: 'hidden' } });
         block.appendChild(el('div', { class: 'list-row' }, [
-          DD.icon('link', 17),
+          icon('link', 16),
           el('div', { class: 'grow' }, [
             el('div', { class: 't', text: d.label || DD.images.hostOf(d.url) }),
             el('div', { class: 's', text: DD.images.hostOf(d.url) })
           ]),
           el('a', { class: 'btn xs', href: d.url, target: '_blank', rel: 'noopener', text: 'Open' }),
-          el('button', { class: 'btn xs ghost', html: '&times;', title: 'Remove', onclick: function () {
-            p.driveLinks.splice(i, 1); S.save(); paint();
-          } })
+          el('button', { class: 'btn xs ghost', html: '&times;', title: 'Remove',
+            onclick: function () { p.driveLinks.splice(i, 1); S.save(); paint(); } })
         ]));
         if (embed) {
-          block.appendChild(el('iframe', {
-            class: 'drive-embed', src: embed, loading: 'lazy',
-            title: d.label || 'Drive folder', style: { border: 0, display: 'block' }
-          }));
+          block.appendChild(el('iframe', { class: 'drive-embed', src: embed, loading: 'lazy',
+            title: d.label || 'Album', style: { border: 0, display: 'block' } }));
         }
         list.appendChild(block);
       });
@@ -409,14 +452,14 @@
       if (!u) { url.focus(); return; }
       p.driveLinks.push({ label: lbl.value.trim() || DD.images.hostOf(u), url: u });
       S.save(); lbl.value = ''; url.value = ''; paint();
-    } }, [DD.icon('plus', 15), 'Add link']));
-    host.appendChild(el('p', { class: 'tiny muted', style: { marginTop: '11px', marginBottom: 0 } },
-      'Google Drive folders and files shared as "anyone with the link" show their contents inline here. Dropbox, OneDrive, iCloud and anything else appear as a link you can open.'));
+    } }, [icon('plus', 14), 'Add link']));
+    host.appendChild(el('p', { class: 'tiny muted', style: { marginTop: '12px', marginBottom: 0 } },
+      'Google Drive folders and files shared as "anyone with the link" show their contents inline. Dropbox, OneDrive, iCloud and the rest appear as a link you can open.'));
   }
 
-  /* ----- plan tab ----- */
+  /* ----- plan ----- */
   function planPane(t, p, host) {
-    var list = el('div', { class: 'card list', style: { marginBottom: '13px' } });
+    var list = el('div', { class: 'card list', style: { marginBottom: '14px' } });
 
     function paint() {
       DD.clear(list);
@@ -430,83 +473,94 @@
       items.forEach(function (it) {
         list.appendChild(el('div', { class: 'list-row' }, [
           el('label', { class: 'inline-check', style: { margin: 0 } }, [
-            el('input', { type: 'checkbox', checked: !!it.done, onchange: function () { it.done = this.checked; S.save(); paint(); } })
+            el('input', { type: 'checkbox', checked: !!it.done,
+              onchange: function () { it.done = this.checked; S.save(); paint(); } })
           ]),
-          el('span', { class: 'chip grey', text: 'Day ' + (it.day || 1) }),
+          el('span', { class: 'chip', text: 'Day ' + (it.day || 1) }),
           el('div', { class: 'grow' }, [
-            el('div', { class: 't', text: it.title, style: it.done ? { textDecoration: 'line-through', color: 'var(--ink-3)' } : {} }),
+            el('div', { class: 't', text: it.title,
+              style: it.done ? { textDecoration: 'line-through', color: 'var(--ink-3)' } : {} }),
             it.note ? el('div', { class: 's', text: it.note }) : null
           ]),
           it.cost ? el('span', { class: 'amt small', text: DD.money(it.cost) }) : null,
-          el('button', { class: 'btn xs ghost', html: '&times;', title: 'Remove', onclick: function () {
-            p.itinerary = p.itinerary.filter(function (o) { return o !== it; }); S.save(); paint();
-          } })
+          el('button', { class: 'btn xs ghost', html: '&times;', title: 'Remove',
+            onclick: function () {
+              p.itinerary = p.itinerary.filter(function (o) { return o !== it; }); S.save(); paint();
+            } })
         ]));
       });
     }
     paint();
     host.appendChild(list);
 
-    var day = el('input', { type: 'number', min: '1', max: String(Math.max(1, p.days)), value: '1' });
+    var day = el('input', { type: 'number', min: '1', value: '1' });
     var title = el('input', { type: 'text', placeholder: 'Ha Long Bay day cruise' });
     var cost = el('input', { type: 'number', min: '0', step: '100', placeholder: '0' });
-    var note = el('input', { type: 'text', placeholder: 'Note (optional)' });
+    var note = el('input', { type: 'text', placeholder: 'Optional' });
 
     host.appendChild(el('div', { class: 'grid3' }, [
       DD.field('Day', day), DD.field('Est. cost ₹', cost), DD.field('Note', note)
     ]));
     host.appendChild(DD.field('What', title));
-    host.appendChild(el('button', { class: 'btn pri', onclick: add }, [DD.icon('plus', 15), 'Add to plan']));
+    host.appendChild(el('button', { class: 'btn pri', onclick: add }, [icon('plus', 14), 'Add to plan']));
     title.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); add(); } });
 
     function add() {
       var v = title.value.trim();
       if (!v) { title.focus(); return; }
-      p.itinerary.push({
-        id: DD.uid('it'), day: Math.max(1, Number(day.value) || 1), title: v,
-        note: note.value.trim(), cost: Number(cost.value) || 0, done: false
-      });
+      p.itinerary.push({ id: DD.uid('it'), day: Math.max(1, Number(day.value) || 1), title: v,
+        note: note.value.trim(), cost: Number(cost.value) || 0, done: false });
       S.save();
       title.value = ''; note.value = ''; cost.value = '';
-      paint();
-      title.focus();
+      paint(); title.focus();
     }
   }
 
-  /* ----- details tab ----- */
+  /* ----- details ----- */
   function aboutPane(t, p, host) {
+    var isCity = t.kind === 'domestic';
     var name = el('input', { type: 'text', value: p.name, oninput: function () { p.name = name.value; saveSoon(); } });
     var city = el('input', { type: 'text', value: p.city || '', oninput: function () { p.city = city.value; saveSoon(); } });
+    var country = el('input', { type: 'text', value: p.country || '',
+      oninput: function () { p.country = country.value; saveSoon(); } });
     var iso = el('input', { type: 'text', maxlength: '2', value: p.iso2 || '', style: { textTransform: 'uppercase' },
       oninput: function () { p.iso2 = iso.value.toUpperCase(); saveSoon(); } });
     var iata = el('input', { type: 'text', maxlength: '3', value: p.iata || '', style: { textTransform: 'uppercase' },
       oninput: function () { p.iata = iata.value.toUpperCase(); saveSoon(); } });
+    var lat = el('input', { type: 'number', step: 'any', value: p.lat === null || p.lat === undefined ? '' : String(p.lat),
+      oninput: function () { p.lat = lat.value === '' ? null : Number(lat.value); saveSoon(); } });
+    var lon = el('input', { type: 'number', step: 'any', value: p.lon === null || p.lon === undefined ? '' : String(p.lon),
+      oninput: function () { p.lon = lon.value === '' ? null : Number(lon.value); saveSoon(); } });
     var notes = el('textarea', { placeholder: 'Visa notes, who to meet, what to pack…',
       oninput: function () { p.notes = notes.value; saveSoon(); } });
     notes.value = p.notes || '';
 
     host.appendChild(el('div', { class: 'grid2' }, [
-      DD.field(t.kind === 'domestic' ? 'City' : 'Country', name),
-      DD.field(t.kind === 'domestic' ? 'State or region' : 'Main city', city)
+      DD.field(isCity ? 'City' : 'Country', name),
+      DD.field(isCity ? 'State — fills the map' : 'Main city', isCity ? country : city)
     ]));
     host.appendChild(el('div', { class: 'grid2' }, [
       DD.field('Country code', iso), DD.field('Airport', iata)
     ]));
+    host.appendChild(el('div', { class: 'grid2' }, [
+      DD.field('Latitude', lat), DD.field('Longitude', lon)
+    ]));
+    host.appendChild(el('p', { class: 'tiny muted', style: { marginTop: '-6px' } },
+      'Coordinates put the dot on the map. They are filled in automatically when a photo is found.'));
     host.appendChild(DD.field('Notes', notes));
 
     var sched = S.schedule(t)[p.id];
     if (sched && sched.start) {
       host.appendChild(el('div', { class: 'banner info' }, [
         el('div', {}, ['Scheduled ', el('strong', { text: DD.niceDate(sched.start) }), ' to ',
-          el('strong', { text: DD.niceDate(sched.end, true) }),
-          ' — from the trip start date and the days before this stop.'])
+          el('strong', { text: DD.niceDate(sched.end, true) }), '.'])
       ]));
     }
 
-    host.appendChild(el('div', { class: 'chip-row', style: { marginTop: '4px' } }, [
-      el('a', { class: 'btn sm', href: DD.links.build('flights', p) || '#', target: '_blank', rel: 'noopener' }, [DD.icon('plane', 14), DD.links.label('flights')]),
-      el('a', { class: 'btn sm', href: DD.links.build('stays', p) || '#', target: '_blank', rel: 'noopener' }, [DD.icon('bed', 14), DD.links.label('stays')]),
-      el('a', { class: 'btn sm', href: DD.links.build('activities', p) || '#', target: '_blank', rel: 'noopener' }, [DD.icon('map', 14), DD.links.label('activities')])
+    host.appendChild(el('div', { class: 'chip-row', style: { marginTop: '6px' } }, [
+      el('a', { class: 'btn sm', href: DD.links.build('flights', p) || '#', target: '_blank', rel: 'noopener' }, DD.links.label('flights')),
+      el('a', { class: 'btn sm', href: DD.links.build('stays', p) || '#', target: '_blank', rel: 'noopener' }, DD.links.label('stays')),
+      el('a', { class: 'btn sm', href: DD.links.build('activities', p) || '#', target: '_blank', rel: 'noopener' }, DD.links.label('activities'))
     ]));
   }
 

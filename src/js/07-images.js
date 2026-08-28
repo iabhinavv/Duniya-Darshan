@@ -50,7 +50,9 @@
       return {
         url: src,
         credit: (d.titles && d.titles.normalized) || query,
-        source: d.content_urls && d.content_urls.desktop ? d.content_urls.desktop.page : ''
+        source: d.content_urls && d.content_urls.desktop ? d.content_urls.desktop.page : '',
+        lat: d.coordinates ? d.coordinates.lat : null,
+        lon: d.coordinates ? d.coordinates.lon : null
       };
     });
   }
@@ -99,7 +101,11 @@
     return enqueue(function () {
       return lead(queryFor(place)).then(function (img) {
         place.images = place.images || [];
-        place.images.push(img);
+        place.images.push({ url: img.url, credit: img.credit, source: img.source });
+        if (typeof place.lat !== 'number' && typeof img.lat === 'number') {
+          place.lat = img.lat;
+          place.lon = img.lon;
+        }
         DD.store.save();
         return true;
       }).catch(function () {

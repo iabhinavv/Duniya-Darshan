@@ -13,7 +13,7 @@
     var db = S.db();
 
     /* ------------------------------------------------------ data file */
-    host.appendChild(DD.sectionHead('Your data'));
+    host.appendChild(DD.sectionHead('Keeping it', 'Your data'));
     var state = S.fileStatus();
     var fileCard = el('div', { class: 'card card-pad' });
 
@@ -65,10 +65,9 @@
     host.appendChild(fileCard);
 
     /* ---------------------------------------------------------- you */
-    host.appendChild(DD.sectionHead('You'));
-    var me = S.personById(S.meId());
-    var nameIn = el('input', { type: 'text', value: me.name, oninput: DD.debounce(function () {
-      me.name = nameIn.value.trim() || 'Me'; S.save();
+    host.appendChild(DD.sectionHead('Who and where from', 'You'));
+    var nameIn = el('input', { type: 'text', value: db.settings.name || '', oninput: DD.debounce(function () {
+      db.settings.name = nameIn.value.trim(); S.save();
     }, 400) });
     var homeIn = el('input', { type: 'text', value: db.settings.homeCity || '', maxlength: '40',
       oninput: DD.debounce(function () { db.settings.homeCity = homeIn.value.trim(); S.save(); }, 400) });
@@ -85,7 +84,7 @@
     ]));
 
     /* ------------------------------------------------- link templates */
-    host.appendChild(DD.sectionHead('Booking links'));
+    host.appendChild(DD.sectionHead('Where you book', 'Booking links'));
     host.appendChild(el('p', { class: 'small muted', style: { marginTop: '-6px' } }, [
       'Swap in whichever site you prefer. These tokens get filled in: ',
       el('span', { class: 'chip-row', style: { display: 'inline-flex', verticalAlign: 'middle', marginLeft: '4px' } },
@@ -117,7 +116,7 @@
 
     /* ---------------------------------------------------- categories */
     var t = S.trip();
-    host.appendChild(DD.sectionHead('Categories in ' + t.name));
+    host.appendChild(DD.sectionHead(t.name, 'Spending categories'));
     var catCard = el('div', { class: 'card list' });
     t.categories.forEach(function (c, i) {
       var lab = el('input', { type: 'text', value: c.label, style: { border: '1px solid transparent', background: 'transparent' },
@@ -125,9 +124,6 @@
       catCard.appendChild(el('div', { class: 'list-row' }, [
         el('span', { class: 'dot', style: { background: DD.charts.colourFor(c.id, i) } }),
         el('div', { class: 'grow' }, [lab]),
-        DD.segmented([['shared', 'Shared'], ['each', 'Per person']], c.shared ? 'shared' : 'each', function (v) {
-          c.shared = (v === 'shared'); S.save();
-        }),
         t.categories.length > 2 ? el('button', { class: 'btn xs ghost', html: '&times;', title: 'Remove category', onclick: function () {
           var used = t.expenses.filter(function (x) { return x.category === c.id; }).length;
           DD.confirmBox('Remove ' + c.label + '?',
@@ -154,7 +150,7 @@
     } }, [DD.icon('plus', 15), 'Add category']));
 
     /* ---------------------------------------------------- currencies */
-    host.appendChild(DD.sectionHead('Exchange rates'));
+    host.appendChild(DD.sectionHead('What a rupee buys', 'Exchange rates'));
     host.appendChild(el('p', { class: 'small muted', style: { marginTop: '-6px' } },
       'How many units of each currency you get for one rupee — the same way your spreadsheet had it. Editing a rate never changes an expense you already logged; each entry keeps the rate it was booked at.'));
 
@@ -213,7 +209,7 @@
     ]));
 
     /* -------------------------------------------------------- danger */
-    host.appendChild(DD.sectionHead('Start again'));
+    host.appendChild(DD.sectionHead('The nuclear option', 'Start again'));
     host.appendChild(el('div', { class: 'card card-pad' }, [
       el('p', { class: 'small', style: { marginTop: 0 } },
         'Reset wipes what is in this browser and reloads the 36 countries from your spreadsheet. Take a JSON backup first if you are unsure.'),

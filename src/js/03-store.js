@@ -42,17 +42,16 @@
       if (!s.linkTemplates[k]) s.linkTemplates[k] = deepClone(seed.linkTemplates[k]);
     });
     DB.currencies = DB.currencies || deepClone(window.DUNIYA_SEED.currencies);
-    DB.people = Array.isArray(DB.people) && DB.people.length ? DB.people
-      : [{ id: 'me', name: 'Me', colour: '#0F766E' }];
+    delete DB.people;
     DB.trips = Array.isArray(DB.trips) ? DB.trips : [];
     DB.trips.forEach(function (t) {
       t.id = t.id || DD.uid('trip');
       t.kind = t.kind === 'domestic' ? 'domestic' : 'world';
-      t.travellerIds = (t.travellerIds || ['me']).filter(function (id) { return personById(id); });
-      if (!t.travellerIds.length) t.travellerIds = [DB.people[0].id];
+      delete t.travellerIds;
       t.defaultDays = t.defaultDays || 10;
       t.categories = (t.categories && t.categories.length) ? t.categories
         : deepClone(window.DUNIYA_SEED.trips[0].categories);
+      t.categories.forEach(function (c) { delete c.shared; });
       t.places = t.places || [];
       t.expenses = t.expenses || [];
       t.places.forEach(function (p, i) {
@@ -71,11 +70,7 @@
         x.amount = Number(x.amount) || 0;
         x.rate = Number(x.rate) || 1;
         if (typeof x.amountINR !== 'number') x.amountINR = x.amount / (x.rate || 1);
-        x.splitMode = x.splitMode || 'equal';
-        x.shares = x.shares || {};
-        if (x.splitMode !== 'mine' && !Object.keys(x.shares).length) {
-          x.shares = equalShares(t);
-        }
+        delete x.splitMode; delete x.shares; delete x.paidBy;
       });
     });
     if (!DB.trips.length) DB.trips = deepClone(window.DUNIYA_SEED.trips);
@@ -205,14 +200,6 @@
   }
   function trip() { return tripById(DB.activeTrip) || DB.trips[0]; }
   function setTrip(id) { if (tripById(id)) { DB.activeTrip = id; save(); } }
-  function personById(id) {
-    for (var i = 0; i < DB.people.length; i++) if (DB.people[i].id === id) return DB.people[i];
-    return null;
-  }
-  function travellers(t) {
-    t = t || trip();
-    return t.travellerIds.map(personById).filter(Boolean);
-  }
   function placeById(t, id) {
     t = t || trip();
     for (var i = 0; i < t.places.length; i++) if (t.places[i].id === id) return t.places[i];
@@ -231,100 +218,56 @@
 
   /* ------------------------------------------------------- derived sums */
 
-  /* Budget for one place. Returns per-category and totals, in "my share" and
-     "group" terms. Shared categories divide by head count; personal ones multiply. */
+  /* Budget for one place: the per-category figures and their total. */
   function placeBudget(t, p) {
     t = t || trip();
-    var heads = Math.max(1, t.travellerIds.length);
-    var mine = 0, group = 0, byCat = {};
+    var total = 0, byCat = {};
     t.categories.forEach(function (c) {
       var v = Number(p.budget[c.id]) || 0;
-      var g = c.shared ? v : v * heads;
-      byCat[c.id] = { base: v, mine: v, group: g, shared: !!c.shared };
-      mine += v;
-      group += g;
+      byCat[c.id] = v;
+      total += v;
     });
-    return { mine: mine, group: group, byCat: byCat, heads: heads };
+    return { total: total, byCat: byCat, days: Number(p.days) || 0 };
   }
 
   function tripBudget(t) {
     t = t || trip();
-    var mine = 0, group = 0, byCat = {}, days = 0;
+    var total = 0, byCat = {}, days = 0;
     t.categories.forEach(function (c) { byCat[c.id] = 0; });
     t.places.forEach(function (p) {
       var b = placeBudget(t, p);
-      mine += b.mine; group += b.group;
+      total += b.total;
       days += Number(p.days) || 0;
-      t.categories.forEach(function (c) { byCat[c.id] += b.byCat[c.id].base; });
+      t.categories.forEach(function (c) { byCat[c.id] += b.byCat[c.id]; });
     });
-    return { mine: mine, group: group, byCat: byCat, days: days, places: t.places.length };
+    return { total: total, byCat: byCat, days: days, places: t.places.length };
   }
 
-  /* What a single expense costs the given person. */
-  function shareOf(x, personId, t) {
-    t = t || trip();
-    var total = Number(x.amountINR) || 0;
-    if (x.splitMode === 'mine') return x.paidBy === personId ? total : 0;
-    var shares = x.shares || {};
-    var keys = Object.keys(shares).filter(function (k) { return Number(shares[k]) > 0; });
-    if (!keys.length) {
-      var ids = t.travellerIds;
-      return ids.indexOf(personId) >= 0 ? total / Math.max(1, ids.length) : 0;
-    }
-    if (x.splitMode === 'exact') return Number(shares[personId]) || 0;
-    var weight = DD.sum(keys, function (k) { return Number(shares[k]) || 0; });
-    if (!weight) return 0;
-    return total * ((Number(shares[personId]) || 0) / weight);
-  }
-
-  function meId() { return DB.people[0] ? DB.people[0].id : 'me'; }
-
-  /* Actual spend, optionally narrowed by place. Returns group total and my share. */
+  /* Actual spend, optionally narrowed to one place. */
   function actuals(t, placeId) {
     t = t || trip();
-    var me = meId();
-    var group = 0, mine = 0, byCat = {}, byCatMine = {};
-    t.categories.forEach(function (c) { byCat[c.id] = 0; byCatMine[c.id] = 0; });
+    var total = 0, byCat = {}, count = 0;
+    t.categories.forEach(function (c) { byCat[c.id] = 0; });
     t.expenses.forEach(function (x) {
       if (placeId && x.placeId !== placeId) return;
       var v = Number(x.amountINR) || 0;
-      var m = shareOf(x, me, t);
-      group += v; mine += m;
-      if (byCat[x.category] === undefined) { byCat[x.category] = 0; byCatMine[x.category] = 0; }
+      total += v;
+      count++;
+      if (byCat[x.category] === undefined) byCat[x.category] = 0;
       byCat[x.category] += v;
-      byCatMine[x.category] += m;
     });
-    return { group: group, mine: mine, byCat: byCat, byCatMine: byCatMine };
+    return { total: total, byCat: byCat, count: count };
   }
 
-  /* Who owes whom, settled with the fewest transfers. */
-  function balances(t) {
-    t = t || trip();
-    var ids = t.travellerIds.slice();
-    var paid = {}, owed = {};
-    ids.forEach(function (id) { paid[id] = 0; owed[id] = 0; });
-    t.expenses.forEach(function (x) {
-      if (paid[x.paidBy] === undefined) return;
-      paid[x.paidBy] += Number(x.amountINR) || 0;
-      ids.forEach(function (id) { owed[id] += shareOf(x, id, t); });
-    });
-    var net = ids.map(function (id) {
-      return { id: id, paid: paid[id], owed: owed[id], net: paid[id] - owed[id] };
-    });
-    var cred = net.filter(function (n) { return n.net > 0.5; }).sort(DD.by('net', 'desc'));
-    var debt = net.filter(function (n) { return n.net < -0.5; }).sort(DD.by('net'));
-    var transfers = [], i = 0, j = 0;
-    cred = cred.map(function (c) { return { id: c.id, amt: c.net }; });
-    debt = debt.map(function (d) { return { id: d.id, amt: -d.net }; });
-    var guard = 0;
-    while (i < debt.length && j < cred.length && guard++ < 500) {
-      var amt = Math.min(debt[i].amt, cred[j].amt);
-      if (amt > 0.5) transfers.push({ from: debt[i].id, to: cred[j].id, amount: amt });
-      debt[i].amt -= amt; cred[j].amt -= amt;
-      if (debt[i].amt <= 0.5) i++;
-      if (cred[j].amt <= 0.5) j++;
-    }
-    return { net: net, transfers: transfers };
+  /* How a place stands: untouched, under way, or done and dusted.
+     Anything with logged spend counts as started — that is what colours the map. */
+  function placeState(t, p) {
+    var b = placeBudget(t, p).total;
+    var a = actuals(t, p.id);
+    if (!a.count) return { state: 'planned', budget: b, spent: 0, ratio: 0, count: 0 };
+    var ratio = b > 0 ? a.total / b : 1;
+    var state = ratio > 1.02 ? 'over' : (ratio >= 0.9 ? 'done' : 'active');
+    return { state: state, budget: b, spent: a.total, ratio: ratio, count: a.count };
   }
 
   /* Dates: places run back to back from the trip start, honouring their day counts. */
@@ -351,7 +294,7 @@
     var t = {
       id: DD.uid('trip'), name: rec.name || 'New trip', kind: rec.kind || 'world',
       start: rec.start || '', end: '', note: rec.note || '',
-      travellerIds: [meId()], defaultDays: rec.defaultDays || (rec.kind === 'domestic' ? 4 : 10),
+      defaultDays: rec.defaultDays || (rec.kind === 'domestic' ? 4 : 10),
       categories: deepClone(window.DUNIYA_SEED.trips[0].categories),
       places: [], expenses: []
     };
@@ -375,6 +318,8 @@
       id: DD.uid('p'),
       name: rec.name, country: rec.country || rec.name, city: rec.city || '',
       iso2: rec.iso2 || '', iata: rec.iata || '', currency: rec.currency || 'INR',
+      lat: typeof rec.lat === 'number' ? rec.lat : null,
+      lon: typeof rec.lon === 'number' ? rec.lon : null,
       days: Number(rec.days) || t.defaultDays, order: maxOrder + 1, notes: '',
       budget: {}, images: rec.images || [], driveLinks: [], itinerary: []
     };
@@ -402,29 +347,17 @@
     save();
   }
 
-  /* Everyone on the trip right now, weighted equally. Frozen onto the expense so
-     that adding or removing a traveller later never rewrites old entries. */
-  function equalShares(t) {
-    var out = {};
-    t.travellerIds.forEach(function (id) { out[id] = 1; });
-    return out;
-  }
-
   function addExpense(t, rec) {
     t = t || trip();
     var code = rec.currency || 'INR';
     var rate = DD.rateFor(code, DB.currencies);
-    var mode = rec.splitMode || 'equal';
-    var shares = rec.shares && Object.keys(rec.shares).length ? rec.shares : null;
-    if (!shares && mode !== 'mine') shares = equalShares(t);
     var x = {
       id: DD.uid('e'),
       placeId: rec.placeId || '', date: rec.date || DD.today(),
       category: rec.category, amount: Number(rec.amount) || 0,
       currency: code, rate: rate,
       amountINR: (Number(rec.amount) || 0) / rate,
-      note: rec.note || '', paidBy: rec.paidBy || meId(),
-      splitMode: mode, shares: shares || {}
+      note: rec.note || ''
     };
     t.expenses.push(x);
     save();
@@ -436,9 +369,6 @@
     var x = t.expenses.filter(function (e) { return e.id === id; })[0];
     if (!x) return null;
     Object.keys(rec).forEach(function (k) { x[k] = rec[k]; });
-    if (x.splitMode !== 'mine' && (!x.shares || !Object.keys(x.shares).length)) {
-      x.shares = equalShares(t);
-    }
     x.rate = DD.rateFor(x.currency, DB.currencies);
     if (rec.rate) x.rate = rec.rate;
     x.amount = Number(x.amount) || 0;
@@ -453,14 +383,6 @@
     save();
   }
 
-  function addPerson(name) {
-    var used = DB.people.map(function (p) { return p.colour; });
-    var p = { id: DD.uid('per'), name: name || 'Traveller', colour: DD.nextColour(used) };
-    DB.people.push(p);
-    save();
-    return p;
-  }
-
   function replaceAll(next) {
     DB = next;
     migrate();
@@ -471,14 +393,13 @@
     STORE_KEY: STORE_KEY,
     load: load, save: save, db: db, deepClone: deepClone,
     trips: trips, trip: trip, tripById: tripById, setTrip: setTrip,
-    personById: personById, travellers: travellers, meId: meId,
     places: places, placeById: placeById, catById: catById, catLabel: catLabel,
     placeBudget: placeBudget, tripBudget: tripBudget, actuals: actuals,
-    shareOf: shareOf, balances: balances, schedule: schedule, tripEnd: tripEnd,
+    placeState: placeState, schedule: schedule, tripEnd: tripEnd,
     addTrip: addTrip, removeTrip: removeTrip,
     addPlace: addPlace, removePlace: removePlace, movePlace: movePlace,
     addExpense: addExpense, updateExpense: updateExpense, removeExpense: removeExpense,
-    addPerson: addPerson, replaceAll: replaceAll,
+    replaceAll: replaceAll,
     canUseFiles: canUseFiles, connectFile: connectFile, reconnectFile: reconnectFile,
     regrantFile: regrantFile, disconnectFile: disconnectFile, fileStatus: fileStatus,
     writeFile: writeFile, fileText: fileText

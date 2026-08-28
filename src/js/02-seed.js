@@ -172,13 +172,6 @@ window.DUNIYA_SEED = {
    "perINR": 0.0385
   }
  },
- "people": [
-  {
-   "id": "me",
-   "name": "Me",
-   "colour": "#0F766E"
-  }
- ],
  "activeTrip": "trip_world",
  "trips": [
   {
@@ -188,50 +181,39 @@ window.DUNIYA_SEED = {
    "start": "",
    "end": "",
    "note": "Imported from World_tour_budget.xlsx",
-   "travellerIds": [
-    "me"
-   ],
    "defaultDays": 10,
    "categories": [
     {
      "id": "flights",
-     "label": "Flights",
-     "shared": false
+     "label": "Flights"
     },
     {
      "id": "transport",
-     "label": "Transportation",
-     "shared": true
+     "label": "Transportation"
     },
     {
      "id": "lodging",
-     "label": "Lodging",
-     "shared": true
+     "label": "Lodging"
     },
     {
      "id": "food",
-     "label": "Food",
-     "shared": false
+     "label": "Food"
     },
     {
      "id": "activities",
-     "label": "Activities",
-     "shared": false
+     "label": "Activities"
     },
     {
      "id": "carRental",
-     "label": "Car Rental",
-     "shared": true
+     "label": "Car Rental"
     },
     {
      "id": "visa",
-     "label": "Visa",
-     "shared": false
+     "label": "Visa"
     },
     {
      "id": "misc",
-     "label": "Misc",
-     "shared": false
+     "label": "Misc"
     }
    ],
    "places": [
@@ -243,6 +225,8 @@ window.DUNIYA_SEED = {
      "iso2": "NP",
      "iata": "KTM",
      "currency": "NPR",
+     "lat": 27.72,
+     "lon": 85.32,
      "days": 10,
      "order": 1,
      "notes": "",
@@ -268,6 +252,8 @@ window.DUNIYA_SEED = {
      "iso2": "BT",
      "iata": "PBH",
      "currency": "BTN",
+     "lat": 27.47,
+     "lon": 89.64,
      "days": 10,
      "order": 2,
      "notes": "",
@@ -293,6 +279,8 @@ window.DUNIYA_SEED = {
      "iso2": "VN",
      "iata": "HAN",
      "currency": "VND",
+     "lat": 21.03,
+     "lon": 105.85,
      "days": 10,
      "order": 3,
      "notes": "",
@@ -318,6 +306,8 @@ window.DUNIYA_SEED = {
      "iso2": "LK",
      "iata": "CMB",
      "currency": "LKR",
+     "lat": 6.93,
+     "lon": 79.86,
      "days": 10,
      "order": 4,
      "notes": "",
@@ -343,6 +333,8 @@ window.DUNIYA_SEED = {
      "iso2": "ID",
      "iata": "DPS",
      "currency": "IDR",
+     "lat": -8.65,
+     "lon": 115.22,
      "days": 10,
      "order": 5,
      "notes": "",
@@ -368,6 +360,8 @@ window.DUNIYA_SEED = {
      "iso2": "TH",
      "iata": "BKK",
      "currency": "THB",
+     "lat": 13.76,
+     "lon": 100.5,
      "days": 10,
      "order": 6,
      "notes": "",
@@ -393,6 +387,8 @@ window.DUNIYA_SEED = {
      "iso2": "KH",
      "iata": "REP",
      "currency": "KHR",
+     "lat": 13.36,
+     "lon": 103.86,
      "days": 10,
      "order": 7,
      "notes": "",
@@ -418,6 +414,8 @@ window.DUNIYA_SEED = {
      "iso2": "LA",
      "iata": "LPQ",
      "currency": "LAK",
+     "lat": 19.89,
+     "lon": 102.14,
      "days": 10,
      "order": 8,
      "notes": "",
@@ -443,6 +441,8 @@ window.DUNIYA_SEED = {
      "iso2": "MY",
      "iata": "KUL",
      "currency": "MYR",
+     "lat": 3.14,
+     "lon": 101.69,
      "days": 10,
      "order": 9,
      "notes": "",
@@ -468,6 +468,8 @@ window.DUNIYA_SEED = {
      "iso2": "PH",
      "iata": "MNL",
      "currency": "PHP",
+     "lat": 14.6,
+     "lon": 120.98,
      "days": 10,
      "order": 10,
      "notes": "",
@@ -493,6 +495,8 @@ window.DUNIYA_SEED = {
      "iso2": "EG",
      "iata": "CAI",
      "currency": "EGP",
+     "lat": 30.04,
+     "lon": 31.24,
      "days": 10,
      "order": 11,
      "notes": "",
@@ -518,6 +522,8 @@ window.DUNIYA_SEED = {
      "iso2": "JO",
      "iata": "AMM",
      "currency": "JOD",
+     "lat": 31.95,
+     "lon": 35.93,
      "days": 10,
      "order": 12,
      "notes": "",
@@ -543,6 +549,8 @@ window.DUNIYA_SEED = {
      "iso2": "CZ",
      "iata": "PRG",
      "currency": "CZK",
+     "lat": 50.08,
+     "lon": 14.44,
      "days": 10,
      "order": 13,
      "notes": "",
@@ -568,6 +576,8 @@ window.DUNIYA_SEED = {
      "iso2": "CN",
      "iata": "PEK",
      "currency": "CNY",
+     "lat": 39.9,
+     "lon": 116.41,
      "days": 10,
      "order": 14,
      "notes": "",
@@ -593,6 +603,8 @@ window.DUNIYA_SEED = {
      "iso2": "SG",
      "iata": "SIN",
      "currency": "SGD",
+     "lat": 1.35,
+     "lon": 103.82,
      "days": 10,
      "order": 15,
      "notes": "",
@@ -618,6 +630,8 @@ window.DUNIYA_SEED = {
      "iso2": "JP",
      "iata": "TYO",
      "currency": "JPY",
+     "lat": 35.68,
+     "lon": 139.69,
      "days": 10,
      "order": 16,
      "notes": "",
@@ -643,6 +657,8 @@ window.DUNIYA_SEED = {
      "iso2": "HU",
      "iata": "BUD",
      "currency": "HUF",
+     "lat": 47.5,
+     "lon": 19.04,
      "days": 10,
      "order": 17,
      "notes": "",
@@ -668,6 +684,8 @@ window.DUNIYA_SEED = {
      "iso2": "HR",
      "iata": "DBV",
      "currency": "EUR",
+     "lat": 42.65,
+     "lon": 18.09,
      "days": 10,
      "order": 18,
      "notes": "",
@@ -693,6 +711,8 @@ window.DUNIYA_SEED = {
      "iso2": "DE",
      "iata": "BER",
      "currency": "EUR",
+     "lat": 52.52,
+     "lon": 13.4,
      "days": 10,
      "order": 19,
      "notes": "",
@@ -718,6 +738,8 @@ window.DUNIYA_SEED = {
      "iso2": "DK",
      "iata": "CPH",
      "currency": "DKK",
+     "lat": 55.68,
+     "lon": 12.57,
      "days": 10,
      "order": 20,
      "notes": "",
@@ -743,6 +765,8 @@ window.DUNIYA_SEED = {
      "iso2": "FO",
      "iata": "FAE",
      "currency": "DKK",
+     "lat": 62.01,
+     "lon": -6.77,
      "days": 10,
      "order": 21,
      "notes": "",
@@ -768,6 +792,8 @@ window.DUNIYA_SEED = {
      "iso2": "TR",
      "iata": "IST",
      "currency": "TRY",
+     "lat": 41.01,
+     "lon": 28.98,
      "days": 10,
      "order": 22,
      "notes": "",
@@ -793,6 +819,8 @@ window.DUNIYA_SEED = {
      "iso2": "GE",
      "iata": "TBS",
      "currency": "GEL",
+     "lat": 41.72,
+     "lon": 44.79,
      "days": 10,
      "order": 23,
      "notes": "",
@@ -818,6 +846,8 @@ window.DUNIYA_SEED = {
      "iso2": "ZA",
      "iata": "CPT",
      "currency": "ZAR",
+     "lat": -33.92,
+     "lon": 18.42,
      "days": 10,
      "order": 24,
      "notes": "",
@@ -843,6 +873,8 @@ window.DUNIYA_SEED = {
      "iso2": "CO",
      "iata": "BOG",
      "currency": "COP",
+     "lat": 4.71,
+     "lon": -74.07,
      "days": 10,
      "order": 25,
      "notes": "",
@@ -868,6 +900,8 @@ window.DUNIYA_SEED = {
      "iso2": "PE",
      "iata": "CUZ",
      "currency": "PEN",
+     "lat": -13.53,
+     "lon": -71.97,
      "days": 10,
      "order": 26,
      "notes": "",
@@ -893,6 +927,8 @@ window.DUNIYA_SEED = {
      "iso2": "EC",
      "iata": "UIO",
      "currency": "USD",
+     "lat": -0.18,
+     "lon": -78.47,
      "days": 10,
      "order": 27,
      "notes": "",
@@ -918,6 +954,8 @@ window.DUNIYA_SEED = {
      "iso2": "BO",
      "iata": "LPB",
      "currency": "BOB",
+     "lat": -16.5,
+     "lon": -68.15,
      "days": 10,
      "order": 28,
      "notes": "",
@@ -943,6 +981,8 @@ window.DUNIYA_SEED = {
      "iso2": "GT",
      "iata": "GUA",
      "currency": "GTQ",
+     "lat": 14.56,
+     "lon": -90.73,
      "days": 10,
      "order": 29,
      "notes": "",
@@ -968,6 +1008,8 @@ window.DUNIYA_SEED = {
      "iso2": "NI",
      "iata": "MGA",
      "currency": "NIO",
+     "lat": 11.93,
+     "lon": -85.96,
      "days": 10,
      "order": 30,
      "notes": "",
@@ -993,6 +1035,8 @@ window.DUNIYA_SEED = {
      "iso2": "MX",
      "iata": "MEX",
      "currency": "MXN",
+     "lat": 19.43,
+     "lon": -99.13,
      "days": 10,
      "order": 31,
      "notes": "",
@@ -1018,6 +1062,8 @@ window.DUNIYA_SEED = {
      "iso2": "KG",
      "iata": "FRU",
      "currency": "KGS",
+     "lat": 42.87,
+     "lon": 74.59,
      "days": 10,
      "order": 32,
      "notes": "",
@@ -1043,6 +1089,8 @@ window.DUNIYA_SEED = {
      "iso2": "UZ",
      "iata": "TAS",
      "currency": "UZS",
+     "lat": 41.3,
+     "lon": 69.24,
      "days": 10,
      "order": 33,
      "notes": "",
@@ -1068,6 +1116,8 @@ window.DUNIYA_SEED = {
      "iso2": "TJ",
      "iata": "DYU",
      "currency": "TJS",
+     "lat": 38.56,
+     "lon": 68.79,
      "days": 10,
      "order": 34,
      "notes": "",
@@ -1093,6 +1143,8 @@ window.DUNIYA_SEED = {
      "iso2": "KZ",
      "iata": "ALA",
      "currency": "KZT",
+     "lat": 43.24,
+     "lon": 76.89,
      "days": 10,
      "order": 35,
      "notes": "",
@@ -1118,6 +1170,8 @@ window.DUNIYA_SEED = {
      "iso2": "AM",
      "iata": "EVN",
      "currency": "AMD",
+     "lat": 40.18,
+     "lon": 44.51,
      "days": 10,
      "order": 36,
      "notes": "",
@@ -1145,50 +1199,39 @@ window.DUNIYA_SEED = {
    "start": "",
    "end": "",
    "note": "Intercity trips at home",
-   "travellerIds": [
-    "me"
-   ],
    "defaultDays": 4,
    "categories": [
     {
      "id": "flights",
-     "label": "Flights",
-     "shared": false
+     "label": "Flights"
     },
     {
      "id": "transport",
-     "label": "Transportation",
-     "shared": true
+     "label": "Transportation"
     },
     {
      "id": "lodging",
-     "label": "Lodging",
-     "shared": true
+     "label": "Lodging"
     },
     {
      "id": "food",
-     "label": "Food",
-     "shared": false
+     "label": "Food"
     },
     {
      "id": "activities",
-     "label": "Activities",
-     "shared": false
+     "label": "Activities"
     },
     {
      "id": "carRental",
-     "label": "Car Rental",
-     "shared": true
+     "label": "Car Rental"
     },
     {
      "id": "visa",
-     "label": "Visa",
-     "shared": false
+     "label": "Visa"
     },
     {
      "id": "misc",
-     "label": "Misc",
-     "shared": false
+     "label": "Misc"
     }
    ],
    "places": [],

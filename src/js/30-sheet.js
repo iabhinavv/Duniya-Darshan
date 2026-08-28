@@ -28,14 +28,16 @@
   function valueFor(t, p, catId) {
     var b = S.placeBudget(t, p);
     var a = S.actuals(t, p.id);
-    if (mode === 'budget') return b.byCat[catId].base;
-    if (mode === 'actual') return a.byCatMine[catId] || 0;
-    return (a.byCatMine[catId] || 0) - b.byCat[catId].base;
+    if (mode === 'budget') return b.byCat[catId];
+    if (mode === 'actual') return a.byCat[catId] || 0;
+    return (a.byCat[catId] || 0) - b.byCat[catId];
   }
 
   function render(host) {
     var t = S.trip();
     var list = S.places(t);
+    host.appendChild(el('p', { class: 'deck' },
+      'Every figure in rupees. Budget cells are typed in; actual and variance are worked out from the ledger.'));
     host.appendChild(toolbar());
     if (!list.length) {
       host.appendChild(DD.emptyState('Nothing to tabulate', 'Add a place and its budget shows up here.', 'Add a place', function () { DD.go('places'); }));
@@ -126,22 +128,14 @@
 
     /* summary strip */
     var b = S.tripBudget(t), a = S.actuals(t);
-    host.appendChild(el('div', { class: 'stats', style: { marginTop: '16px' } }, [
-      DD.stat('Budget', DD.money(b.mine), DD.money(b.days ? b.mine / b.days : 0) + ' a day'),
-      DD.stat('Actual', DD.money(a.mine), DD.plural(t.expenses.length, 'entry', 'entries')),
-      DD.stat(a.mine > b.mine ? 'Over by' : 'Under by', DD.money(Math.abs(a.mine - b.mine)),
-        DD.pct(a.mine, b.mine) + '% of budget used', a.mine > b.mine ? 'neg' : 'pos'),
+    host.appendChild(el('div', { style: { marginTop: '18px' } }, [DD.statStrip([
+      DD.stat('Budget', DD.money(b.total), DD.money(b.days ? b.total / b.days : 0) + ' a day', 'hero'),
+      DD.stat('Actual', DD.money(a.total), DD.plural(a.count, 'entry', 'entries')),
+      DD.stat(a.total > b.total ? 'Over by' : 'Under by', DD.money(Math.abs(a.total - b.total)),
+        DD.pct(a.total, b.total) + '% of budget used', a.total > b.total ? 'neg' : 'pos'),
       DD.stat('Places', String(list.length), DD.plural(b.days, 'day'))
-    ]));
+    ])]));
 
-    if (t.travellerIds.length > 1) {
-      host.appendChild(el('div', { class: 'banner', style: { marginTop: '14px' } }, [
-        el('div', {}, ['These are ', el('strong', { text: 'your' }), ' numbers. With ',
-          DD.plural(t.travellerIds.length, 'traveller'), ' the group budget is ',
-          el('strong', { text: DD.money(b.group) }), ' — shared categories are split, personal ones are counted per head. See ',
-          el('button', { class: 'btn xs', text: 'Split', onclick: function () { DD.go('split'); } }), '.'])
-      ]));
-    }
   }
 
   function fmt(v) {

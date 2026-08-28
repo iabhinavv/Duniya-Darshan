@@ -9,11 +9,12 @@
     return n;
   }
 
+  /* Inks that sit properly on newsprint — muted, not screen-bright. */
   var CAT_COLOURS = {
-    flights: '#0F766E', transport: '#2563EB', lodging: '#B45309', food: '#DC2626',
-    activities: '#9333EA', carRental: '#0891B2', visa: '#65A30D', misc: '#64748B'
+    flights: '#0B3B37', transport: '#1F5D8C', lodging: '#9A5B12', food: '#8E2F2F',
+    activities: '#5B3A7E', carRental: '#158F82', visa: '#5C6B22', misc: '#6B6058'
   };
-  var FALLBACK = ['#0F766E', '#2563EB', '#B45309', '#DC2626', '#9333EA', '#0891B2', '#65A30D', '#DB2777', '#4F46E5', '#EA580C'];
+  var FALLBACK = ['#0B3B37', '#1F5D8C', '#9A5B12', '#8E2F2F', '#5B3A7E', '#158F82', '#5C6B22', '#8A3A6B', '#3C4A8A', '#A85A24'];
 
   function colourFor(id, i) { return CAT_COLOURS[id] || FALLBACK[i % FALLBACK.length]; }
 
@@ -25,7 +26,7 @@
     var svg = s('svg', { viewBox: '0 0 ' + size + ' ' + size, width: size, height: size, role: 'img' });
     svg.setAttribute('aria-label', o.aria || 'Breakdown');
 
-    svg.appendChild(s('circle', { cx: c, cy: c, r: r, fill: 'none', stroke: '#EDF1EF', 'stroke-width': thick }));
+    svg.appendChild(s('circle', { cx: c, cy: c, r: r, fill: 'none', stroke: '#EAE4D7', 'stroke-width': thick }));
 
     if (total > 0) {
       var circ = 2 * Math.PI * r, offset = 0;
@@ -46,11 +47,11 @@
     }
 
     if (o.centre) {
-      var t1 = s('text', { x: c, y: c - 2, 'text-anchor': 'middle', 'font-size': 19, 'font-weight': 680, fill: '#0F1D1B' });
+      var t1 = s('text', { x: c, y: c - 2, 'text-anchor': 'middle', 'font-size': 20, 'font-weight': 800, fill: '#14100D' });
       t1.textContent = o.centre;
       svg.appendChild(t1);
       if (o.centreSub) {
-        var t2 = s('text', { x: c, y: c + 16, 'text-anchor': 'middle', 'font-size': 11, fill: '#6B807D' });
+        var t2 = s('text', { x: c, y: c + 16, 'text-anchor': 'middle', 'font-size': 10.5, fill: '#6B6058' });
         t2.textContent = o.centreSub;
         svg.appendChild(t2);
       }
@@ -90,7 +91,7 @@
     var ys = function (v) { return padT + ih - (v / maxY) * ih; };
 
     [0.25, 0.5, 0.75, 1].forEach(function (f) {
-      svg.appendChild(s('line', { x1: padL, x2: w - padR, y1: ys(maxY * f), y2: ys(maxY * f), stroke: '#EDF1EF', 'stroke-width': 1 }));
+      svg.appendChild(s('line', { x1: padL, x2: w - padR, y1: ys(maxY * f), y2: ys(maxY * f), stroke: '#EAE4D7', 'stroke-width': 1 }));
     });
 
     function path(key) {
@@ -98,12 +99,12 @@
     }
 
     var area = path('budget') + ' L' + xs(points.length - 1) + ' ' + ys(0) + ' L' + xs(0) + ' ' + ys(0) + ' Z';
-    svg.appendChild(s('path', { d: area, fill: 'rgba(15,118,110,.07)', stroke: 'none' }));
-    svg.appendChild(s('path', { d: path('budget'), fill: 'none', stroke: '#0F766E', 'stroke-width': 2, 'stroke-linejoin': 'round', 'vector-effect': 'non-scaling-stroke' }));
-    svg.appendChild(s('path', { d: path('actual'), fill: 'none', stroke: '#2563EB', 'stroke-width': 2, 'stroke-dasharray': '4 3', 'stroke-linejoin': 'round', 'vector-effect': 'non-scaling-stroke' }));
+    svg.appendChild(s('path', { d: area, fill: 'rgba(21,143,130,.08)', stroke: 'none' }));
+    svg.appendChild(s('path', { d: path('budget'), fill: 'none', stroke: '#0B3B37', 'stroke-width': 2, 'stroke-linejoin': 'round', 'vector-effect': 'non-scaling-stroke' }));
+    svg.appendChild(s('path', { d: path('actual'), fill: 'none', stroke: '#9A5B12', 'stroke-width': 2, 'stroke-dasharray': '4 3', 'stroke-linejoin': 'round', 'vector-effect': 'non-scaling-stroke' }));
 
     points.forEach(function (p, i) {
-      var g = s('circle', { cx: xs(i), cy: ys(p.budget), r: 2.6, fill: '#0F766E' });
+      var g = s('circle', { cx: xs(i), cy: ys(p.budget), r: 2.6, fill: '#0B3B37' });
       var ttl = s('title', {});
       ttl.textContent = p.label + ' — budget ' + DD.money(p.budget) + ', actual ' + DD.money(p.actual);
       g.appendChild(ttl);
@@ -127,9 +128,9 @@
           DD.el('span', { class: 'num tiny', style: { color: over ? 'var(--red)' : 'var(--ink-3)' }, text: DD.money(r.actual, { compact: true }) + ' / ' + DD.money(r.budget, { compact: true }) })
         ]),
         DD.el('div', { style: { position: 'relative', height: '15px' } }, [
-          DD.el('div', { style: { position: 'absolute', inset: '4px 0', background: '#EDF1EF', borderRadius: '99px' } }),
-          DD.el('div', { style: { position: 'absolute', top: '4px', bottom: '4px', left: '0', width: (r.budget / max * 100) + '%', background: 'var(--teal-100)', borderRadius: '99px' } }),
-          DD.el('div', { style: { position: 'absolute', top: '1px', bottom: '1px', left: '0', width: (Math.min(r.actual, max) / max * 100) + '%', background: over ? 'var(--red)' : 'var(--teal-600)', borderRadius: '99px' } })
+          DD.el('div', { style: { position: 'absolute', inset: '4px 0', background: '#EAE4D7', borderRadius: '2px' } }),
+          DD.el('div', { style: { position: 'absolute', top: '4px', bottom: '4px', left: '0', width: (r.budget / max * 100) + '%', background: 'var(--teal-100)', borderRadius: '2px' } }),
+          DD.el('div', { style: { position: 'absolute', top: '1px', bottom: '1px', left: '0', width: (Math.min(r.actual, max) / max * 100) + '%', background: over ? 'var(--red)' : 'linear-gradient(90deg,var(--teal-800),var(--teal-500))', borderRadius: '2px' } })
         ])
       ]));
     });

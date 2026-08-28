@@ -21,7 +21,7 @@
       '{in}': start,
       '{out}': end,
       '{yymmdd}': start ? DD.yymmdd(start) : '',
-      '{adults}': String(Math.max(1, t.travellerIds.length)),
+      '{adults}': String(Math.max(1, Number(db.settings.adults) || 1)),
       '{days}': String(place.days || '')
     };
     var url = tpl.url;

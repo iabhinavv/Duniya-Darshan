@@ -21,45 +21,46 @@ COLS = {
 }
 COLNUM = {"I": 9, "J": 10, "K": 11, "L": 12, "M": 13, "N": 14, "O": 15, "P": 16, "Q": 17}
 
-# Sheet's country label -> (clean name, iso2, default city, IATA, currency code).
+# Sheet's country label -> (clean name, iso2, default city, IATA, currency, lat, lon).
+# The coordinates put a dot on the world map; the polygon fill comes from iso2.
 # The sheet had three typos and filed Copenhagen under the country column.
 META = {
-    "Nepal":          ("Nepal", "NP", "Kathmandu", "KTM", "NPR"),
-    "Bhutan":         ("Bhutan", "BT", "Thimphu", "PBH", "BTN"),
-    "Vietnam":        ("Vietnam", "VN", "Hanoi", "HAN", "VND"),
-    "Sri Lanka":      ("Sri Lanka", "LK", "Colombo", "CMB", "LKR"),
-    "Indonisia":      ("Indonesia", "ID", "Bali", "DPS", "IDR"),
-    "Thailand":       ("Thailand", "TH", "Bangkok", "BKK", "THB"),
-    "Cambodia":       ("Cambodia", "KH", "Siem Reap", "REP", "KHR"),
-    "Laos":           ("Laos", "LA", "Luang Prabang", "LPQ", "LAK"),
-    "Malaysia":       ("Malaysia", "MY", "Kuala Lumpur", "KUL", "MYR"),
-    "Phillipines":    ("Philippines", "PH", "Manila", "MNL", "PHP"),
-    "Egypt":          ("Egypt", "EG", "Cairo", "CAI", "EGP"),
-    "Jordan":         ("Jordan", "JO", "Amman", "AMM", "JOD"),
-    "Czech Republic": ("Czech Republic", "CZ", "Prague", "PRG", "CZK"),
-    "China":          ("China", "CN", "Beijing", "PEK", "CNY"),
-    "Singapore":      ("Singapore", "SG", "Singapore", "SIN", "SGD"),
-    "Japan":          ("Japan", "JP", "Tokyo", "TYO", "JPY"),
-    "Hungary":        ("Hungary", "HU", "Budapest", "BUD", "HUF"),
-    "Croatia":        ("Croatia", "HR", "Dubrovnik", "DBV", "EUR"),
-    "Germany":        ("Germany", "DE", "Berlin", "BER", "EUR"),
-    "Copenhagen":     ("Denmark", "DK", "Copenhagen", "CPH", "DKK"),
-    "Faroe Islands":  ("Faroe Islands", "FO", "Torshavn", "FAE", "DKK"),
-    "Turkey":         ("Turkey", "TR", "Istanbul", "IST", "TRY"),
-    "Georgia":        ("Georgia", "GE", "Tbilisi", "TBS", "GEL"),
-    "South Africa":   ("South Africa", "ZA", "Cape Town", "CPT", "ZAR"),
-    "Columbia":       ("Colombia", "CO", "Bogota", "BOG", "COP"),
-    "Peru":           ("Peru", "PE", "Cusco", "CUZ", "PEN"),
-    "Ecuador":        ("Ecuador", "EC", "Quito", "UIO", "USD"),
-    "Bolivia":        ("Bolivia", "BO", "La Paz", "LPB", "BOB"),
-    "Guatemala":      ("Guatemala", "GT", "Antigua Guatemala", "GUA", "GTQ"),
-    "Nicaragua":      ("Nicaragua", "NI", "Granada", "MGA", "NIO"),
-    "Mexico":         ("Mexico", "MX", "Mexico City", "MEX", "MXN"),
-    "Kyrgyzstan":     ("Kyrgyzstan", "KG", "Bishkek", "FRU", "KGS"),
-    "Uzbekistan":     ("Uzbekistan", "UZ", "Tashkent", "TAS", "UZS"),
-    "Tajikistan":     ("Tajikistan", "TJ", "Dushanbe", "DYU", "TJS"),
-    "Kazakhstan":     ("Kazakhstan", "KZ", "Almaty", "ALA", "KZT"),
-    "Armenia":        ("Armenia", "AM", "Yerevan", "EVN", "AMD"),
+    "Nepal":           ("Nepal", "NP", "Kathmandu", "KTM", "NPR", 27.72, 85.32),
+    "Bhutan":          ("Bhutan", "BT", "Thimphu", "PBH", "BTN", 27.47, 89.64),
+    "Vietnam":         ("Vietnam", "VN", "Hanoi", "HAN", "VND", 21.03, 105.85),
+    "Sri Lanka":       ("Sri Lanka", "LK", "Colombo", "CMB", "LKR", 6.93, 79.86),
+    "Indonisia":       ("Indonesia", "ID", "Bali", "DPS", "IDR", -8.65, 115.22),
+    "Thailand":        ("Thailand", "TH", "Bangkok", "BKK", "THB", 13.76, 100.5),
+    "Cambodia":        ("Cambodia", "KH", "Siem Reap", "REP", "KHR", 13.36, 103.86),
+    "Laos":            ("Laos", "LA", "Luang Prabang", "LPQ", "LAK", 19.89, 102.14),
+    "Malaysia":        ("Malaysia", "MY", "Kuala Lumpur", "KUL", "MYR", 3.14, 101.69),
+    "Phillipines":     ("Philippines", "PH", "Manila", "MNL", "PHP", 14.6, 120.98),
+    "Egypt":           ("Egypt", "EG", "Cairo", "CAI", "EGP", 30.04, 31.24),
+    "Jordan":          ("Jordan", "JO", "Amman", "AMM", "JOD", 31.95, 35.93),
+    "Czech Republic":  ("Czech Republic", "CZ", "Prague", "PRG", "CZK", 50.08, 14.44),
+    "China":           ("China", "CN", "Beijing", "PEK", "CNY", 39.9, 116.41),
+    "Singapore":       ("Singapore", "SG", "Singapore", "SIN", "SGD", 1.35, 103.82),
+    "Japan":           ("Japan", "JP", "Tokyo", "TYO", "JPY", 35.68, 139.69),
+    "Hungary":         ("Hungary", "HU", "Budapest", "BUD", "HUF", 47.5, 19.04),
+    "Croatia":         ("Croatia", "HR", "Dubrovnik", "DBV", "EUR", 42.65, 18.09),
+    "Germany":         ("Germany", "DE", "Berlin", "BER", "EUR", 52.52, 13.4),
+    "Copenhagen":      ("Denmark", "DK", "Copenhagen", "CPH", "DKK", 55.68, 12.57),
+    "Faroe Islands":   ("Faroe Islands", "FO", "Torshavn", "FAE", "DKK", 62.01, -6.77),
+    "Turkey":          ("Turkey", "TR", "Istanbul", "IST", "TRY", 41.01, 28.98),
+    "Georgia":         ("Georgia", "GE", "Tbilisi", "TBS", "GEL", 41.72, 44.79),
+    "South Africa":    ("South Africa", "ZA", "Cape Town", "CPT", "ZAR", -33.92, 18.42),
+    "Columbia":        ("Colombia", "CO", "Bogota", "BOG", "COP", 4.71, -74.07),
+    "Peru":            ("Peru", "PE", "Cusco", "CUZ", "PEN", -13.53, -71.97),
+    "Ecuador":         ("Ecuador", "EC", "Quito", "UIO", "USD", -0.18, -78.47),
+    "Bolivia":         ("Bolivia", "BO", "La Paz", "LPB", "BOB", -16.5, -68.15),
+    "Guatemala":       ("Guatemala", "GT", "Antigua Guatemala", "GUA", "GTQ", 14.56, -90.73),
+    "Nicaragua":       ("Nicaragua", "NI", "Granada", "MGA", "NIO", 11.93, -85.96),
+    "Mexico":          ("Mexico", "MX", "Mexico City", "MEX", "MXN", 19.43, -99.13),
+    "Kyrgyzstan":      ("Kyrgyzstan", "KG", "Bishkek", "FRU", "KGS", 42.87, 74.59),
+    "Uzbekistan":      ("Uzbekistan", "UZ", "Tashkent", "TAS", "UZS", 41.3, 69.24),
+    "Tajikistan":      ("Tajikistan", "TJ", "Dushanbe", "DYU", "TJS", 38.56, 68.79),
+    "Kazakhstan":      ("Kazakhstan", "KZ", "Almaty", "ALA", "KZT", 43.24, 76.89),
+    "Armenia":         ("Armenia", "AM", "Yerevan", "EVN", "AMD", 40.18, 44.51),
 }
 
 # code -> (display name, units per 1 INR). Rates come from the sheet's A/B columns.
@@ -105,14 +106,14 @@ CURRENCIES = {
 }
 
 CATEGORIES = [
-    ("flights",    "Flights",        False),
-    ("transport",  "Transportation", True),
-    ("lodging",    "Lodging",        True),
-    ("food",       "Food",           False),
-    ("activities", "Activities",     False),
-    ("carRental",  "Car Rental",     True),
-    ("visa",       "Visa",           False),
-    ("misc",       "Misc",           False),
+    ("flights",    "Flights"),
+    ("transport",  "Transportation"),
+    ("lodging",    "Lodging"),
+    ("food",       "Food"),
+    ("activities", "Activities"),
+    ("carRental",  "Car Rental"),
+    ("visa",       "Visa"),
+    ("misc",       "Misc"),
 ]
 
 
@@ -128,11 +129,11 @@ def read_places():
         if label not in META:
             print("  ! no metadata for %r, skipping" % label)
             continue
-        name, iso2, city, iata, cur = META[label]
+        name, iso2, city, iata, cur, lat, lon = META[label]
         sheet_city = ws.cell(row=row, column=4).value
         if sheet_city and str(sheet_city).strip():
             city = str(sheet_city).strip()
-        budget = {cid: 0 for cid, _, _ in CATEGORIES}
+        budget = {cid: 0 for cid, _ in CATEGORIES}
         for letter, cid in COLS.items():
             v = ws.cell(row=row, column=COLNUM[letter]).value
             if isinstance(v, (int, float)):
@@ -142,6 +143,7 @@ def read_places():
             "id": "p_" + iso2.lower(),
             "name": name, "country": name, "city": city,
             "iso2": iso2, "iata": iata, "currency": cur,
+            "lat": lat, "lon": lon,
             "days": 10, "order": order, "notes": "",
             "budget": budget, "images": [], "driveLinks": [], "itinerary": [],
         })
@@ -177,7 +179,6 @@ def build():
             },
         },
         "currencies": {c: {"name": n, "perINR": r} for c, (n, r) in CURRENCIES.items()},
-        "people": [{"id": "me", "name": "Me", "colour": "#0F766E"}],
         "activeTrip": "trip_world",
         "trips": [
             {
@@ -186,9 +187,8 @@ def build():
                 "kind": "world",
                 "start": "", "end": "",
                 "note": "Imported from World_tour_budget.xlsx",
-                "travellerIds": ["me"],
                 "defaultDays": 10,
-                "categories": [{"id": c, "label": l, "shared": s} for c, l, s in CATEGORIES],
+                "categories": [{"id": c, "label": l} for c, l in CATEGORIES],
                 "places": places,
                 "expenses": [],
             },
@@ -198,9 +198,8 @@ def build():
                 "kind": "domestic",
                 "start": "", "end": "",
                 "note": "Intercity trips at home",
-                "travellerIds": ["me"],
                 "defaultDays": 4,
-                "categories": [{"id": c, "label": l, "shared": s} for c, l, s in CATEGORIES],
+                "categories": [{"id": c, "label": l} for c, l in CATEGORIES],
                 "places": [],
                 "expenses": [],
             },

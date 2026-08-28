@@ -80,3 +80,44 @@ cell; set to a real EUR rate. Days default to 10 per country.
 Manual pass, served over http:// and verified in-browser at 375×812 and desktop:
 create trip → add place → edit budget → log an expense in local currency → confirm the
 sheet, overview and split all move → export → reload → data survives.
+
+
+---
+
+# Revision — 2026-08-28, later the same day
+
+The user asked for a different product after seeing the first build. Superseded
+decisions are struck through below rather than deleted, so the reasoning survives.
+
+## What changed
+
+1. **~~Split~~ removed.** No travellers, no shares, no settle-up, no shared vs
+   per-person category flags. "I don't want it to be like Splitwise and no use for
+   those features." Budget is simply budget; an expense is simply an amount.
+2. **No Log section.** Spending belongs to a trip and is reached from a place card,
+   the Spending tab inside a place, or the ledger at the foot of the places page.
+3. **Trips merged into the dashboard.** The front page is now trips + aggregate
+   stats + the world map. Opening a trip goes straight to its Countries (world) or
+   Cities (domestic) page.
+4. **Maps.** A Robinson-projection world map on the front page and a Mercator map
+   of India inside a domestic trip. Fill states: planned / under way / done / over
+   budget, driven by whether a place has logged spending. Clicking an empty country
+   offers to add it.
+5. **Broadsheet redesign.** Playfair Display, newsprint ground, hairline rules,
+   masthead with dateline, small-caps sans furniture, drop-cap lede. Left rail
+   replaced by a centred masthead and a horizontal section bar; mobile keeps a
+   bottom tab bar.
+6. **Gradients** carry the accent colour — masthead wordmark, hero stat, primary
+   buttons, map fills, progress bars.
+
+## Map data
+
+`make_maps.py` converts `geodata/` into `src/js/01-maps.js` (~92 KB of path
+strings). Sources are Natural Earth 1:110m countries via world-atlas, a
+public-domain set of Indian state outlines, and the ISO 3166 numeric-to-alpha-2
+table. Douglas-Peucker simplification keeps the size down. Nothing is fetched at
+runtime.
+
+Places carry `lat`/`lon` so cities and countries too small to fill at 110m
+(Singapore, the Faroe Islands) get a dot instead. Coordinates are seeded for the
+36 imported countries and picked up from Wikipedia for anything added later.

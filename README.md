@@ -1,8 +1,8 @@
 # Duniya Darshan
 
-A travel budget that works on the road. Plan what a trip should cost, log what it
-actually cost in whatever currency you are holding, keep the itinerary, and split
-everything with whoever you are travelling with.
+A travel budget that works on the road, laid out like a broadsheet. Plan what a
+trip should cost, log what it actually cost in whatever currency you are holding,
+keep the itinerary — and watch the world map fill in as you go.
 
 No account, no server, no install. Your data is a file in this repo — clone it,
 open one file, and it is all there.
@@ -20,6 +20,8 @@ Traveller Budget App/
 ├── serve.py                ← optional; gives you an http:// origin
 ├── build.py                ← rebuilds index.html from src/ (only if you edit the code)
 ├── import_xlsx.py          ← re-imports the spreadsheet (only if you edit the sheet)
+├── make_maps.py            ← rebuilds the maps (only if you change the boundaries)
+├── geodata/                ← the public-domain boundary files the maps come from
 └── src/                    ← the source index.html is built from
     ├── app.css
     ├── index.template.html
@@ -72,38 +74,65 @@ backup** puts it back.
 
 ---
 
-## 3. Trips
+## 3. The front page
 
-A trip owns its own places, budget, travellers and expenses. Two come set up:
+Opening the app puts everything on one page: the totals across every trip, the
+world map, and the trips themselves. Click a trip to go straight to its places.
+
+Two trips come set up:
 
 - **World Tour** — the spreadsheet, 36 countries.
-- **Within India** — empty, for intercity trips at home. Places are cities
-  instead of countries, and it defaults to 4 days a stop.
+- **Within India** — empty, for intercity trips at home. Its places are cities
+  rather than countries, it defaults to 4 days a stop, and it gets a map of India
+  instead of the world.
 
-Make as many as you like (**Trips → New trip**). **Duplicate** copies a trip's
-places and budget but clears its expenses — handy for planning the same route
-again, or for turning a plan into the real thing.
+Make as many as you like. **Duplicate** copies a trip's places and budget but
+clears its spending — handy for planning the same route again, or for turning a
+plan into the real thing.
 
 ---
 
-## 4. The screens
+## 4. The maps
+
+The front page carries a world map; a trip at home carries a map of India. They
+work the same way.
+
+- **Pale teal** — the place is on the itinerary, nothing spent yet.
+- **Teal gradient** — money has been logged there. It is under way.
+- **Deep teal** — 90% or more of its budget is spent. Call it done.
+- **Red** — spent past the budget.
+
+A dot marks each city, and stands in for countries too small to fill at this
+scale — Singapore, the Faroes. Hover for the figures; click to open the place.
+On the world map, **clicking an empty country offers to add it to the trip**.
+
+Boundaries are Natural Earth 1:110m and a public-domain set of Indian state
+outlines, baked into the file by `make_maps.py`. Nothing is fetched at runtime,
+so the maps work with no network at all.
+
+---
+
+## 5. The screens
 
 | | |
 |---|---|
-| **Overview** | Budget, spent, what is left, per-day burn, where the money goes, running total along the route |
-| **Places** | One photo card per country or city: days, budget across eight heads, actual, booking links, photos, Drive albums, day plan |
-| **Sheet** | Your spreadsheet — places down, categories across, Budget / Actual / Variance, CSV out |
-| **Log** | What you actually spent. The screen you will use most |
+| **Front Page** | Everything at once: totals across all trips, the world map, the trips, where the money is budgeted, the latest spending, what is coming up |
+| **Countries / Cities** | The trip itself — its map, a card per place, and the trip's whole ledger of spending at the bottom |
+| **The Sheet** | Your spreadsheet — places down, categories across, Budget / Actual / Variance, CSV out |
 | **Itinerary** | The whole route day by day, dated from the trip start |
-| **Split** | Fellow travellers, how each category divides, and who owes whom |
-| **Data** | Backup, exchange rates, categories, booking links, reset |
+| **Almanac** | Backup, exchange rates, categories, booking links, reset |
 
-Keyboard on a desktop: <kbd>O</kbd> overview, <kbd>P</kbd> places, <kbd>S</kbd>
-sheet, <kbd>L</kbd> log, <kbd>?</kbd> for the list, <kbd>Esc</kbd> closes a dialog.
+**There is no separate Log section.** Spending belongs to a trip, so you log it
+from a place card, from the **Spending** tab inside a place, or from the ledger at
+the foot of the Countries page. On a phone the **+** in the middle of the tab bar
+logs from anywhere.
+
+Keyboard on a desktop: <kbd>F</kbd> front page, <kbd>P</kbd> places, <kbd>S</kbd>
+sheet, <kbd>I</kbd> itinerary, <kbd>L</kbd> log spend, <kbd>Esc</kbd> closes a dialog.
 
 ---
 
-## 5. Money
+## 6. Money
 
 **Budgets are in rupees. Spending can be in anything.**
 
@@ -113,27 +142,6 @@ rupee"). Edit a rate any time; **already-logged expenses never move**, because
 each one remembers the rate it was booked at.
 
 The eight spend heads are yours to rename, remove or add to, per trip.
-
----
-
-## 6. Travelling with other people
-
-Add them under **Split**. Two things then happen.
-
-**Budgets.** Every category is flagged **Shared** or **Per person**. A hotel room
-is shared — one bill, split N ways. A flight seat, a visa and a plate of food are
-per person — everyone needs their own. So adding a second traveller raises the
-group budget for flights but not for lodging. You always see *my budget* and
-*group budget* side by side. Change any flag on the Split or Data page; the
-starting flags are Lodging, Transportation and Car Rental shared, the rest
-per person.
-
-**Expenses.** Each entry records who paid and who shares it — split equally, by
-exact amounts, or kept entirely with the payer. **Settle up** then works out the
-smallest set of payments that clears every balance, the way Splitwise does.
-
-Who shared an expense is fixed at the moment you log it. Adding a traveller next
-week will not quietly re-split the dinner you had on your own.
 
 ---
 
@@ -173,10 +181,12 @@ Only if you change the code or the spreadsheet.
 ```bash
 python3 build.py        # src/ -> index.html
 python3 import_xlsx.py  # World_tour_budget.xlsx -> the starting data
+python3 make_maps.py    # geodata/ -> the map paths
 ```
 
 `import_xlsx.py` needs `openpyxl`. It rewrites the starter data, so take a JSON
-backup first if you have real trips in there.
+backup first if you have real trips in there. `make_maps.py` needs nothing but
+the files already in `geodata/`.
 
 ---
 
@@ -195,6 +205,15 @@ Four corrections on import:
 
 ---
 
+## 11. The look
+
+Set in **Playfair Display**, served from Google Fonts with Georgia behind it — so
+if you are offline it still reads as a newspaper rather than falling apart. The
+furniture (labels, buttons, table headings) is in a plain sans, the way a
+broadsheet sets its captions and standfirsts against serif body copy.
+
+---
+
 Nothing is uploaded. There is no account and no analytics. The only network calls
-the app ever makes are the optional photo lookups on Wikipedia — everything else
-happens in your browser.
+the app ever makes are the optional photo lookups on Wikipedia and the font —
+everything else, maps included, happens in your browser.
