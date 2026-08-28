@@ -38,10 +38,12 @@
       return;
     }
 
+    DD.append(host, DD.placesViewToggle('cities'));
+
     var all = cityDays(t);
     if (!all.length) {
       host.appendChild(DD.emptyState('No cities yet',
-        'Add a state on the ' + DD.placesLabel() + ' page, then list its cities day by day under Plan.',
+        'Add a state on the States page, then list its towns day by day under Plan.',
         'Open ' + DD.placesLabel(), function () { DD.go('places'); }));
       return;
     }

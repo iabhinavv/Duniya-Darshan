@@ -36,6 +36,7 @@
   function render(host) {
     var t = S.trip();
     var list = S.places(t);
+    DD.append(host, DD.tripSwitcher());
     host.appendChild(el('p', { class: 'deck' },
       'Every figure in rupees. Budget cells are typed in; actual and variance are worked out from the ledger.'));
     host.appendChild(toolbar());
@@ -55,7 +56,7 @@
     var table = el('table', { class: 'grid' });
 
     /* head */
-    var hr = el('tr', {}, [el('th', { text: t.kind === 'domestic' ? 'City' : 'Country' }), el('th', { text: 'Days' })]);
+    var hr = el('tr', {}, [el('th', { text: t.kind === 'domestic' ? 'State' : 'Country' }), el('th', { text: 'Days' })]);
     t.categories.forEach(function (c) { hr.appendChild(el('th', { text: c.label })); });
     hr.appendChild(el('th', { text: 'Total' }));
     hr.appendChild(el('th', { text: 'Per day' }));
@@ -149,7 +150,7 @@
     var rows = [];
     rows.push([t.name + ' — ' + mode, 'all figures in INR']);
     rows.push([]);
-    var head = [t.kind === 'domestic' ? 'City' : 'Country', 'City', 'Currency', 'Days'];
+    var head = [t.kind === 'domestic' ? 'State' : 'Country', 'Main city', 'Currency', 'Days'];
     t.categories.forEach(function (c) { head.push(c.label); });
     head.push('Total', 'Per day');
     rows.push(head);

@@ -12,19 +12,41 @@
   function emit(evt, arg) { (listeners[evt] || []).forEach(function (f) { f(arg); }); }
   function register(name, def) { screens[name] = def; }
 
-  /* Front page first, then the sections of whichever trip is open. */
-  var NAV = [
-    { id: 'front', label: 'Front Page' },
-    { id: 'places', label: 'Places', trip: true },
-    { id: 'cities', label: 'Cities', trip: true, domesticOnly: true },
-    { id: 'sheet', label: 'The Sheet', trip: true },
-    { id: 'itinerary', label: 'Itinerary', trip: true },
+  /* The bar carries the front page, then one section per trip, then the three
+     pages that serve every trip and switch between them from inside. */
+  var TAIL = [
+    { id: 'sheet', label: 'The Sheet' },
+    { id: 'itinerary', label: 'Itinerary' },
     { id: 'data', label: 'Almanac' }
   ];
 
   /* The India sheet budgets by state, so that is what a domestic place is. */
   function placesLabel() {
     return DD.store.trip().kind === 'domestic' ? 'States' : 'Countries';
+  }
+
+  /* "Within India" -> India, "World Tour" -> World. Drop the filler, then take
+     the longest word that is left. */
+  var FILLER = /^(within|in|at|the|a|an|across|around|to|my|our|tour|trip|travels?)$/i;
+  function shortLabel(name) {
+    var words = String(name || '').split(/\s+/).filter(function (w) { return /[A-Za-z]/.test(w); });
+    if (!words.length) return name || 'Trip';
+    var meaty = words.filter(function (w) { return !FILLER.test(w); });
+    return (meaty.length ? meaty : words).sort(function (a, b) { return b.length - a.length; })[0];
+  }
+
+  /* Segmented control listing every trip — used at the top of The Sheet,
+     Itinerary and Almanac so those pages serve both trips. */
+  function tripSwitcher(onSwitch) {
+    var db = DD.store.db();
+    if (db.trips.length < 2) return null;
+    return el('div', { style: { marginBottom: '16px' } }, [
+      segmented(db.trips.map(function (t) { return [t.id, t.name]; }), db.activeTrip, function (id) {
+        DD.store.setTrip(id);
+        if (onSwitch) onSwitch(id);
+        render();
+      })
+    ]);
   }
 
   function go(name, arg) {
@@ -109,42 +131,58 @@
   }
 
   function paintNav() {
+    var db = DD.store.db();
+    var activeId = db.activeTrip;
+    var onTrip = (route === 'places' || route === 'cities');
+
     var nav = $('#sections');
     if (nav) {
       DD.clear(nav);
-      var domestic = DD.store.trip().kind === 'domestic';
-      NAV.forEach(function (n) {
-        if (n.domesticOnly && !domestic) return;
-        if (n.id === 'data') nav.appendChild(el('span', { class: 'sep' }));
-        nav.appendChild(el('a', {
-          class: route === n.id ? 'on' : '',
-          'data-route': n.id,
-          onclick: function () { go(n.id); }
-        }, n.id === 'places' ? placesLabel() : n.label));
-      });
+      nav.appendChild(el('a', {
+        class: route === 'front' ? 'on' : '', onclick: function () { go('front'); }
+      }, 'Front Page'));
+
       nav.appendChild(el('span', { class: 'sep' }));
-      nav.appendChild(el('span', { class: 'trip-name', text: DD.store.trip().name }));
+      db.trips.forEach(function (t) {
+        nav.appendChild(el('a', {
+          class: (onTrip && t.id === activeId) ? 'on' : '',
+          title: t.name,
+          onclick: function () { DD.store.setTrip(t.id); go('places'); }
+        }, t.name));
+      });
+
+      nav.appendChild(el('span', { class: 'sep' }));
+      TAIL.forEach(function (n) {
+        nav.appendChild(el('a', {
+          class: route === n.id ? 'on' : '', onclick: function () { go(n.id); }
+        }, n.label));
+      });
     }
 
     var tabs = $('#tabbar');
     if (!tabs) return;
     DD.clear(tabs);
-    var domestic = DD.store.trip().kind === 'domestic';
-    [['front', 'Front', 'home'], ['places', placesLabel(), 'map'],
-     ['__log', 'Log', 'plus'],
-     domestic ? ['cities', 'Cities', 'route'] : ['sheet', 'Sheet', 'sheet'],
-     ['data', 'More', 'more']
-    ].forEach(function (n) {
-      var fab = n[0] === '__log';
+
+    var items = [{ id: 'front', label: 'Front', icon: 'home' }];
+    db.trips.slice(0, 2).forEach(function (t) {
+      items.push({ id: 'trip:' + t.id, label: shortLabel(t.name), icon: 'map', trip: t.id });
+    });
+    if (db.trips.length < 2) items.push({ id: 'sheet', label: 'Sheet', icon: 'sheet' });
+    items.splice(Math.min(2, items.length), 0, { id: '__log', label: 'Log', icon: 'plus', fab: true });
+    items.push({ id: 'data', label: 'More', icon: 'more', more: true });
+
+    items.forEach(function (n) {
+      var on = n.trip ? (onTrip && n.trip === activeId) : (route === n.id);
       tabs.appendChild(el('button', {
-        class: (fab ? 'fab' : '') + (route === n[0] ? ' on' : ''),
-        'aria-label': n[1],
+        class: (n.fab ? 'fab' : '') + (on ? ' on' : ''),
+        'aria-label': n.label,
         onclick: function () {
-          if (fab) { if (DD.logForm) DD.logForm(); }
-          else if (n[0] === 'data') moreSheet();
-          else go(n[0]);
+          if (n.fab) { if (DD.logForm) DD.logForm(); }
+          else if (n.more) moreSheet();
+          else if (n.trip) { DD.store.setTrip(n.trip); go('places'); }
+          else go(n.id);
         }
-      }, [DD.icon(n[2], fab ? 22 : 19), el('span', { text: n[1] })]));
+      }, [DD.icon(n.icon, n.fab ? 22 : 19), el('span', { text: n.label })]));
     });
   }
 
@@ -156,11 +194,18 @@
     if (DD.store.trip().kind === 'domestic') {
       rows.unshift(['cities', 'Cities', 'Every town on the route']);
     }
+    DD.store.db().trips.slice(2).forEach(function (t) {
+      rows.push(['trip:' + t.id, t.name, 'Open this trip']);
+    });
     rows.forEach(function (r) {
       body.appendChild(el('button', {
         class: 'list-row',
         style: { border: 0, background: 'none', width: '100%', textAlign: 'left', cursor: 'pointer' },
-        onclick: function () { closeModal(); go(r[0]); }
+        onclick: function () {
+          closeModal();
+          if (r[0].indexOf('trip:') === 0) { DD.store.setTrip(r[0].slice(5)); go('places'); }
+          else go(r[0]);
+        }
       }, [
         el('div', { class: 'grow' }, [
           el('div', { class: 't', text: r[1] }),
@@ -346,5 +391,5 @@
   DD.confirmBox = confirmBox; DD.toast = toast; DD.stat = stat; DD.statStrip = statStrip;
   DD.progressBar = progressBar; DD.emptyState = emptyState; DD.field = field;
   DD.selectOf = selectOf; DD.segmented = segmented; DD.sectionHead = sectionHead;
-  DD.placesLabel = placesLabel; DD.NAV = NAV;
+  DD.placesLabel = placesLabel; DD.tripSwitcher = tripSwitcher; DD.shortLabel = shortLabel;
 })();

@@ -15,6 +15,7 @@
   function render(host) {
     var t = S.trip();
     var list = S.places(t);
+    DD.append(host, DD.tripSwitcher());
 
     if (!list.length) {
       host.appendChild(DD.emptyState('No route yet',
@@ -29,7 +30,7 @@
     var done = DD.sum(list, function (p) { return (p.itinerary || []).filter(function (i) { return i.done; }).length; });
 
     host.appendChild(DD.statStrip([
-      DD.stat('Stops', String(list.length), t.kind === 'domestic' ? 'cities' : 'countries', 'hero'),
+      DD.stat('Stops', String(list.length), t.kind === 'domestic' ? 'states' : 'countries', 'hero'),
       DD.stat('Days', String(totalDays), t.start ? DD.dateSpan(t.start, S.tripEnd(t)) : 'no start date set'),
       DD.stat('Planned', String(planned), done + ' ticked off'),
       DD.stat('Planned cost', DD.money(DD.sum(list, function (p) {

@@ -60,7 +60,9 @@
         DD.downloadFile('duniya-backup-' + DD.today() + '.json', JSON.stringify(S.db(), null, 2), 'application/json');
         DD.toast('Backup downloaded');
       } }, [DD.icon('down', 15), 'JSON backup']),
-      el('button', { class: 'btn sm', onclick: importJSON }, [DD.icon('link', 15), 'Restore from backup'])
+      el('button', { class: 'btn sm', onclick: importJSON }, [DD.icon('link', 15), 'Restore from backup']),
+      window.DUNIYA_DATA ? el('button', { class: 'btn sm', onclick: reloadFile },
+        [DD.icon('down', 15), 'Reload from data/trip-data.js']) : null
     ]));
     host.appendChild(fileCard);
 
@@ -116,7 +118,10 @@
 
     /* ---------------------------------------------------- categories */
     var t = S.trip();
-    host.appendChild(DD.sectionHead(t.name, 'Spending categories'));
+    host.appendChild(DD.sectionHead('Per trip', 'Spending categories'));
+    DD.append(host, DD.tripSwitcher());
+    host.appendChild(el('p', { class: 'deck', style: { marginTop: '2px' } },
+      'These belong to ' + t.name + '. Each trip keeps its own set — the world sheet has eight heads, the India sheet seven.'));
     var catCard = el('div', { class: 'card list' });
     t.categories.forEach(function (c, i) {
       var lab = el('input', { type: 'text', value: c.label, style: { border: '1px solid transparent', background: 'transparent' },
@@ -223,6 +228,22 @@
 
     host.appendChild(el('p', { class: 'tiny muted', style: { marginTop: '22px', textAlign: 'center' } },
       'Duniya Darshan runs entirely in this browser. Nothing is uploaded, there is no account, and the only network calls are the optional photo lookups on Wikipedia.'));
+  }
+
+  /* Pull the repo's data file back in, over whatever is in this browser. */
+  function reloadFile() {
+    var file = window.DUNIYA_DATA;
+    if (!file) { DD.toast('No data/trip-data.js alongside this page', true); return; }
+    var mine = DD.sum(S.db().trips, function (t) { return t.expenses.length; });
+    DD.confirmBox('Reload from the folder?',
+      'This replaces everything in the browser with what the file holds'
+      + (file.stampNote ? ' (' + file.stampNote + ')' : '') + '.'
+      + (mine ? ' The ' + DD.plural(mine, 'expense') + ' logged here would go.' : ''),
+      function () {
+        S.replaceAll(S.deepClone(file));
+        DD.render();
+        DD.toast('Reloaded from the file');
+      }, 'Reload');
   }
 
   function importJSON() {

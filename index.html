@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light">
-<meta name="theme-color" content="#0B3B37">
+<meta name="theme-color" content="#00254a">
 <meta name="description" content="Duniya Darshan — plan a travel budget, log what you actually spend, keep the itinerary, and split costs with whoever you are travelling with. Runs entirely in your browser.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -13,27 +13,33 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..700&display=swap" rel="stylesheet">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%230B3B37'/%3E%3Ccircle cx='32' cy='32' r='17' fill='none' stroke='%23fff' stroke-width='3.5'/%3E%3Cpath d='M15 32h34M32 15c8 9 8 25 0 34-8-9-8-25 0-34' fill='none' stroke='%23fff' stroke-width='3.5'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%2300254a'/%3E%3Ccircle cx='32' cy='32' r='17' fill='none' stroke='%23fff' stroke-width='3.5'/%3E%3Cpath d='M15 32h34M32 15c8 9 8 25 0 34-8-9-8-25 0-34' fill='none' stroke='%23fff' stroke-width='3.5'/%3E%3C/svg%3E">
 <style>
 /* Duniya Darshan — a broadsheet. Playfair Display over newsprint, hairline
-   rules, small-caps furniture, and a teal-green gradient doing the colour work. */
+   rules, small-caps furniture, and a navy-to-blue gradient doing the colour work.
+   Palette: navy #00254a, blue #75a7f1, magenta #db0b69, black, white. */
 
 :root{
-  /* ink and paper */
-  --ink:#14100D; --ink-2:#3A322B; --ink-3:#6B6058; --ink-4:#9A8F85;
-  --paper:#FAF7F0; --paper-2:#F3EFE5; --card:#FFFDF8;
-  --rule:#1A1512; --rule-2:#D9D1C2; --rule-3:#EAE4D7;
+  /* The five-colour palette: navy #00254a, blue #75a7f1, magenta #db0b69,
+     black, white. Everything else is a tint of one of them on white. */
+  --navy:#00254a; --blue:#75a7f1; --pink:#db0b69;
 
-  /* the one accent, expressed as a gradient wherever it can be */
-  --teal-900:#0B3B37; --teal-800:#0F5750; --teal-700:#12736A; --teal-600:#158F82;
-  --teal-500:#1FB09E; --teal-300:#7FD6C9; --teal-100:#D3F0EA; --teal-50:#EEF9F6;
-  --grad:linear-gradient(135deg,var(--teal-800) 0%,var(--teal-600) 55%,var(--teal-500) 100%);
-  --grad-soft:linear-gradient(135deg,var(--teal-50) 0%,var(--teal-100) 100%);
-  --grad-deep:linear-gradient(160deg,var(--teal-900) 0%,var(--teal-700) 60%,var(--teal-600) 100%);
-  --grad-warm:linear-gradient(135deg,#9A5B12 0%,#C88A2E 100%);
+  --ink:#000000; --ink-2:#00254a; --ink-3:#667c92; --ink-4:#a6b3c0;
+  --paper:#ffffff; --paper-2:#eef4fd; --card:#ffffff;
+  --rule:#00254a; --rule-2:#c8dcf9; --rule-3:#e3edfc;
 
-  --red:#9B2C2C; --red-bg:#FBEBEB;
-  --green:#1C6B45; --amber:#8A5A12; --amber-bg:#FBF3E2;
+  /* navy -> blue ramp */
+  --brand-900:#00163a; --brand-800:#00254a; --brand-700:#003a75; --brand-600:#0b529b;
+  --brand-500:#75a7f1; --brand-300:#a9c8f7; --brand-100:#d8e7fb; --brand-50:#eef4fd;
+
+  --grad:linear-gradient(135deg,var(--brand-800) 0%,var(--brand-600) 55%,var(--brand-500) 100%);
+  --grad-soft:linear-gradient(135deg,var(--brand-50) 0%,var(--brand-100) 100%);
+  --grad-deep:linear-gradient(160deg,var(--brand-900) 0%,var(--brand-800) 45%,var(--brand-600) 100%);
+  --grad-pink:linear-gradient(135deg,var(--pink) 0%,#f4569b 100%);
+
+  /* the magenta is the only warm note: it means over, late, or careful */
+  --red:#db0b69; --red-bg:#fde7f0;
+  --green:#00254a; --amber:#db0b69; --amber-bg:#fde7f0;
 
   --serif:"Playfair Display","Playfair Display Fallback",Georgia,"Times New Roman",serif;
   --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,"Helvetica Neue",Arial,sans-serif;
@@ -51,13 +57,13 @@ body{
   font-family:var(--serif); color:var(--ink); background:var(--paper);
   font-size:16px; line-height:1.5; overscroll-behavior-y:none;
   -webkit-font-smoothing:antialiased;
-  background-image:radial-gradient(circle at 20% 0%,rgba(21,143,130,.035),transparent 55%),
-                   radial-gradient(circle at 90% 10%,rgba(154,91,18,.03),transparent 45%);
+  background-image:radial-gradient(circle at 18% 0%,rgba(117,167,241,.14),transparent 58%),
+                   radial-gradient(circle at 92% 6%,rgba(219,11,105,.05),transparent 42%);
   background-attachment:fixed;
 }
 h1,h2,h3,h4{margin:0;font-family:var(--serif);font-weight:700;line-height:1.15;letter-spacing:-.01em}
 p{margin:0 0 .7em}
-a{color:var(--teal-800)}
+a{color:var(--brand-800)}
 button,input,select,textarea{font:inherit;color:inherit}
 [hidden]{display:none !important}
 
@@ -120,8 +126,8 @@ button,input,select,textarea{font:inherit;color:inherit}
   font-size:11px;padding:11px 17px;color:var(--ink-2);text-decoration:none;cursor:pointer;
   border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap;
 }
-#sections a:hover{color:var(--teal-800);background:rgba(21,143,130,.05)}
-#sections a.on{color:var(--teal-900);border-bottom-color:var(--teal-700);font-weight:700}
+#sections a:hover{color:var(--brand-700);background:var(--brand-50)}
+#sections a.on{color:var(--brand-900);border-bottom-color:var(--brand-700);font-weight:700}
 #sections .sep{width:1px;background:var(--rule-3);margin:9px 0}
 #sections .trip-name{
   font-family:var(--serif);text-transform:none;letter-spacing:0;font-size:14px;font-style:italic;
@@ -136,7 +142,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .section-head:first-child{margin-top:6px}
 .section-head h2{font-size:21px;letter-spacing:-.015em}
 .section-head .spacer{flex:1}
-.kicker{font-size:10.5px;color:var(--teal-800);font-weight:700}
+.kicker{font-size:10.5px;color:var(--brand-800);font-weight:700}
 .deck{font-size:15px;color:var(--ink-3);font-style:italic;margin:-6px 0 14px}
 
 /* ------------------------------------------------------------ controls */
@@ -149,7 +155,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 }
 .btn:hover{background:var(--ink);color:var(--paper)}
 .btn:active{transform:translateY(1px)}
-.btn.pri{background:var(--grad);border-color:var(--teal-800);color:#fff}
+.btn.pri{background:var(--grad);border-color:var(--brand-800);color:#fff}
 .btn.pri:hover{background:var(--grad-deep);color:#fff}
 .btn.ghost{border-color:transparent;background:transparent;color:var(--ink-2)}
 .btn.ghost:hover{background:var(--paper-2);color:var(--ink)}
@@ -168,7 +174,7 @@ input[type=text],input[type=number],input[type=date],input[type=url],input[type=
   width:100%;border:1px solid var(--rule-2);border-radius:var(--r);background:var(--card);
   padding:9px 11px;font-size:15px;font-family:var(--serif);outline:0;
 }
-input:focus,select:focus,textarea:focus{border-color:var(--teal-700);box-shadow:0 0 0 3px var(--teal-100)}
+input:focus,select:focus,textarea:focus{border-color:var(--brand-700);box-shadow:0 0 0 3px var(--brand-100)}
 input[type=number]{font-family:var(--num)}
 textarea{min-height:76px;resize:vertical}
 select{
@@ -180,7 +186,7 @@ select{
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .inline-check{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;margin-bottom:9px}
-.inline-check input{width:16px;height:16px;accent-color:var(--teal-700);flex:0 0 16px}
+.inline-check input{width:16px;height:16px;accent-color:var(--brand-700);flex:0 0 16px}
 
 .seg{display:inline-flex;border:1px solid var(--rule);border-radius:var(--r);overflow:hidden}
 .seg button{
@@ -195,8 +201,8 @@ select{
   color:var(--ink-2);border:1px solid var(--rule-3);border-radius:var(--r);
   padding:3px 8px;font-size:10px;font-weight:600;
 }
-.chip.teal{background:var(--grad-soft);border-color:var(--teal-100);color:var(--teal-900)}
-.chip.warm{background:var(--amber-bg);border-color:#EBD9B4;color:var(--amber)}
+.chip.brand{background:var(--grad-soft);border-color:var(--brand-100);color:var(--brand-900)}
+.chip.pink{background:var(--red-bg);border-color:#f6bcd6;color:var(--pink)}
 .chip-row{display:flex;flex-wrap:wrap;gap:6px}
 
 /* --------------------------------------------------------------- cards */
@@ -217,7 +223,7 @@ select{
 .stat .v{font-size:29px;font-weight:800;letter-spacing:-.03em;margin-top:4px;font-family:var(--num);line-height:1.05}
 .stat .s{font-size:12.5px;color:var(--ink-3);margin-top:3px;font-style:italic}
 .stat.hero{background:var(--grad-deep);color:#fff;border-right-color:rgba(255,255,255,.2)}
-.stat.hero .k{color:var(--teal-300)} .stat.hero .s{color:var(--teal-100)}
+.stat.hero .k{color:var(--brand-300)} .stat.hero .s{color:var(--brand-100)}
 .stat.pos .v{color:var(--green)} .stat.neg .v{color:var(--red)}
 
 .bar{height:6px;background:var(--rule-3);overflow:hidden;display:flex;border-radius:1px}
@@ -233,17 +239,17 @@ select{
 .mapwrap svg{display:block;width:100%;height:auto;max-height:clamp(260px,56vh,540px);margin:0 auto}
 /* India is tall and narrow; letterbox it rather than let it run off the page. */
 .mapwrap.tall svg{max-height:clamp(300px,64vh,620px)}
-.map-land{fill:var(--paper-2);stroke:#fff;stroke-width:.5;transition:fill .18s}
+.map-land{fill:#e8eef6;stroke:#fff;stroke-width:.5;transition:fill .18s}
 .map-land.in-trip{cursor:pointer}
-.map-land.planned{fill:var(--teal-100)}
+.map-land.planned{fill:var(--brand-300)}
 .map-land.active{fill:url(#ddGradActive)}
 .map-land.done{fill:url(#ddGradDone)}
 .map-land.over{fill:url(#ddGradOver)}
-.map-land.in-trip:hover{fill:var(--teal-900)}
-.map-dot{fill:var(--teal-600);stroke:#fff;stroke-width:1.2;cursor:pointer}
-.map-dot.planned{fill:var(--paper);stroke:var(--teal-600);stroke-width:1.8}
-.map-dot.active{fill:var(--teal-500)}
-.map-dot.done{fill:var(--teal-900)}
+.map-land.in-trip:hover{fill:var(--pink)}
+.map-dot{fill:var(--brand-600);stroke:#fff;stroke-width:1.2;cursor:pointer}
+.map-dot.planned{fill:#fff;stroke:var(--brand-700);stroke-width:1.8}
+.map-dot.active{fill:var(--brand-500)}
+.map-dot.done{fill:var(--brand-900)}
 .map-dot.over{fill:var(--red)}
 .map-dot:hover{stroke:var(--ink);stroke-width:2}
 .mapwrap svg{touch-action:none;cursor:grab}
@@ -255,12 +261,12 @@ select{
 }
 .map-zoom .btn{
   min-width:30px;padding:5px 8px;background:var(--card);border-color:var(--rule-2);
-  box-shadow:0 1px 3px rgba(20,16,13,.14);font-size:13px;line-height:1;
+  box-shadow:0 1px 3px rgba(0,22,58,.16);font-size:13px;line-height:1;
 }
 .map-zoom .btn:disabled{opacity:.4}
 /* India on the world map is a doorway to the trip at home */
-.map-land.map-home{fill:var(--paper-2);stroke:var(--teal-700);stroke-width:1;stroke-dasharray:2.5 2;cursor:pointer}
-.map-land.map-home:hover{fill:var(--teal-100)}
+.map-land.map-home{fill:var(--red-bg);stroke:var(--pink);stroke-width:1.1;stroke-dasharray:3 2;cursor:pointer}
+.map-land.map-home:hover{fill:var(--pink)}
 .map-legend{
   display:flex;flex-wrap:wrap;gap:14px;align-items:center;padding-top:9px;margin-top:8px;
   border-top:1px solid var(--rule-3);font-family:var(--sans);font-size:10.5px;
@@ -289,7 +295,7 @@ select{
   filter:saturate(.82) contrast(1.03);
 }
 .place-photo::after{content:"";position:absolute;inset:0;
-  background:linear-gradient(180deg,rgba(11,59,55,.1) 0%,rgba(11,59,55,.72) 100%)}
+  background:linear-gradient(180deg,rgba(0,22,58,.12) 0%,rgba(0,22,58,.78) 100%)}
 .place-photo .cap{position:absolute;left:14px;right:14px;bottom:9px;z-index:2;color:#fff}
 .place-photo .cap .n{font-size:20px;font-weight:700;letter-spacing:-.02em;text-shadow:0 1px 8px rgba(0,0,0,.45)}
 .place-photo .cap .c{font-family:var(--sans);font-size:10px;letter-spacing:.12em;text-transform:uppercase;opacity:.92}
@@ -302,7 +308,7 @@ select{
   position:absolute;top:9px;right:11px;z-index:3;font-family:var(--sans);font-size:9px;
   letter-spacing:.1em;padding:2px 7px;border-radius:2px;color:#fff;background:var(--grad);
 }
-.place-photo .state.done{background:var(--teal-900)}
+.place-photo .state.done{background:var(--brand-900)}
 .place-photo .state.over{background:var(--red)}
 .place-body{padding:13px 15px 15px;display:flex;flex-direction:column;gap:10px;flex:1}
 .place-nums{display:flex;align-items:baseline;gap:8px}
@@ -312,7 +318,7 @@ select{
 
 .stepper{display:inline-flex;align-items:center;border:1px solid var(--rule-3);border-radius:var(--r);background:var(--card)}
 .stepper button{border:0;background:none;width:25px;height:24px;cursor:pointer;color:var(--ink-2);font-size:15px;line-height:1}
-.stepper button:hover{background:var(--paper-2);color:var(--teal-800)}
+.stepper button:hover{background:var(--paper-2);color:var(--brand-800)}
 .stepper .n{min-width:46px;text-align:center;font-family:var(--sans);font-size:10.5px;font-weight:700;letter-spacing:.06em}
 
 .gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:9px}
@@ -338,7 +344,7 @@ table.grid th:first-child,table.grid td:first-child{
   box-shadow:1px 0 0 var(--rule-3);max-width:200px;overflow:hidden;text-overflow:ellipsis;
 }
 table.grid th:first-child{background:var(--paper-2);z-index:3}
-table.grid tbody tr:hover td,table.grid tbody tr:hover td:first-child{background:var(--teal-50)}
+table.grid tbody tr:hover td,table.grid tbody tr:hover td:first-child{background:var(--brand-50)}
 table.grid tfoot td,table.grid tfoot td:first-child{
   font-weight:800;background:var(--paper-2);border-top:2px solid var(--rule);border-bottom:0}
 table.grid td.n{font-family:var(--num);font-variant-numeric:tabular-nums lining-nums}
@@ -352,7 +358,7 @@ td.under{color:var(--green)}
 .cell-in::-webkit-outer-spin-button,.cell-in::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .cell-in[type=number]{-moz-appearance:textfield;appearance:textfield;min-width:78px}
 .cell-in:hover{border-color:var(--rule-2);background:#fff}
-.cell-in:focus{border-color:var(--teal-700);background:#fff;box-shadow:0 0 0 3px var(--teal-100)}
+.cell-in:focus{border-color:var(--brand-700);background:#fff;box-shadow:0 0 0 3px var(--brand-100)}
 
 /* --------------------------------------------------------------- lists */
 .list{display:flex;flex-direction:column}
@@ -375,7 +381,7 @@ td.under{color:var(--green)}
 
 /* --------------------------------------------------------------- modal */
 .scrim{
-  position:fixed;inset:0;background:rgba(20,16,13,.5);z-index:200;
+  position:fixed;inset:0;background:rgba(0,22,58,.55);z-index:200;
   display:flex;align-items:center;justify-content:center;padding:20px;animation:fade .14s;
 }
 @keyframes fade{from{opacity:0}to{opacity:1}}
@@ -383,7 +389,7 @@ td.under{color:var(--green)}
 .modal{
   background:var(--card);border:1px solid var(--rule);border-radius:var(--r-lg);width:100%;max-width:560px;
   max-height:calc(100dvh - 40px);display:flex;flex-direction:column;
-  box-shadow:0 30px 60px -20px rgba(20,16,13,.45);animation:rise .18s cubic-bezier(.2,.7,.3,1);
+  box-shadow:0 30px 60px -20px rgba(0,22,58,.4);animation:rise .18s cubic-bezier(.2,.7,.3,1);
 }
 .modal.lg{max-width:860px}
 .modal-head{
@@ -407,10 +413,10 @@ td.under{color:var(--green)}
 
 /* ---------------------------------------------------------------- misc */
 .banner{
-  display:flex;gap:12px;align-items:flex-start;background:var(--amber-bg);
-  border-left:3px solid var(--amber);padding:12px 16px;font-size:14.5px;margin-bottom:16px;color:#5A3A0C;
+  display:flex;gap:12px;align-items:flex-start;background:var(--red-bg);
+  border-left:3px solid var(--pink);padding:12px 16px;font-size:14.5px;margin-bottom:16px;color:#8a0a43;
 }
-.banner.info{background:var(--teal-50);border-left-color:var(--teal-700);color:var(--teal-900)}
+.banner.info{background:var(--brand-50);border-left-color:var(--brand-600);color:var(--brand-800)}
 .lede{font-size:17px;line-height:1.55}
 .lede::first-letter{
   float:left;font-size:56px;line-height:.82;padding:4px 9px 0 0;font-weight:800;
@@ -419,7 +425,7 @@ td.under{color:var(--green)}
 .kbd{font-family:var(--mono);font-size:11px;background:var(--paper-2);border:1px solid var(--rule-2);
   border-bottom-width:2px;border-radius:3px;padding:1px 5px;color:var(--ink-2)}
 .drive-embed{width:100%;height:340px;border:1px solid var(--rule-2);background:#fff}
-.spin{width:14px;height:14px;border:2px solid var(--teal-100);border-top-color:var(--teal-700);
+.spin{width:14px;height:14px;border:2px solid var(--brand-100);border-top-color:var(--brand-700);
   border-radius:99px;animation:sp .7s linear infinite;display:inline-block;vertical-align:-2px}
 @keyframes sp{to{transform:rotate(360deg)}}
 
@@ -431,9 +437,9 @@ td.under{color:var(--green)}
 .today-mark{
   background:var(--grad-deep);color:#fff;padding:16px 20px;flex:1 1 260px;min-width:0;
 }
-.today-mark .k{font-family:var(--sans);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--teal-300)}
+.today-mark .k{font-family:var(--sans);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--brand-300)}
 .today-mark h3{font-size:30px;margin:4px 0 3px;letter-spacing:-.02em}
-.today-mark .s{font-family:var(--sans);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--teal-100)}
+.today-mark .s{font-family:var(--sans);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--brand-100)}
 .today-cols{display:flex;flex:2 1 340px;flex-wrap:wrap}
 .today-col{flex:1 1 150px;padding:14px 18px;border-left:1px solid var(--rule-3);min-width:0}
 .today-col .k{font-family:var(--sans);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:700}
@@ -448,7 +454,7 @@ td.under{color:var(--green)}
 .pace-track{position:relative;height:22px}
 .pace-track .rail{position:absolute;inset:8px 0;background:var(--rule-3);border-radius:2px}
 .pace-track .fill{position:absolute;top:5px;bottom:5px;left:0;background:var(--grad);border-radius:2px}
-.pace-track .fill.over{background:linear-gradient(90deg,var(--teal-800),var(--red))}
+.pace-track .fill.over{background:linear-gradient(90deg,var(--brand-700),var(--pink))}
 .pace-track .marker{position:absolute;top:0;bottom:0;width:2px;background:var(--ink)}
 .pace-track .marker::after{
   content:attr(data-label);position:absolute;top:-2px;left:6px;font-family:var(--sans);
@@ -467,13 +473,13 @@ td.under{color:var(--green)}
 /* drag to reorder */
 .place[draggable=true]{cursor:grab}
 .place.dragging{opacity:.4}
-.place.drop-before{box-shadow:inset 4px 0 0 var(--teal-600)}
-.place.drop-after{box-shadow:inset -4px 0 0 var(--teal-600)}
+.place.drop-before{box-shadow:inset 4px 0 0 var(--brand-600)}
+.place.drop-after{box-shadow:inset -4px 0 0 var(--brand-600)}
 .drag-hint{font-family:var(--sans);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-4)}
 
 /* cities index */
 .city-row .day{
-  font-family:var(--num);font-weight:800;font-size:17px;min-width:34px;text-align:right;color:var(--teal-800);
+  font-family:var(--num);font-weight:800;font-size:17px;min-width:34px;text-align:right;color:var(--brand-800);
 }
 .city-note{font-size:13.5px;color:var(--ink-2);white-space:normal;line-height:1.45}
 
@@ -482,17 +488,17 @@ td.under{color:var(--green)}
   border:1px solid var(--rule);background:var(--card);display:flex;flex-direction:column;cursor:pointer;
   transition:box-shadow .16s,transform .16s;
 }
-.trip-card:hover{box-shadow:0 14px 30px -18px rgba(20,16,13,.5);transform:translateY(-2px)}
-.trip-card.on{border-width:2px;border-color:var(--teal-700)}
+.trip-card:hover{box-shadow:0 14px 30px -18px rgba(0,22,58,.45);transform:translateY(-2px)}
+.trip-card.on{border-width:2px;border-color:var(--brand-700)}
 .trip-hero{
   padding:18px 20px 16px;background:var(--grad-deep);color:#fff;position:relative;
   background-size:cover;background-position:center;
 }
-.trip-hero.photo::before{content:"";position:absolute;inset:0;background:linear-gradient(160deg,rgba(11,59,55,.86),rgba(18,115,106,.7))}
+.trip-hero.photo::before{content:"";position:absolute;inset:0;background:linear-gradient(160deg,rgba(0,22,58,.9),rgba(11,82,155,.74))}
 .trip-hero > *{position:relative;z-index:1}
-.trip-hero .k{font-family:var(--sans);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--teal-300)}
+.trip-hero .k{font-family:var(--sans);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--brand-300)}
 .trip-hero h3{font-size:27px;margin:3px 0 4px;letter-spacing:-.02em}
-.trip-hero .s{font-family:var(--sans);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--teal-100)}
+.trip-hero .s{font-family:var(--sans);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--brand-100)}
 .trip-body{padding:14px 20px 16px;display:flex;flex-direction:column;gap:10px;flex:1}
 
 /* ------------------------------------------------------------- mobile */
@@ -540,7 +546,7 @@ td.under{color:var(--green)}
 
   #tabbar{
     display:flex;position:fixed;left:0;right:0;bottom:0;z-index:60;
-    background:rgba(250,247,240,.96);backdrop-filter:blur(12px);border-top:1px solid var(--rule);
+    background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border-top:1px solid var(--rule);
     padding:5px 4px calc(5px + env(safe-area-inset-bottom));
   }
   #tabbar button{
@@ -548,7 +554,7 @@ td.under{color:var(--green)}
     padding:5px 2px;color:var(--ink-3);font-family:var(--sans);font-size:9.5px;font-weight:600;
     letter-spacing:.07em;text-transform:uppercase;cursor:pointer;min-height:46px;justify-content:center;
   }
-  #tabbar button.on{color:var(--teal-800)}
+  #tabbar button.on{color:var(--brand-800)}
   #tabbar .fab{background:var(--grad);color:#fff;border-radius:99px;max-width:52px;flex:0 0 52px;margin:0 6px}
   #tabbar .fab span{display:none}
 }
@@ -760,16 +766,9 @@ function uid(prefix) {
 }
 
 /* --------------------------------------------------------------- colour */
-var PALETTE = ['#0F766E', '#2563EB', '#B45309', '#9333EA', '#DC2626', '#0891B2', '#65A30D', '#DB2777', '#4F46E5', '#EA580C'];
-function nextColour(used) {
-  for (var i = 0; i < PALETTE.length; i++) if (used.indexOf(PALETTE[i]) < 0) return PALETTE[i];
-  return PALETTE[used.length % PALETTE.length];
-}
-function initials(name) {
-  var parts = String(name || '?').trim().split(/\s+/);
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-}
+/* The whole app draws from five colours. Charts pick from here. */
+var PALETTE = ['#00254a', '#75a7f1', '#db0b69', '#0b529b', '#a9c8f7',
+               '#f4569b', '#003a75', '#667c92', '#00163a', '#c8dcf9'];
 
 /* Regional-indicator flag from an ISO-3166 alpha-2 code. */
 function flagOf(iso2) {
@@ -846,8 +845,7 @@ DD.$ = $; DD.$$ = $$; DD.el = el; DD.append = append; DD.clear = clear; DD.esc =
 DD.icon = icon; DD.money = money; DD.groupIN = groupIN; DD.num = num; DD.pct = pct;
 DD.plural = plural; DD.today = today; DD.toISO = toISO; DD.fromISO = fromISO;
 DD.niceDate = niceDate; DD.shortDate = shortDate; DD.addDays = addDays;
-DD.daysBetween = daysBetween; DD.dateSpan = dateSpan; DD.yymmdd = yymmdd; DD.uid = uid; DD.PALETTE = PALETTE;
-DD.nextColour = nextColour; DD.initials = initials; DD.flagOf = flagOf;
+DD.daysBetween = daysBetween; DD.dateSpan = dateSpan; DD.yymmdd = yymmdd; DD.uid = uid; DD.PALETTE = PALETTE; DD.flagOf = flagOf;
 DD.toINR = toINR; DD.rateFor = rateFor; DD.fmtLocal = fmtLocal; DD.clamp = clamp;
 DD.sum = sum; DD.by = by; DD.debounce = debounce; DD.slug = slug;
 DD.downloadFile = downloadFile; DD.csvOf = csvOf; DD.MONTHS = MONTHS; DD.DAYS = DAYS;
@@ -4331,7 +4329,9 @@ window.DUNIYA_SEED = {
    ],
    "expenses": []
   }
- ]
+ ],
+ "stamp": "544f065110c8",
+ "stampNote": "36 countries, 28 states, 545 days"
 };
 
 
@@ -4345,6 +4345,7 @@ window.DUNIYA_SEED = {
   var DB = null;
   var fileHandle = null;
   var dirty = false;
+  var freshImport = null;   /* set when data/trip-data.js is newer than this browser's copy */
 
   /* ------------------------------------------------------------ loading */
   function deepClone(o) { return JSON.parse(JSON.stringify(o)); }
@@ -4356,6 +4357,13 @@ window.DUNIYA_SEED = {
       try {
         DB = JSON.parse(raw);
         migrate();
+        /* The repo's data file has been re-imported since this browser last
+           saved. Without this check the new sheets would sit invisible behind
+           a stale copy — which is exactly what happened with the India import. */
+        var file = window.DUNIYA_DATA;
+        if (file && file.stamp && file.stamp !== DB.stamp) {
+          freshImport = { stamp: file.stamp, note: file.stampNote || '', data: file };
+        }
         return 'local';
       } catch (e) { console.warn('stored data unreadable, falling back', e); }
     }
@@ -4413,6 +4421,24 @@ window.DUNIYA_SEED = {
     });
     if (!DB.trips.length) DB.trips = deepClone(window.DUNIYA_SEED.trips);
     if (!tripById(DB.activeTrip)) DB.activeTrip = DB.trips[0].id;
+    if (!DB.stamp && window.DUNIYA_SEED) DB.stamp = window.DUNIYA_SEED.stamp;
+  }
+
+  /* What the data file holds that this browser does not, if anything. */
+  function pendingImport() { return freshImport; }
+
+  function acceptImport() {
+    if (!freshImport) return false;
+    replaceAll(deepClone(freshImport.data));
+    freshImport = null;
+    return true;
+  }
+
+  function dismissImport() {
+    if (!freshImport) return;
+    DB.stamp = freshImport.stamp;   /* remember we were asked, do not nag again */
+    freshImport = null;
+    save();
   }
 
   /* ------------------------------------------------------------- saving */
@@ -4799,6 +4825,7 @@ window.DUNIYA_SEED = {
     addPlace: addPlace, removePlace: removePlace, movePlace: movePlace,
     addExpense: addExpense, updateExpense: updateExpense, removeExpense: removeExpense,
     replaceAll: replaceAll,
+    pendingImport: pendingImport, acceptImport: acceptImport, dismissImport: dismissImport,
     canUseFiles: canUseFiles, connectFile: connectFile, reconnectFile: reconnectFile,
     regrantFile: regrantFile, disconnectFile: disconnectFile, fileStatus: fileStatus,
     writeFile: writeFile, fileText: fileText
@@ -4821,19 +4848,41 @@ window.DUNIYA_SEED = {
   function emit(evt, arg) { (listeners[evt] || []).forEach(function (f) { f(arg); }); }
   function register(name, def) { screens[name] = def; }
 
-  /* Front page first, then the sections of whichever trip is open. */
-  var NAV = [
-    { id: 'front', label: 'Front Page' },
-    { id: 'places', label: 'Places', trip: true },
-    { id: 'cities', label: 'Cities', trip: true, domesticOnly: true },
-    { id: 'sheet', label: 'The Sheet', trip: true },
-    { id: 'itinerary', label: 'Itinerary', trip: true },
+  /* The bar carries the front page, then one section per trip, then the three
+     pages that serve every trip and switch between them from inside. */
+  var TAIL = [
+    { id: 'sheet', label: 'The Sheet' },
+    { id: 'itinerary', label: 'Itinerary' },
     { id: 'data', label: 'Almanac' }
   ];
 
   /* The India sheet budgets by state, so that is what a domestic place is. */
   function placesLabel() {
     return DD.store.trip().kind === 'domestic' ? 'States' : 'Countries';
+  }
+
+  /* "Within India" -> India, "World Tour" -> World. Drop the filler, then take
+     the longest word that is left. */
+  var FILLER = /^(within|in|at|the|a|an|across|around|to|my|our|tour|trip|travels?)$/i;
+  function shortLabel(name) {
+    var words = String(name || '').split(/\s+/).filter(function (w) { return /[A-Za-z]/.test(w); });
+    if (!words.length) return name || 'Trip';
+    var meaty = words.filter(function (w) { return !FILLER.test(w); });
+    return (meaty.length ? meaty : words).sort(function (a, b) { return b.length - a.length; })[0];
+  }
+
+  /* Segmented control listing every trip — used at the top of The Sheet,
+     Itinerary and Almanac so those pages serve both trips. */
+  function tripSwitcher(onSwitch) {
+    var db = DD.store.db();
+    if (db.trips.length < 2) return null;
+    return el('div', { style: { marginBottom: '16px' } }, [
+      segmented(db.trips.map(function (t) { return [t.id, t.name]; }), db.activeTrip, function (id) {
+        DD.store.setTrip(id);
+        if (onSwitch) onSwitch(id);
+        render();
+      })
+    ]);
   }
 
   function go(name, arg) {
@@ -4918,42 +4967,58 @@ window.DUNIYA_SEED = {
   }
 
   function paintNav() {
+    var db = DD.store.db();
+    var activeId = db.activeTrip;
+    var onTrip = (route === 'places' || route === 'cities');
+
     var nav = $('#sections');
     if (nav) {
       DD.clear(nav);
-      var domestic = DD.store.trip().kind === 'domestic';
-      NAV.forEach(function (n) {
-        if (n.domesticOnly && !domestic) return;
-        if (n.id === 'data') nav.appendChild(el('span', { class: 'sep' }));
-        nav.appendChild(el('a', {
-          class: route === n.id ? 'on' : '',
-          'data-route': n.id,
-          onclick: function () { go(n.id); }
-        }, n.id === 'places' ? placesLabel() : n.label));
-      });
+      nav.appendChild(el('a', {
+        class: route === 'front' ? 'on' : '', onclick: function () { go('front'); }
+      }, 'Front Page'));
+
       nav.appendChild(el('span', { class: 'sep' }));
-      nav.appendChild(el('span', { class: 'trip-name', text: DD.store.trip().name }));
+      db.trips.forEach(function (t) {
+        nav.appendChild(el('a', {
+          class: (onTrip && t.id === activeId) ? 'on' : '',
+          title: t.name,
+          onclick: function () { DD.store.setTrip(t.id); go('places'); }
+        }, t.name));
+      });
+
+      nav.appendChild(el('span', { class: 'sep' }));
+      TAIL.forEach(function (n) {
+        nav.appendChild(el('a', {
+          class: route === n.id ? 'on' : '', onclick: function () { go(n.id); }
+        }, n.label));
+      });
     }
 
     var tabs = $('#tabbar');
     if (!tabs) return;
     DD.clear(tabs);
-    var domestic = DD.store.trip().kind === 'domestic';
-    [['front', 'Front', 'home'], ['places', placesLabel(), 'map'],
-     ['__log', 'Log', 'plus'],
-     domestic ? ['cities', 'Cities', 'route'] : ['sheet', 'Sheet', 'sheet'],
-     ['data', 'More', 'more']
-    ].forEach(function (n) {
-      var fab = n[0] === '__log';
+
+    var items = [{ id: 'front', label: 'Front', icon: 'home' }];
+    db.trips.slice(0, 2).forEach(function (t) {
+      items.push({ id: 'trip:' + t.id, label: shortLabel(t.name), icon: 'map', trip: t.id });
+    });
+    if (db.trips.length < 2) items.push({ id: 'sheet', label: 'Sheet', icon: 'sheet' });
+    items.splice(Math.min(2, items.length), 0, { id: '__log', label: 'Log', icon: 'plus', fab: true });
+    items.push({ id: 'data', label: 'More', icon: 'more', more: true });
+
+    items.forEach(function (n) {
+      var on = n.trip ? (onTrip && n.trip === activeId) : (route === n.id);
       tabs.appendChild(el('button', {
-        class: (fab ? 'fab' : '') + (route === n[0] ? ' on' : ''),
-        'aria-label': n[1],
+        class: (n.fab ? 'fab' : '') + (on ? ' on' : ''),
+        'aria-label': n.label,
         onclick: function () {
-          if (fab) { if (DD.logForm) DD.logForm(); }
-          else if (n[0] === 'data') moreSheet();
-          else go(n[0]);
+          if (n.fab) { if (DD.logForm) DD.logForm(); }
+          else if (n.more) moreSheet();
+          else if (n.trip) { DD.store.setTrip(n.trip); go('places'); }
+          else go(n.id);
         }
-      }, [DD.icon(n[2], fab ? 22 : 19), el('span', { text: n[1] })]));
+      }, [DD.icon(n.icon, n.fab ? 22 : 19), el('span', { text: n.label })]));
     });
   }
 
@@ -4965,11 +5030,18 @@ window.DUNIYA_SEED = {
     if (DD.store.trip().kind === 'domestic') {
       rows.unshift(['cities', 'Cities', 'Every town on the route']);
     }
+    DD.store.db().trips.slice(2).forEach(function (t) {
+      rows.push(['trip:' + t.id, t.name, 'Open this trip']);
+    });
     rows.forEach(function (r) {
       body.appendChild(el('button', {
         class: 'list-row',
         style: { border: 0, background: 'none', width: '100%', textAlign: 'left', cursor: 'pointer' },
-        onclick: function () { closeModal(); go(r[0]); }
+        onclick: function () {
+          closeModal();
+          if (r[0].indexOf('trip:') === 0) { DD.store.setTrip(r[0].slice(5)); go('places'); }
+          else go(r[0]);
+        }
       }, [
         el('div', { class: 'grow' }, [
           el('div', { class: 't', text: r[1] }),
@@ -5155,7 +5227,7 @@ window.DUNIYA_SEED = {
   DD.confirmBox = confirmBox; DD.toast = toast; DD.stat = stat; DD.statStrip = statStrip;
   DD.progressBar = progressBar; DD.emptyState = emptyState; DD.field = field;
   DD.selectOf = selectOf; DD.segmented = segmented; DD.sectionHead = sectionHead;
-  DD.placesLabel = placesLabel; DD.NAV = NAV;
+  DD.placesLabel = placesLabel; DD.tripSwitcher = tripSwitcher; DD.shortLabel = shortLabel;
 })();
 
 
@@ -5172,11 +5244,14 @@ window.DUNIYA_SEED = {
   }
 
   /* Inks that sit properly on newsprint — muted, not screen-bright. */
+  /* Everything is navy, blue or magenta — the five-colour palette, no strays. */
   var CAT_COLOURS = {
-    flights: '#0B3B37', transport: '#1F5D8C', lodging: '#9A5B12', food: '#8E2F2F',
-    activities: '#5B3A7E', carRental: '#158F82', visa: '#5C6B22', misc: '#6B6058'
+    flights: '#00254a', transport: '#75a7f1', lodging: '#db0b69', food: '#0b529b',
+    activities: '#a9c8f7', carRental: '#f4569b', visa: '#003a75', misc: '#667c92',
+    railway: '#00254a', intercity: '#75a7f1', petrol: '#f4569b'
   };
-  var FALLBACK = ['#0B3B37', '#1F5D8C', '#9A5B12', '#8E2F2F', '#5B3A7E', '#158F82', '#5C6B22', '#8A3A6B', '#3C4A8A', '#A85A24'];
+  var FALLBACK = ['#00254a', '#75a7f1', '#db0b69', '#0b529b', '#a9c8f7', '#f4569b',
+                  '#003a75', '#667c92', '#00163a', '#c8dcf9'];
 
   function colourFor(id, i) { return CAT_COLOURS[id] || FALLBACK[i % FALLBACK.length]; }
 
@@ -5188,7 +5263,7 @@ window.DUNIYA_SEED = {
     var svg = s('svg', { viewBox: '0 0 ' + size + ' ' + size, width: size, height: size, role: 'img' });
     svg.setAttribute('aria-label', o.aria || 'Breakdown');
 
-    svg.appendChild(s('circle', { cx: c, cy: c, r: r, fill: 'none', stroke: '#EAE4D7', 'stroke-width': thick }));
+    svg.appendChild(s('circle', { cx: c, cy: c, r: r, fill: 'none', stroke: '#d8e7fb', 'stroke-width': thick }));
 
     if (total > 0) {
       var circ = 2 * Math.PI * r, offset = 0;
@@ -5209,11 +5284,11 @@ window.DUNIYA_SEED = {
     }
 
     if (o.centre) {
-      var t1 = s('text', { x: c, y: c - 2, 'text-anchor': 'middle', 'font-size': 20, 'font-weight': 800, fill: '#14100D' });
+      var t1 = s('text', { x: c, y: c - 2, 'text-anchor': 'middle', 'font-size': 20, 'font-weight': 800, fill: '#00254a' });
       t1.textContent = o.centre;
       svg.appendChild(t1);
       if (o.centreSub) {
-        var t2 = s('text', { x: c, y: c + 16, 'text-anchor': 'middle', 'font-size': 10.5, fill: '#6B6058' });
+        var t2 = s('text', { x: c, y: c + 16, 'text-anchor': 'middle', 'font-size': 10.5, fill: '#667c92' });
         t2.textContent = o.centreSub;
         svg.appendChild(t2);
       }
@@ -5253,7 +5328,7 @@ window.DUNIYA_SEED = {
     var ys = function (v) { return padT + ih - (v / maxY) * ih; };
 
     [0.25, 0.5, 0.75, 1].forEach(function (f) {
-      svg.appendChild(s('line', { x1: padL, x2: w - padR, y1: ys(maxY * f), y2: ys(maxY * f), stroke: '#EAE4D7', 'stroke-width': 1 }));
+      svg.appendChild(s('line', { x1: padL, x2: w - padR, y1: ys(maxY * f), y2: ys(maxY * f), stroke: '#d8e7fb', 'stroke-width': 1 }));
     });
 
     function path(key) {
@@ -5261,12 +5336,12 @@ window.DUNIYA_SEED = {
     }
 
     var area = path('budget') + ' L' + xs(points.length - 1) + ' ' + ys(0) + ' L' + xs(0) + ' ' + ys(0) + ' Z';
-    svg.appendChild(s('path', { d: area, fill: 'rgba(21,143,130,.08)', stroke: 'none' }));
-    svg.appendChild(s('path', { d: path('budget'), fill: 'none', stroke: '#0B3B37', 'stroke-width': 2, 'stroke-linejoin': 'round', 'vector-effect': 'non-scaling-stroke' }));
-    svg.appendChild(s('path', { d: path('actual'), fill: 'none', stroke: '#9A5B12', 'stroke-width': 2, 'stroke-dasharray': '4 3', 'stroke-linejoin': 'round', 'vector-effect': 'non-scaling-stroke' }));
+    svg.appendChild(s('path', { d: area, fill: 'rgba(117,167,241,.18)', stroke: 'none' }));
+    svg.appendChild(s('path', { d: path('budget'), fill: 'none', stroke: '#00254a', 'stroke-width': 2, 'stroke-linejoin': 'round', 'vector-effect': 'non-scaling-stroke' }));
+    svg.appendChild(s('path', { d: path('actual'), fill: 'none', stroke: '#db0b69', 'stroke-width': 2, 'stroke-dasharray': '4 3', 'stroke-linejoin': 'round', 'vector-effect': 'non-scaling-stroke' }));
 
     points.forEach(function (p, i) {
-      var g = s('circle', { cx: xs(i), cy: ys(p.budget), r: 2.6, fill: '#0B3B37' });
+      var g = s('circle', { cx: xs(i), cy: ys(p.budget), r: 2.6, fill: '#00254a' });
       var ttl = s('title', {});
       ttl.textContent = p.label + ' — budget ' + DD.money(p.budget) + ', actual ' + DD.money(p.actual);
       g.appendChild(ttl);
@@ -5290,9 +5365,9 @@ window.DUNIYA_SEED = {
           DD.el('span', { class: 'num tiny', style: { color: over ? 'var(--red)' : 'var(--ink-3)' }, text: DD.money(r.actual, { compact: true }) + ' / ' + DD.money(r.budget, { compact: true }) })
         ]),
         DD.el('div', { style: { position: 'relative', height: '15px' } }, [
-          DD.el('div', { style: { position: 'absolute', inset: '4px 0', background: '#EAE4D7', borderRadius: '2px' } }),
-          DD.el('div', { style: { position: 'absolute', top: '4px', bottom: '4px', left: '0', width: (r.budget / max * 100) + '%', background: 'var(--teal-100)', borderRadius: '2px' } }),
-          DD.el('div', { style: { position: 'absolute', top: '1px', bottom: '1px', left: '0', width: (Math.min(r.actual, max) / max * 100) + '%', background: over ? 'var(--red)' : 'linear-gradient(90deg,var(--teal-800),var(--teal-500))', borderRadius: '2px' } })
+          DD.el('div', { style: { position: 'absolute', inset: '4px 0', background: '#e3edfc', borderRadius: '2px' } }),
+          DD.el('div', { style: { position: 'absolute', top: '4px', bottom: '4px', left: '0', width: (r.budget / max * 100) + '%', background: 'var(--brand-100)', borderRadius: '2px' } }),
+          DD.el('div', { style: { position: 'absolute', top: '1px', bottom: '1px', left: '0', width: (Math.min(r.actual, max) / max * 100) + '%', background: over ? 'var(--pink)' : 'linear-gradient(90deg,var(--brand-800),var(--brand-500))', borderRadius: '2px' } })
         ])
       ]));
     });
@@ -5737,16 +5812,22 @@ window.DUNIYA_SEED = {
       zoomAt(pt[0], pt[1], ev.deltaY < 0 ? 1.16 : 1 / 1.16);
     }, { passive: false });
 
-    /* Drag to pan, and two fingers to pinch. */
-    var pointers = {}, last = null, pinchGap = 0, moved = 0;
+    /* Drag to pan, two fingers to pinch.
+
+       The pointer is captured LAZILY — only once a drag is really under way.
+       Capturing on pointerdown retargets every later event, the click included,
+       from the country to the <svg>, so the country's own handler never runs
+       and nothing opens when you click the map. */
+    var pointers = {}, last = null, pinchGap = 0, moved = 0, dragging = false;
+    var DRAG_SLOP = 5;
 
     svg.addEventListener('pointerdown', function (ev) {
       pointers[ev.pointerId] = { x: ev.clientX, y: ev.clientY };
       var ids = Object.keys(pointers);
-      moved = 0;
       if (ids.length === 1) {
+        moved = 0;
+        dragging = false;
         last = toBox(ev.clientX, ev.clientY);
-        svg.setPointerCapture(ev.pointerId);
       } else if (ids.length === 2) {
         pinchGap = gap(ids);
       }
@@ -5759,7 +5840,7 @@ window.DUNIYA_SEED = {
       pointers[ev.pointerId] = { x: ev.clientX, y: ev.clientY };
       var ids = Object.keys(pointers);
 
-      if (ids.length === 2) {
+      if (ids.length >= 2) {
         var now = gap(ids);
         if (pinchGap > 0 && now > 0) {
           var mid = midpoint(ids);
@@ -5770,7 +5851,12 @@ window.DUNIYA_SEED = {
         ev.preventDefault();
         return;
       }
-      if (ids.length === 1 && last && k > 1.01) {
+
+      if (ids.length === 1 && last && k > 1.01 && moved > DRAG_SLOP) {
+        if (!dragging) {
+          dragging = true;
+          try { svg.setPointerCapture(ev.pointerId); } catch (e) { /* fine without it */ }
+        }
         var p = toBox(ev.clientX, ev.clientY);
         tx += (p[0] - last[0]) * k;
         ty += (p[1] - last[1]) * k;
@@ -5781,16 +5867,19 @@ window.DUNIYA_SEED = {
     });
 
     function release(ev) {
+      if (dragging) {
+        try { svg.releasePointerCapture(ev.pointerId); } catch (e) { /* already gone */ }
+      }
       delete pointers[ev.pointerId];
-      if (!Object.keys(pointers).length) { last = null; pinchGap = 0; }
+      if (!Object.keys(pointers).length) { last = null; pinchGap = 0; dragging = false; }
     }
     svg.addEventListener('pointerup', release);
     svg.addEventListener('pointercancel', release);
-    svg.addEventListener('pointerleave', release);
 
-    /* A drag should not also count as a click on whatever is underneath. */
+    /* A real drag should not also count as a click on whatever is underneath. */
     svg.addEventListener('click', function (ev) {
-      if (moved > 8) { ev.stopPropagation(); ev.preventDefault(); }
+      if (moved > 10) { ev.stopPropagation(); ev.preventDefault(); }
+      moved = 0;
     }, true);
 
     function gap(ids) {
@@ -5836,9 +5925,9 @@ window.DUNIYA_SEED = {
 
   function defs() {
     var d = s('defs', {});
-    [['ddGradActive', '#7FD6C9', '#158F82'],
-     ['ddGradDone', '#158F82', '#0B3B37'],
-     ['ddGradOver', '#C86A6A', '#9B2C2C']].forEach(function (g) {
+    [['ddGradActive', '#a9c8f7', '#0b529b'],
+     ['ddGradDone', '#0b529b', '#00163a'],
+     ['ddGradOver', '#f4569b', '#db0b69']].forEach(function (g) {
       var lg = s('linearGradient', { id: g[0], x1: '0', y1: '0', x2: '1', y2: '1' });
       lg.appendChild(s('stop', { offset: '0%', 'stop-color': g[1] }));
       lg.appendChild(s('stop', { offset: '100%', 'stop-color': g[2] }));
@@ -5851,14 +5940,14 @@ window.DUNIYA_SEED = {
     var counts = { planned: 0, active: 0, done: 0, over: 0 };
     list.forEach(function (e) { counts[e.st.state] = (counts[e.st.state] || 0) + 1; });
     var wrap = el('div', { class: 'map-legend' });
-    [['planned', 'Planned', 'var(--teal-100)'],
-     ['active', 'Under way', 'linear-gradient(135deg,#7FD6C9,#158F82)'],
-     ['done', 'Done', 'linear-gradient(135deg,#158F82,#0B3B37)'],
-     ['over', 'Over budget', 'linear-gradient(135deg,#C86A6A,#9B2C2C)']
+    [['planned', 'Planned', 'var(--brand-300)'],
+     ['active', 'Under way', 'linear-gradient(135deg,#a9c8f7,#0b529b)'],
+     ['done', 'Done', 'linear-gradient(135deg,#0b529b,#00163a)'],
+     ['over', 'Over budget', 'linear-gradient(135deg,#f4569b,#db0b69)']
     ].forEach(function (row) {
       if (!counts[row[0]] && row[0] === 'over') return;
       wrap.appendChild(el('span', {}, [
-        el('i', { style: { background: row[2], border: row[0] === 'planned' ? '1px solid var(--teal-300)' : '0' } }),
+        el('i', { style: { background: row[2], border: row[0] === 'planned' ? '1px solid var(--brand-300)' : '0' } }),
         row[1] + ' (' + (counts[row[0]] || 0) + ')'
       ]));
     });
@@ -5932,7 +6021,7 @@ window.DUNIYA_SEED = {
     var worldTrips = all.filter(function (t) { return t.kind !== 'domestic'; });
     if (worldTrips.length) {
       host.appendChild(DD.sectionHead('The world, so far', 'Where the money goes',
-        el('span', { class: 'chip teal', text: DD.plural(started, 'place') + ' under way' })));
+        el('span', { class: 'chip brand', text: DD.plural(started, 'place') + ' under way' })));
       host.appendChild(el('p', { class: 'deck' },
         'Filled countries are on the itinerary. They deepen once you start spending there — click any one to open it.'));
       host.appendChild(DD.map.render({
@@ -6192,7 +6281,7 @@ window.DUNIYA_SEED = {
         el('div', { class: 'place-meta' }, [
           el('span', { class: 'chip', text: DD.plural(a.count, 'entry', 'entries') }),
           t.start ? el('span', { class: 'chip', text: DD.shortDate(t.start) }) : null,
-          active ? el('span', { class: 'chip teal', text: 'Open' }) : null
+          active ? el('span', { class: 'chip brand', text: 'Open' }) : null
         ]),
         el('div', { class: 'place-acts' }, [
           el('button', { class: 'btn xs pri', onclick: function () { S.setTrip(t.id); DD.go('places'); } },
@@ -6329,7 +6418,7 @@ window.DUNIYA_SEED = {
 (function () {
   var el = DD.el, S = DD.store, icon = DD.icon;
 
-  var GRADIENT = 'linear-gradient(160deg,var(--teal-900),var(--teal-700) 60%,var(--teal-600))';
+  var GRADIENT = 'linear-gradient(160deg,var(--brand-900),var(--brand-700) 60%,var(--brand-600))';
   function photoLayers(url) {
     return 'url("' + String(url).replace(/"/g, '%22') + '"), ' + GRADIENT;
   }
@@ -6341,17 +6430,22 @@ window.DUNIYA_SEED = {
 
   function render(host) {
     var t = S.trip();
+    /* A domestic place is a state: that is the level the India sheet budgets at
+       and the level the map fills at. Its towns live on the Cities page. */
     var isCity = t.kind === 'domestic';
     var list = S.places(t);
-    var noun = isCity ? ['city', 'cities'] : ['country', 'countries'];
+    var noun = isCity ? ['state', 'states'] : ['country', 'countries'];
 
     if (!list.length) {
+      if (isCity) host.appendChild(viewToggle('places'));
       host.appendChild(el('p', { class: 'lede' },
         'Nothing on ' + t.name + ' yet. Add the ' + noun[1] + ' you mean to visit — each one gets a photo, '
         + 'a starter budget of ' + DD.plural(t.defaultDays, 'day') + ', and booking links.'));
       host.appendChild(DD.emptyState('No ' + noun[1] + ' yet', '', 'Add a ' + noun[0], addDialog));
       return;
     }
+
+    if (isCity) host.appendChild(viewToggle('places'));
 
     var b = S.tripBudget(t), a = S.actuals(t);
     var started = list.filter(function (p) { return S.placeState(t, p).count; }).length;
@@ -6362,7 +6456,7 @@ window.DUNIYA_SEED = {
       DD.stat('Spent', DD.money(a.total, { compact: true }), DD.pct(a.total, b.total) + '% of budget'),
       DD.stat(a.total > b.total ? 'Over by' : 'Remaining', DD.money(Math.abs(b.total - a.total), { compact: true }),
         '', a.total > b.total ? 'neg' : 'pos'),
-      DD.stat(isCity ? 'Cities' : 'Countries', String(list.length), started + ' under way')
+      DD.stat(isCity ? 'States' : 'Countries', String(list.length), started + ' under way')
     ]));
 
     var pace = S.pacing(t);
@@ -6398,7 +6492,7 @@ window.DUNIYA_SEED = {
       + (kind === 'world' ? ' India opens your travels at home.' : '')));
 
     /* ---- the places ---- */
-    host.appendChild(DD.sectionHead('In order', isCity ? 'The cities' : 'The countries',
+    host.appendChild(DD.sectionHead('In order', isCity ? 'The states' : 'The countries',
       el('span', { class: 'chip', text: DD.plural(list.length, noun[0], noun[1]) })));
     var grid = el('div', { class: 'places' });
     list.forEach(function (p, i) { grid.appendChild(card(t, p, i, list.length)); });
@@ -6416,6 +6510,16 @@ window.DUNIYA_SEED = {
       el('button', { class: 'btn sm pri', onclick: function () { DD.logForm({ trip: t }); } },
         [icon('plus', 14), 'Log spend'])));
     host.appendChild(DD.expenseLedger(t));
+  }
+
+  /* A trip at home has two views of the same route: the states that carry the
+     budget, and the towns you pass through. */
+  function viewToggle(current) {
+    return el('div', { style: { marginBottom: '16px' } }, [
+      DD.segmented([['places', 'States'], ['cities', 'Cities']], current, function (v) {
+        if (v !== current) DD.go(v);
+      })
+    ]);
   }
 
   /* Drag a card on to another to slot it in there. Touch keeps the arrows. */
@@ -6500,7 +6604,7 @@ window.DUNIYA_SEED = {
         el('span', { class: 'muted tiny sans', text: 'budget' }),
         el('span', { style: { flex: '1' } }),
         st.count ? el('span', {
-          class: 'num', style: { fontWeight: '700', color: st.state === 'over' ? 'var(--red)' : 'var(--teal-800)' },
+          class: 'num', style: { fontWeight: '700', color: st.state === 'over' ? 'var(--red)' : 'var(--brand-800)' },
           text: DD.money(st.spent, { compact: true })
         }) : null
       ]),
@@ -6585,25 +6689,25 @@ window.DUNIYA_SEED = {
   function addDialog() {
     var t = S.trip();
     var isCity = t.kind === 'domestic';
-    var nameIn = el('input', { type: 'text', placeholder: isCity ? 'Jaipur' : 'Portugal', autocapitalize: 'words' });
-    var cityIn = el('input', { type: 'text', placeholder: isCity ? 'Rajasthan' : 'Lisbon' });
+    var nameIn = el('input', { type: 'text', placeholder: isCity ? 'Rajasthan' : 'Portugal', autocapitalize: 'words' });
+    var cityIn = el('input', { type: 'text', placeholder: isCity ? 'Jaipur' : 'Lisbon' });
     var daysIn = el('input', { type: 'number', min: '1', value: String(t.defaultDays) });
     var curIn = DD.selectOf(currencyOptions(), 'INR', null);
     var isoIn = el('input', { type: 'text', maxlength: '2', placeholder: 'PT', style: { textTransform: 'uppercase' } });
     var iataIn = el('input', { type: 'text', maxlength: '3', placeholder: 'LIS', style: { textTransform: 'uppercase' } });
 
     DD.modal({
-      title: isCity ? 'Add a city' : 'Add a country',
+      title: isCity ? 'Add a state' : 'Add a country',
       body: el('div', {}, [
-        DD.field(isCity ? 'City' : 'Country', nameIn),
-        DD.field(isCity ? 'State — used to fill the map' : 'Main city', cityIn),
+        DD.field(isCity ? 'State — this fills the map' : 'Country', nameIn),
+        DD.field(isCity ? 'Gateway city' : 'Main city', cityIn),
         el('div', { class: 'grid2' }, [DD.field('Days', daysIn), DD.field('Currency', curIn)]),
         el('div', { class: 'grid2' }, [
           DD.field(isCity ? 'Country code' : 'Country code', isoIn),
           DD.field('Airport', iataIn)
         ]),
         el('p', { class: 'tiny muted', style: { margin: '2px 0 0' } }, isCity
-          ? 'The state name fills that part of the India map. A photo and the city’s coordinates are looked up for you.'
+          ? 'The state name fills that part of the India map; the gateway city places the dot and finds a photo. Add the towns day by day under Plan.'
           : 'The country code fills the map and gives you a flag; the airport code builds the flight link.')
       ]),
       okLabel: 'Add',
@@ -6612,8 +6716,8 @@ window.DUNIYA_SEED = {
         if (!name) { nameIn.focus(); DD.toast('Give it a name first', true); return; }
         var p = S.addPlace(t, {
           name: name,
-          country: isCity ? (cityIn.value.trim() || name) : name,
-          city: isCity ? name : cityIn.value.trim(),
+          country: name,
+          city: cityIn.value.trim() || name,
           iso2: isoIn.value.trim().toUpperCase() || (isCity ? 'IN' : ''),
           iata: iataIn.value.trim().toUpperCase(),
           currency: curIn.value,
@@ -6935,10 +7039,14 @@ window.DUNIYA_SEED = {
   /* ----- details ----- */
   function aboutPane(t, p, host) {
     var isCity = t.kind === 'domestic';
-    var name = el('input', { type: 'text', value: p.name, oninput: function () { p.name = name.value; saveSoon(); } });
+    /* For a domestic place the name IS the state, and the map matches on it —
+       so keep p.country in step or a rename would stop filling the shape. */
+    var name = el('input', { type: 'text', value: p.name, oninput: function () {
+      p.name = name.value;
+      if (isCity) p.country = name.value;
+      saveSoon();
+    } });
     var city = el('input', { type: 'text', value: p.city || '', oninput: function () { p.city = city.value; saveSoon(); } });
-    var country = el('input', { type: 'text', value: p.country || '',
-      oninput: function () { p.country = country.value; saveSoon(); } });
     var iso = el('input', { type: 'text', maxlength: '2', value: p.iso2 || '', style: { textTransform: 'uppercase' },
       oninput: function () { p.iso2 = iso.value.toUpperCase(); saveSoon(); } });
     var iata = el('input', { type: 'text', maxlength: '3', value: p.iata || '', style: { textTransform: 'uppercase' },
@@ -6952,8 +7060,8 @@ window.DUNIYA_SEED = {
     notes.value = p.notes || '';
 
     host.appendChild(el('div', { class: 'grid2' }, [
-      DD.field(isCity ? 'City' : 'Country', name),
-      DD.field(isCity ? 'State — fills the map' : 'Main city', isCity ? country : city)
+      DD.field(isCity ? 'State — fills the map' : 'Country', name),
+      DD.field(isCity ? 'Gateway city' : 'Main city', city)
     ]));
     host.appendChild(el('div', { class: 'grid2' }, [
       DD.field('Country code', iso), DD.field('Airport', iata)
@@ -6980,6 +7088,7 @@ window.DUNIYA_SEED = {
     ]));
   }
 
+  DD.placesViewToggle = viewToggle;
   DD.placesAddDialog = addDialog;
   DD.placeEditor = editor;
   DD.currencyOptions = currencyOptions;
@@ -7027,10 +7136,12 @@ window.DUNIYA_SEED = {
       return;
     }
 
+    DD.append(host, DD.placesViewToggle('cities'));
+
     var all = cityDays(t);
     if (!all.length) {
       host.appendChild(DD.emptyState('No cities yet',
-        'Add a state on the ' + DD.placesLabel() + ' page, then list its cities day by day under Plan.',
+        'Add a state on the States page, then list its towns day by day under Plan.',
         'Open ' + DD.placesLabel(), function () { DD.go('places'); }));
       return;
     }
@@ -7165,6 +7276,7 @@ window.DUNIYA_SEED = {
   function render(host) {
     var t = S.trip();
     var list = S.places(t);
+    DD.append(host, DD.tripSwitcher());
     host.appendChild(el('p', { class: 'deck' },
       'Every figure in rupees. Budget cells are typed in; actual and variance are worked out from the ledger.'));
     host.appendChild(toolbar());
@@ -7184,7 +7296,7 @@ window.DUNIYA_SEED = {
     var table = el('table', { class: 'grid' });
 
     /* head */
-    var hr = el('tr', {}, [el('th', { text: t.kind === 'domestic' ? 'City' : 'Country' }), el('th', { text: 'Days' })]);
+    var hr = el('tr', {}, [el('th', { text: t.kind === 'domestic' ? 'State' : 'Country' }), el('th', { text: 'Days' })]);
     t.categories.forEach(function (c) { hr.appendChild(el('th', { text: c.label })); });
     hr.appendChild(el('th', { text: 'Total' }));
     hr.appendChild(el('th', { text: 'Per day' }));
@@ -7278,7 +7390,7 @@ window.DUNIYA_SEED = {
     var rows = [];
     rows.push([t.name + ' — ' + mode, 'all figures in INR']);
     rows.push([]);
-    var head = [t.kind === 'domestic' ? 'City' : 'Country', 'City', 'Currency', 'Days'];
+    var head = [t.kind === 'domestic' ? 'State' : 'Country', 'Main city', 'Currency', 'Days'];
     t.categories.forEach(function (c) { head.push(c.label); });
     head.push('Total', 'Per day');
     rows.push(head);
@@ -7421,7 +7533,7 @@ window.DUNIYA_SEED = {
       conv,
       el('div', { class: 'grid2' }, [
         DD.field('Category', catSel),
-        DD.field(t.kind === 'domestic' ? 'City' : 'Country', placeSel)
+        DD.field(t.kind === 'domestic' ? 'State' : 'Country', placeSel)
       ]),
       el('div', { class: 'grid2' }, [
         DD.field('Date', dateIn),
@@ -7504,6 +7616,7 @@ window.DUNIYA_SEED = {
   function render(host) {
     var t = S.trip();
     var list = S.places(t);
+    DD.append(host, DD.tripSwitcher());
 
     if (!list.length) {
       host.appendChild(DD.emptyState('No route yet',
@@ -7518,7 +7631,7 @@ window.DUNIYA_SEED = {
     var done = DD.sum(list, function (p) { return (p.itinerary || []).filter(function (i) { return i.done; }).length; });
 
     host.appendChild(DD.statStrip([
-      DD.stat('Stops', String(list.length), t.kind === 'domestic' ? 'cities' : 'countries', 'hero'),
+      DD.stat('Stops', String(list.length), t.kind === 'domestic' ? 'states' : 'countries', 'hero'),
       DD.stat('Days', String(totalDays), t.start ? DD.dateSpan(t.start, S.tripEnd(t)) : 'no start date set'),
       DD.stat('Planned', String(planned), done + ' ticked off'),
       DD.stat('Planned cost', DD.money(DD.sum(list, function (p) {
@@ -7683,7 +7796,9 @@ window.DUNIYA_SEED = {
         DD.downloadFile('duniya-backup-' + DD.today() + '.json', JSON.stringify(S.db(), null, 2), 'application/json');
         DD.toast('Backup downloaded');
       } }, [DD.icon('down', 15), 'JSON backup']),
-      el('button', { class: 'btn sm', onclick: importJSON }, [DD.icon('link', 15), 'Restore from backup'])
+      el('button', { class: 'btn sm', onclick: importJSON }, [DD.icon('link', 15), 'Restore from backup']),
+      window.DUNIYA_DATA ? el('button', { class: 'btn sm', onclick: reloadFile },
+        [DD.icon('down', 15), 'Reload from data/trip-data.js']) : null
     ]));
     host.appendChild(fileCard);
 
@@ -7739,7 +7854,10 @@ window.DUNIYA_SEED = {
 
     /* ---------------------------------------------------- categories */
     var t = S.trip();
-    host.appendChild(DD.sectionHead(t.name, 'Spending categories'));
+    host.appendChild(DD.sectionHead('Per trip', 'Spending categories'));
+    DD.append(host, DD.tripSwitcher());
+    host.appendChild(el('p', { class: 'deck', style: { marginTop: '2px' } },
+      'These belong to ' + t.name + '. Each trip keeps its own set — the world sheet has eight heads, the India sheet seven.'));
     var catCard = el('div', { class: 'card list' });
     t.categories.forEach(function (c, i) {
       var lab = el('input', { type: 'text', value: c.label, style: { border: '1px solid transparent', background: 'transparent' },
@@ -7848,6 +7966,22 @@ window.DUNIYA_SEED = {
       'Duniya Darshan runs entirely in this browser. Nothing is uploaded, there is no account, and the only network calls are the optional photo lookups on Wikipedia.'));
   }
 
+  /* Pull the repo's data file back in, over whatever is in this browser. */
+  function reloadFile() {
+    var file = window.DUNIYA_DATA;
+    if (!file) { DD.toast('No data/trip-data.js alongside this page', true); return; }
+    var mine = DD.sum(S.db().trips, function (t) { return t.expenses.length; });
+    DD.confirmBox('Reload from the folder?',
+      'This replaces everything in the browser with what the file holds'
+      + (file.stampNote ? ' (' + file.stampNote + ')' : '') + '.'
+      + (mine ? ' The ' + DD.plural(mine, 'expense') + ' logged here would go.' : ''),
+      function () {
+        S.replaceAll(S.deepClone(file));
+        DD.render();
+        DD.toast('Reloaded from the file');
+      }, 'Reload');
+  }
+
   function importJSON() {
     var input = el('input', { type: 'file', accept: '.json,application/json', style: { display: 'none' } });
     document.body.appendChild(input);
@@ -7901,7 +8035,10 @@ window.DUNIYA_SEED = {
     DD.on('filestate', paintFileState);
     paintFileState();
 
-    if (!seenBefore()) {
+    var fresh = DD.store.pendingImport();
+    if (fresh) {
+      setTimeout(function () { offerImport(fresh); }, 250);
+    } else if (!seenBefore()) {
       markSeen();
       setTimeout(welcome, 320);
     }
@@ -7924,6 +8061,51 @@ window.DUNIYA_SEED = {
       : s === 'none' ? 'Saved in this browser'
       : 'Saved in this browser';
     node.textContent = txt;
+  }
+
+  /* The spreadsheets have been re-imported since this browser last saved. */
+  function offerImport(fresh) {
+    var here = DD.store.db();
+    var mine = DD.sum(here.trips, function (t) { return t.expenses.length; });
+    var body = DD.el('div', {}, [
+      DD.el('p', {}, [
+        'The data file in this folder has been rebuilt from your spreadsheets since this browser last saved. It now holds ',
+        DD.el('strong', { text: fresh.note || 'a newer import' }), '.'
+      ]),
+      DD.el('p', { class: 'small' },
+        mine
+          ? 'Loading it replaces everything here, including the ' + DD.plural(mine, 'expense') + ' you have logged. Take a backup first if those matter.'
+          : 'Nothing is logged in this browser yet, so there is nothing to lose.'),
+      mine ? DD.el('button', {
+        class: 'btn sm', onclick: function () {
+          DD.downloadFile('duniya-backup-' + DD.today() + '.json',
+            JSON.stringify(DD.store.db(), null, 2), 'application/json');
+          DD.toast('Backup downloaded');
+        }
+      }, [DD.icon('down', 14), 'Back up what I have first']) : null
+    ]);
+
+    DD.modal({
+      title: 'Newer data in the folder',
+      body: body,
+      cancelLabel: 'Keep what I have',
+      okLabel: 'Load the new file',
+      ok: function (close) {
+        DD.store.acceptImport();
+        close();
+        DD.render();
+        DD.toast('Loaded — ' + (fresh.note || 'new data in'));
+      }
+    });
+
+    /* Closing the dialog counts as "keep mine", and we stop asking. */
+    var scrim = document.querySelector('.scrim:last-child');
+    if (scrim) {
+      scrim.addEventListener('click', function (e) {
+        if (e.target.closest('.btn.pri')) return;
+        DD.store.dismissImport();
+      });
+    }
   }
 
   function welcome() {

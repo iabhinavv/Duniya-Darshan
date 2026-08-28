@@ -13,6 +13,7 @@ India_tour_budget.xlsx  ->  the "Within India" trip, one place per STATE, with
 Writes src/js/02-seed.js (baked into index.html by build.py) and data/trip-data.js
 (the file the app reads on a fresh clone). Run it again if you change a sheet.
 """
+import hashlib
 import json
 import os
 
@@ -338,6 +339,14 @@ def build():
             },
         ],
     }
+
+    # A fingerprint of what the sheets produced. The app compares it with the
+    # copy in the browser so a re-import never sits invisible behind stale data.
+    seed["stamp"] = hashlib.sha1(
+        json.dumps(seed["trips"], ensure_ascii=False, sort_keys=True).encode()
+    ).hexdigest()[:12]
+    seed["stampNote"] = "%d countries, %d states, %s days" % (
+        len(places), len(india), sum(p["days"] for p in places + india))
 
     blob = json.dumps(seed, ensure_ascii=False, indent=1)
     with open(os.path.join(HERE, "src", "js", "02-seed.js"), "w") as fh:

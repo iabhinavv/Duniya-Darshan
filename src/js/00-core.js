@@ -179,16 +179,9 @@ function uid(prefix) {
 }
 
 /* --------------------------------------------------------------- colour */
-var PALETTE = ['#0F766E', '#2563EB', '#B45309', '#9333EA', '#DC2626', '#0891B2', '#65A30D', '#DB2777', '#4F46E5', '#EA580C'];
-function nextColour(used) {
-  for (var i = 0; i < PALETTE.length; i++) if (used.indexOf(PALETTE[i]) < 0) return PALETTE[i];
-  return PALETTE[used.length % PALETTE.length];
-}
-function initials(name) {
-  var parts = String(name || '?').trim().split(/\s+/);
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-}
+/* The whole app draws from five colours. Charts pick from here. */
+var PALETTE = ['#00254a', '#75a7f1', '#db0b69', '#0b529b', '#a9c8f7',
+               '#f4569b', '#003a75', '#667c92', '#00163a', '#c8dcf9'];
 
 /* Regional-indicator flag from an ISO-3166 alpha-2 code. */
 function flagOf(iso2) {
@@ -265,8 +258,7 @@ DD.$ = $; DD.$$ = $$; DD.el = el; DD.append = append; DD.clear = clear; DD.esc =
 DD.icon = icon; DD.money = money; DD.groupIN = groupIN; DD.num = num; DD.pct = pct;
 DD.plural = plural; DD.today = today; DD.toISO = toISO; DD.fromISO = fromISO;
 DD.niceDate = niceDate; DD.shortDate = shortDate; DD.addDays = addDays;
-DD.daysBetween = daysBetween; DD.dateSpan = dateSpan; DD.yymmdd = yymmdd; DD.uid = uid; DD.PALETTE = PALETTE;
-DD.nextColour = nextColour; DD.initials = initials; DD.flagOf = flagOf;
+DD.daysBetween = daysBetween; DD.dateSpan = dateSpan; DD.yymmdd = yymmdd; DD.uid = uid; DD.PALETTE = PALETTE; DD.flagOf = flagOf;
 DD.toINR = toINR; DD.rateFor = rateFor; DD.fmtLocal = fmtLocal; DD.clamp = clamp;
 DD.sum = sum; DD.by = by; DD.debounce = debounce; DD.slug = slug;
 DD.downloadFile = downloadFile; DD.csvOf = csvOf; DD.MONTHS = MONTHS; DD.DAYS = DAYS;

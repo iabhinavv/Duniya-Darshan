@@ -7,6 +7,7 @@
   var DB = null;
   var fileHandle = null;
   var dirty = false;
+  var freshImport = null;   /* set when data/trip-data.js is newer than this browser's copy */
 
   /* ------------------------------------------------------------ loading */
   function deepClone(o) { return JSON.parse(JSON.stringify(o)); }
@@ -18,6 +19,13 @@
       try {
         DB = JSON.parse(raw);
         migrate();
+        /* The repo's data file has been re-imported since this browser last
+           saved. Without this check the new sheets would sit invisible behind
+           a stale copy — which is exactly what happened with the India import. */
+        var file = window.DUNIYA_DATA;
+        if (file && file.stamp && file.stamp !== DB.stamp) {
+          freshImport = { stamp: file.stamp, note: file.stampNote || '', data: file };
+        }
         return 'local';
       } catch (e) { console.warn('stored data unreadable, falling back', e); }
     }
@@ -75,6 +83,24 @@
     });
     if (!DB.trips.length) DB.trips = deepClone(window.DUNIYA_SEED.trips);
     if (!tripById(DB.activeTrip)) DB.activeTrip = DB.trips[0].id;
+    if (!DB.stamp && window.DUNIYA_SEED) DB.stamp = window.DUNIYA_SEED.stamp;
+  }
+
+  /* What the data file holds that this browser does not, if anything. */
+  function pendingImport() { return freshImport; }
+
+  function acceptImport() {
+    if (!freshImport) return false;
+    replaceAll(deepClone(freshImport.data));
+    freshImport = null;
+    return true;
+  }
+
+  function dismissImport() {
+    if (!freshImport) return;
+    DB.stamp = freshImport.stamp;   /* remember we were asked, do not nag again */
+    freshImport = null;
+    save();
   }
 
   /* ------------------------------------------------------------- saving */
@@ -461,6 +487,7 @@
     addPlace: addPlace, removePlace: removePlace, movePlace: movePlace,
     addExpense: addExpense, updateExpense: updateExpense, removeExpense: removeExpense,
     replaceAll: replaceAll,
+    pendingImport: pendingImport, acceptImport: acceptImport, dismissImport: dismissImport,
     canUseFiles: canUseFiles, connectFile: connectFile, reconnectFile: reconnectFile,
     regrantFile: regrantFile, disconnectFile: disconnectFile, fileStatus: fileStatus,
     writeFile: writeFile, fileText: fileText

@@ -60,7 +60,7 @@
     var worldTrips = all.filter(function (t) { return t.kind !== 'domestic'; });
     if (worldTrips.length) {
       host.appendChild(DD.sectionHead('The world, so far', 'Where the money goes',
-        el('span', { class: 'chip teal', text: DD.plural(started, 'place') + ' under way' })));
+        el('span', { class: 'chip brand', text: DD.plural(started, 'place') + ' under way' })));
       host.appendChild(el('p', { class: 'deck' },
         'Filled countries are on the itinerary. They deepen once you start spending there — click any one to open it.'));
       host.appendChild(DD.map.render({
@@ -320,7 +320,7 @@
         el('div', { class: 'place-meta' }, [
           el('span', { class: 'chip', text: DD.plural(a.count, 'entry', 'entries') }),
           t.start ? el('span', { class: 'chip', text: DD.shortDate(t.start) }) : null,
-          active ? el('span', { class: 'chip teal', text: 'Open' }) : null
+          active ? el('span', { class: 'chip brand', text: 'Open' }) : null
         ]),
         el('div', { class: 'place-acts' }, [
           el('button', { class: 'btn xs pri', onclick: function () { S.setTrip(t.id); DD.go('places'); } },

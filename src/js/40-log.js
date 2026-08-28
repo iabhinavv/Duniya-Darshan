@@ -123,7 +123,7 @@
       conv,
       el('div', { class: 'grid2' }, [
         DD.field('Category', catSel),
-        DD.field(t.kind === 'domestic' ? 'City' : 'Country', placeSel)
+        DD.field(t.kind === 'domestic' ? 'State' : 'Country', placeSel)
       ]),
       el('div', { class: 'grid2' }, [
         DD.field('Date', dateIn),

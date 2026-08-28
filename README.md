@@ -63,7 +63,15 @@ Then open **http://localhost:4190/**. Two things only work over `http://`:
 
 ## 2. Where your data lives
 
+> **If a page looks empty after a re-import**, the browser is showing an older
+> copy. The app now notices and offers to load the newer file when you open it,
+> and **Almanac → Reload from data/trip-data.js** does it on demand.
+
+
 Everything is saved in the browser as you work — instantly, no save button.
+That copy takes priority over the file, which is what you want day to day but not
+after a re-import; the app stamps each import and tells you when the folder holds
+something newer.
 
 To make it a real file that commits and diffs, go to **Data → Connect data file**
 and pick `data/trip-data.js` in this folder. From then on every change is written
@@ -128,7 +136,7 @@ On the world map, **clicking an empty country offers to add it to the trip**, an
 
 **Both maps zoom.** Scroll or pinch to zoom about the pointer, drag to pan, or use
 the +/− and Reset buttons in the corner. A drag never counts as a click on the
-country underneath.
+country underneath, and a click always reaches it.
 
 Boundaries are Natural Earth 1:110m and a public-domain set of Indian state
 outlines, baked into the file by `make_maps.py`. Nothing is fetched at runtime,
@@ -138,19 +146,29 @@ so the maps work with no network at all.
 
 ## 5. The screens
 
+The bar reads:
+
+```
+FRONT PAGE   WORLD TOUR   WITHIN INDIA   |   THE SHEET   ITINERARY   ALMANAC
+```
+
+Every trip you own gets its own entry, and the three pages on the right serve
+**all** trips — each one carries a World Tour / Within India switch at the top
+rather than quietly following whatever you last opened.
+
 | | |
 |---|---|
-| **Front Page** | Everything at once: totals across all trips, the world map, the trips, where the money is budgeted, the latest spending, what is coming up |
-| **Countries / States** | The trip itself — its map, a card per place, and the trip's whole ledger of spending at the bottom. Drag a card to reorder the route |
-| **Cities** | Trips at home only: all 131 towns, in order, with the day, the date and what you meant to do there. Searchable, tickable, and each row logs spending straight to its state |
-| **The Sheet** | Your spreadsheet — places down, categories across, Budget / Actual / Variance, CSV out |
-| **Itinerary** | The whole route day by day, dated from the trip start |
-| **Almanac** | Backup, exchange rates, categories, booking links, reset |
+| **Front Page** | Everything at once: totals across all trips, the world map, Today, the pacing bar, the trips, where the money is budgeted, the latest spending, what is coming up |
+| **World Tour** | Its map, a card per country, and the trip's ledger. Drag a card to reorder the route |
+| **Within India** | Two views of the same route: **States**, which carry the budget and fill the map, and **Cities**, all 131 towns in order with dates and notes — searchable, tickable, each row logging spend to its state |
+| **The Sheet** | Your spreadsheet — places down, categories across, Budget / Actual / Variance, CSV out. Switches between trips |
+| **Itinerary** | The whole route day by day, dated from the trip start. Switches between trips |
+| **Almanac** | Backup, exchange rates, categories, booking links, reset. Categories are per trip, so it switches too |
 
 **There is no separate Log section.** Spending belongs to a trip, so you log it
 from a place card, from the **Spending** tab inside a place, or from the ledger at
-the foot of the Countries page. On a phone the **+** in the middle of the tab bar
-logs from anywhere.
+the foot of the trip's page. On a phone the **+** in the middle of the tab bar
+logs from anywhere, and the two trips sit either side of it.
 
 Keyboard on a desktop: <kbd>F</kbd> front page, <kbd>P</kbd> places, <kbd>S</kbd>
 sheet, <kbd>I</kbd> itinerary, <kbd>L</kbd> log spend, <kbd>Esc</kbd> closes a dialog.
@@ -159,8 +177,8 @@ sheet, <kbd>I</kbd> itinerary, <kbd>L</kbd> log spend, <kbd>Esc</kbd> closes a d
 
 Your India sheet budgets **by state** — one row of figures for Kerala, one for
 Rajasthan — and the map fills by state too. So a state is the thing that carries
-money, and the cities live inside it as the day-by-day plan. The **Cities** page
-reads them straight back out, which is why both views exist.
+money, and the towns live inside it as the day-by-day plan. The **Cities** view
+reads them straight back out, which is why the India section has both.
 
 ---
 
@@ -255,6 +273,16 @@ Set in **Playfair Display**, served from Google Fonts with Georgia behind it —
 if you are offline it still reads as a newspaper rather than falling apart. The
 furniture (labels, buttons, table headings) is in a plain sans, the way a
 broadsheet sets its captions and standfirsts against serif body copy.
+
+Five colours, and nothing else:
+
+| | | |
+|---|---|---|
+| `#00254a` | navy | the masthead, headings, primary buttons, the deep end of every gradient |
+| `#75a7f1` | blue | planned places on the map, tints, the light end of every gradient |
+| `#db0b69` | magenta | over budget, the India doorway on the world map, anything that wants your attention |
+| `#000000` | black | body text |
+| `#ffffff` | white | paper |
 
 ---
 

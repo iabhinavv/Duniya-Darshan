@@ -20,7 +20,10 @@
     DD.on('filestate', paintFileState);
     paintFileState();
 
-    if (!seenBefore()) {
+    var fresh = DD.store.pendingImport();
+    if (fresh) {
+      setTimeout(function () { offerImport(fresh); }, 250);
+    } else if (!seenBefore()) {
       markSeen();
       setTimeout(welcome, 320);
     }
@@ -43,6 +46,51 @@
       : s === 'none' ? 'Saved in this browser'
       : 'Saved in this browser';
     node.textContent = txt;
+  }
+
+  /* The spreadsheets have been re-imported since this browser last saved. */
+  function offerImport(fresh) {
+    var here = DD.store.db();
+    var mine = DD.sum(here.trips, function (t) { return t.expenses.length; });
+    var body = DD.el('div', {}, [
+      DD.el('p', {}, [
+        'The data file in this folder has been rebuilt from your spreadsheets since this browser last saved. It now holds ',
+        DD.el('strong', { text: fresh.note || 'a newer import' }), '.'
+      ]),
+      DD.el('p', { class: 'small' },
+        mine
+          ? 'Loading it replaces everything here, including the ' + DD.plural(mine, 'expense') + ' you have logged. Take a backup first if those matter.'
+          : 'Nothing is logged in this browser yet, so there is nothing to lose.'),
+      mine ? DD.el('button', {
+        class: 'btn sm', onclick: function () {
+          DD.downloadFile('duniya-backup-' + DD.today() + '.json',
+            JSON.stringify(DD.store.db(), null, 2), 'application/json');
+          DD.toast('Backup downloaded');
+        }
+      }, [DD.icon('down', 14), 'Back up what I have first']) : null
+    ]);
+
+    DD.modal({
+      title: 'Newer data in the folder',
+      body: body,
+      cancelLabel: 'Keep what I have',
+      okLabel: 'Load the new file',
+      ok: function (close) {
+        DD.store.acceptImport();
+        close();
+        DD.render();
+        DD.toast('Loaded — ' + (fresh.note || 'new data in'));
+      }
+    });
+
+    /* Closing the dialog counts as "keep mine", and we stop asking. */
+    var scrim = document.querySelector('.scrim:last-child');
+    if (scrim) {
+      scrim.addEventListener('click', function (e) {
+        if (e.target.closest('.btn.pri')) return;
+        DD.store.dismissImport();
+      });
+    }
   }
 
   function welcome() {

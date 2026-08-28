@@ -3470,5 +3470,7 @@ window.DUNIYA_SEED = {
    ],
    "expenses": []
   }
- ]
+ ],
+ "stamp": "544f065110c8",
+ "stampNote": "36 countries, 28 states, 545 days"
 };

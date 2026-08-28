@@ -223,16 +223,22 @@
       zoomAt(pt[0], pt[1], ev.deltaY < 0 ? 1.16 : 1 / 1.16);
     }, { passive: false });
 
-    /* Drag to pan, and two fingers to pinch. */
-    var pointers = {}, last = null, pinchGap = 0, moved = 0;
+    /* Drag to pan, two fingers to pinch.
+
+       The pointer is captured LAZILY — only once a drag is really under way.
+       Capturing on pointerdown retargets every later event, the click included,
+       from the country to the <svg>, so the country's own handler never runs
+       and nothing opens when you click the map. */
+    var pointers = {}, last = null, pinchGap = 0, moved = 0, dragging = false;
+    var DRAG_SLOP = 5;
 
     svg.addEventListener('pointerdown', function (ev) {
       pointers[ev.pointerId] = { x: ev.clientX, y: ev.clientY };
       var ids = Object.keys(pointers);
-      moved = 0;
       if (ids.length === 1) {
+        moved = 0;
+        dragging = false;
         last = toBox(ev.clientX, ev.clientY);
-        svg.setPointerCapture(ev.pointerId);
       } else if (ids.length === 2) {
         pinchGap = gap(ids);
       }
@@ -245,7 +251,7 @@
       pointers[ev.pointerId] = { x: ev.clientX, y: ev.clientY };
       var ids = Object.keys(pointers);
 
-      if (ids.length === 2) {
+      if (ids.length >= 2) {
         var now = gap(ids);
         if (pinchGap > 0 && now > 0) {
           var mid = midpoint(ids);
@@ -256,7 +262,12 @@
         ev.preventDefault();
         return;
       }
-      if (ids.length === 1 && last && k > 1.01) {
+
+      if (ids.length === 1 && last && k > 1.01 && moved > DRAG_SLOP) {
+        if (!dragging) {
+          dragging = true;
+          try { svg.setPointerCapture(ev.pointerId); } catch (e) { /* fine without it */ }
+        }
         var p = toBox(ev.clientX, ev.clientY);
         tx += (p[0] - last[0]) * k;
         ty += (p[1] - last[1]) * k;
@@ -267,16 +278,19 @@
     });
 
     function release(ev) {
+      if (dragging) {
+        try { svg.releasePointerCapture(ev.pointerId); } catch (e) { /* already gone */ }
+      }
       delete pointers[ev.pointerId];
-      if (!Object.keys(pointers).length) { last = null; pinchGap = 0; }
+      if (!Object.keys(pointers).length) { last = null; pinchGap = 0; dragging = false; }
     }
     svg.addEventListener('pointerup', release);
     svg.addEventListener('pointercancel', release);
-    svg.addEventListener('pointerleave', release);
 
-    /* A drag should not also count as a click on whatever is underneath. */
+    /* A real drag should not also count as a click on whatever is underneath. */
     svg.addEventListener('click', function (ev) {
-      if (moved > 8) { ev.stopPropagation(); ev.preventDefault(); }
+      if (moved > 10) { ev.stopPropagation(); ev.preventDefault(); }
+      moved = 0;
     }, true);
 
     function gap(ids) {
@@ -322,9 +336,9 @@
 
   function defs() {
     var d = s('defs', {});
-    [['ddGradActive', '#7FD6C9', '#158F82'],
-     ['ddGradDone', '#158F82', '#0B3B37'],
-     ['ddGradOver', '#C86A6A', '#9B2C2C']].forEach(function (g) {
+    [['ddGradActive', '#a9c8f7', '#0b529b'],
+     ['ddGradDone', '#0b529b', '#00163a'],
+     ['ddGradOver', '#f4569b', '#db0b69']].forEach(function (g) {
       var lg = s('linearGradient', { id: g[0], x1: '0', y1: '0', x2: '1', y2: '1' });
       lg.appendChild(s('stop', { offset: '0%', 'stop-color': g[1] }));
       lg.appendChild(s('stop', { offset: '100%', 'stop-color': g[2] }));
@@ -337,14 +351,14 @@
     var counts = { planned: 0, active: 0, done: 0, over: 0 };
     list.forEach(function (e) { counts[e.st.state] = (counts[e.st.state] || 0) + 1; });
     var wrap = el('div', { class: 'map-legend' });
-    [['planned', 'Planned', 'var(--teal-100)'],
-     ['active', 'Under way', 'linear-gradient(135deg,#7FD6C9,#158F82)'],
-     ['done', 'Done', 'linear-gradient(135deg,#158F82,#0B3B37)'],
-     ['over', 'Over budget', 'linear-gradient(135deg,#C86A6A,#9B2C2C)']
+    [['planned', 'Planned', 'var(--brand-300)'],
+     ['active', 'Under way', 'linear-gradient(135deg,#a9c8f7,#0b529b)'],
+     ['done', 'Done', 'linear-gradient(135deg,#0b529b,#00163a)'],
+     ['over', 'Over budget', 'linear-gradient(135deg,#f4569b,#db0b69)']
     ].forEach(function (row) {
       if (!counts[row[0]] && row[0] === 'over') return;
       wrap.appendChild(el('span', {}, [
-        el('i', { style: { background: row[2], border: row[0] === 'planned' ? '1px solid var(--teal-300)' : '0' } }),
+        el('i', { style: { background: row[2], border: row[0] === 'planned' ? '1px solid var(--brand-300)' : '0' } }),
         row[1] + ' (' + (counts[row[0]] || 0) + ')'
       ]));
     });

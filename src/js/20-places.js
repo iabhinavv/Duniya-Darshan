@@ -5,7 +5,7 @@
 (function () {
   var el = DD.el, S = DD.store, icon = DD.icon;
 
-  var GRADIENT = 'linear-gradient(160deg,var(--teal-900),var(--teal-700) 60%,var(--teal-600))';
+  var GRADIENT = 'linear-gradient(160deg,var(--brand-900),var(--brand-700) 60%,var(--brand-600))';
   function photoLayers(url) {
     return 'url("' + String(url).replace(/"/g, '%22') + '"), ' + GRADIENT;
   }
@@ -17,17 +17,22 @@
 
   function render(host) {
     var t = S.trip();
+    /* A domestic place is a state: that is the level the India sheet budgets at
+       and the level the map fills at. Its towns live on the Cities page. */
     var isCity = t.kind === 'domestic';
     var list = S.places(t);
-    var noun = isCity ? ['city', 'cities'] : ['country', 'countries'];
+    var noun = isCity ? ['state', 'states'] : ['country', 'countries'];
 
     if (!list.length) {
+      if (isCity) host.appendChild(viewToggle('places'));
       host.appendChild(el('p', { class: 'lede' },
         'Nothing on ' + t.name + ' yet. Add the ' + noun[1] + ' you mean to visit — each one gets a photo, '
         + 'a starter budget of ' + DD.plural(t.defaultDays, 'day') + ', and booking links.'));
       host.appendChild(DD.emptyState('No ' + noun[1] + ' yet', '', 'Add a ' + noun[0], addDialog));
       return;
     }
+
+    if (isCity) host.appendChild(viewToggle('places'));
 
     var b = S.tripBudget(t), a = S.actuals(t);
     var started = list.filter(function (p) { return S.placeState(t, p).count; }).length;
@@ -38,7 +43,7 @@
       DD.stat('Spent', DD.money(a.total, { compact: true }), DD.pct(a.total, b.total) + '% of budget'),
       DD.stat(a.total > b.total ? 'Over by' : 'Remaining', DD.money(Math.abs(b.total - a.total), { compact: true }),
         '', a.total > b.total ? 'neg' : 'pos'),
-      DD.stat(isCity ? 'Cities' : 'Countries', String(list.length), started + ' under way')
+      DD.stat(isCity ? 'States' : 'Countries', String(list.length), started + ' under way')
     ]));
 
     var pace = S.pacing(t);
@@ -74,7 +79,7 @@
       + (kind === 'world' ? ' India opens your travels at home.' : '')));
 
     /* ---- the places ---- */
-    host.appendChild(DD.sectionHead('In order', isCity ? 'The cities' : 'The countries',
+    host.appendChild(DD.sectionHead('In order', isCity ? 'The states' : 'The countries',
       el('span', { class: 'chip', text: DD.plural(list.length, noun[0], noun[1]) })));
     var grid = el('div', { class: 'places' });
     list.forEach(function (p, i) { grid.appendChild(card(t, p, i, list.length)); });
@@ -92,6 +97,16 @@
       el('button', { class: 'btn sm pri', onclick: function () { DD.logForm({ trip: t }); } },
         [icon('plus', 14), 'Log spend'])));
     host.appendChild(DD.expenseLedger(t));
+  }
+
+  /* A trip at home has two views of the same route: the states that carry the
+     budget, and the towns you pass through. */
+  function viewToggle(current) {
+    return el('div', { style: { marginBottom: '16px' } }, [
+      DD.segmented([['places', 'States'], ['cities', 'Cities']], current, function (v) {
+        if (v !== current) DD.go(v);
+      })
+    ]);
   }
 
   /* Drag a card on to another to slot it in there. Touch keeps the arrows. */
@@ -176,7 +191,7 @@
         el('span', { class: 'muted tiny sans', text: 'budget' }),
         el('span', { style: { flex: '1' } }),
         st.count ? el('span', {
-          class: 'num', style: { fontWeight: '700', color: st.state === 'over' ? 'var(--red)' : 'var(--teal-800)' },
+          class: 'num', style: { fontWeight: '700', color: st.state === 'over' ? 'var(--red)' : 'var(--brand-800)' },
           text: DD.money(st.spent, { compact: true })
         }) : null
       ]),
@@ -261,25 +276,25 @@
   function addDialog() {
     var t = S.trip();
     var isCity = t.kind === 'domestic';
-    var nameIn = el('input', { type: 'text', placeholder: isCity ? 'Jaipur' : 'Portugal', autocapitalize: 'words' });
-    var cityIn = el('input', { type: 'text', placeholder: isCity ? 'Rajasthan' : 'Lisbon' });
+    var nameIn = el('input', { type: 'text', placeholder: isCity ? 'Rajasthan' : 'Portugal', autocapitalize: 'words' });
+    var cityIn = el('input', { type: 'text', placeholder: isCity ? 'Jaipur' : 'Lisbon' });
     var daysIn = el('input', { type: 'number', min: '1', value: String(t.defaultDays) });
     var curIn = DD.selectOf(currencyOptions(), 'INR', null);
     var isoIn = el('input', { type: 'text', maxlength: '2', placeholder: 'PT', style: { textTransform: 'uppercase' } });
     var iataIn = el('input', { type: 'text', maxlength: '3', placeholder: 'LIS', style: { textTransform: 'uppercase' } });
 
     DD.modal({
-      title: isCity ? 'Add a city' : 'Add a country',
+      title: isCity ? 'Add a state' : 'Add a country',
       body: el('div', {}, [
-        DD.field(isCity ? 'City' : 'Country', nameIn),
-        DD.field(isCity ? 'State — used to fill the map' : 'Main city', cityIn),
+        DD.field(isCity ? 'State — this fills the map' : 'Country', nameIn),
+        DD.field(isCity ? 'Gateway city' : 'Main city', cityIn),
         el('div', { class: 'grid2' }, [DD.field('Days', daysIn), DD.field('Currency', curIn)]),
         el('div', { class: 'grid2' }, [
           DD.field(isCity ? 'Country code' : 'Country code', isoIn),
           DD.field('Airport', iataIn)
         ]),
         el('p', { class: 'tiny muted', style: { margin: '2px 0 0' } }, isCity
-          ? 'The state name fills that part of the India map. A photo and the city’s coordinates are looked up for you.'
+          ? 'The state name fills that part of the India map; the gateway city places the dot and finds a photo. Add the towns day by day under Plan.'
           : 'The country code fills the map and gives you a flag; the airport code builds the flight link.')
       ]),
       okLabel: 'Add',
@@ -288,8 +303,8 @@
         if (!name) { nameIn.focus(); DD.toast('Give it a name first', true); return; }
         var p = S.addPlace(t, {
           name: name,
-          country: isCity ? (cityIn.value.trim() || name) : name,
-          city: isCity ? name : cityIn.value.trim(),
+          country: name,
+          city: cityIn.value.trim() || name,
           iso2: isoIn.value.trim().toUpperCase() || (isCity ? 'IN' : ''),
           iata: iataIn.value.trim().toUpperCase(),
           currency: curIn.value,
@@ -611,10 +626,14 @@
   /* ----- details ----- */
   function aboutPane(t, p, host) {
     var isCity = t.kind === 'domestic';
-    var name = el('input', { type: 'text', value: p.name, oninput: function () { p.name = name.value; saveSoon(); } });
+    /* For a domestic place the name IS the state, and the map matches on it —
+       so keep p.country in step or a rename would stop filling the shape. */
+    var name = el('input', { type: 'text', value: p.name, oninput: function () {
+      p.name = name.value;
+      if (isCity) p.country = name.value;
+      saveSoon();
+    } });
     var city = el('input', { type: 'text', value: p.city || '', oninput: function () { p.city = city.value; saveSoon(); } });
-    var country = el('input', { type: 'text', value: p.country || '',
-      oninput: function () { p.country = country.value; saveSoon(); } });
     var iso = el('input', { type: 'text', maxlength: '2', value: p.iso2 || '', style: { textTransform: 'uppercase' },
       oninput: function () { p.iso2 = iso.value.toUpperCase(); saveSoon(); } });
     var iata = el('input', { type: 'text', maxlength: '3', value: p.iata || '', style: { textTransform: 'uppercase' },
@@ -628,8 +647,8 @@
     notes.value = p.notes || '';
 
     host.appendChild(el('div', { class: 'grid2' }, [
-      DD.field(isCity ? 'City' : 'Country', name),
-      DD.field(isCity ? 'State — fills the map' : 'Main city', isCity ? country : city)
+      DD.field(isCity ? 'State — fills the map' : 'Country', name),
+      DD.field(isCity ? 'Gateway city' : 'Main city', city)
     ]));
     host.appendChild(el('div', { class: 'grid2' }, [
       DD.field('Country code', iso), DD.field('Airport', iata)
@@ -656,6 +675,7 @@
     ]));
   }
 
+  DD.placesViewToggle = viewToggle;
   DD.placesAddDialog = addDialog;
   DD.placeEditor = editor;
   DD.currencyOptions = currencyOptions;

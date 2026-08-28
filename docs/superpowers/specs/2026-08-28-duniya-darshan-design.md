@@ -152,3 +152,40 @@ Added on request, plus the four usability suggestions from the previous handover
 7. **FX cheat line on every card** — ₹100 in local money, and the reverse stepped
    up by powers of ten so it is readable.
 8. **Drag to reorder** places on desktop; the arrows remain for touch.
+
+
+---
+
+# Revision 3 — 2026-08-28, fourth pass
+
+Two real bugs and three changes of direction.
+
+## Bugs
+
+1. **Clicking the map did nothing.** `svg.setPointerCapture()` on `pointerdown`
+   retargets every later event — the `click` included — from the country to the
+   `<svg>`, so the country's own handler never ran. The capture is now taken
+   lazily, only once a drag has passed a 5px slop, so a plain click stays on the
+   path. Caught only by clicking with a real mouse; a synthesised `click` event
+   passed happily.
+2. **A re-import sat invisible behind stale localStorage.** The saved copy always
+   won on load, so the India import never reached a browser that had used the app
+   before — which is exactly what happened. `import_xlsx.py` now writes a `stamp`
+   (sha1 of the trips) into both the seed and the data file; on load a differing
+   stamp raises a dialog offering to load the newer file, with a backup button
+   first. Almanac also has a manual "Reload from data/trip-data.js".
+
+## Changes
+
+3. **Navigation is trip-first.** The bar is Front Page · <one entry per trip> ·
+   The Sheet · Itinerary · Almanac. Those last three no longer follow whatever
+   trip was last opened — each carries a trip switcher. The India section holds a
+   States / Cities toggle rather than a separate nav entry. Mobile puts the two
+   trips either side of the log button.
+4. **Domestic places are states, and now say so.** Labels, the add dialog, the
+   sheet header and the stat cards all read "state"; renaming one keeps
+   `p.country` in step so the map keeps filling.
+5. **New palette**, applied everywhere including charts, map gradients, favicon
+   and theme colour: navy `#00254a`, blue `#75a7f1`, magenta `#db0b69`, black,
+   white. Greys are tints of the navy on white, so nothing strays outside it.
+   The old `--teal-*` ramp was renamed `--brand-*`.
