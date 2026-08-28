@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
-"""Read World_tour_budget.xlsx and write the seed used by Duniya Darshan.
+"""Read both budget workbooks and write the seed used by Duniya Darshan.
 
     python3 import_xlsx.py
 
+World_tour_budget.xlsx  ->  the "World Tour" trip, one place per country.
+India_tour_budget.xlsx  ->  the "Within India" trip, one place per STATE, with
+                            each day's city kept as an itinerary entry. The India
+                            sheet budgets by state and the map fills by state, so
+                            the state is the unit that makes both work; the Cities
+                            page reads the day-by-day cities back out.
+
 Writes src/js/02-seed.js (baked into index.html by build.py) and data/trip-data.js
-(the file the app reads on a fresh clone). Run it again if you change the sheet.
+(the file the app reads on a fresh clone). Run it again if you change a sheet.
 """
 import json
 import os
@@ -12,7 +19,8 @@ import os
 import openpyxl
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-BOOK = os.path.join(HERE, "World_tour_budget.xlsx")
+WORLD_BOOK = os.path.join(HERE, "World_tour_budget.xlsx")
+INDIA_BOOK = os.path.join(HERE, "India_tour_budget.xlsx")
 
 # Column letter in the sheet -> category id in the app.
 COLS = {
@@ -117,8 +125,8 @@ CATEGORIES = [
 ]
 
 
-def read_places():
-    wb = openpyxl.load_workbook(BOOK, data_only=True)
+def read_world_places():
+    wb = openpyxl.load_workbook(WORLD_BOOK, data_only=True)
     ws = wb["World Tour Budget"]
     places, order = [], 0
     for row in range(6, ws.max_row + 1):
@@ -150,10 +158,135 @@ def read_places():
     return places
 
 
+# --------------------------------------------------------------- india
+
+# Column letter in the India sheet -> category id.
+INDIA_COLS = {"I": "railway", "J": "intercity", "K": "lodging", "L": "food",
+              "M": "activities", "N": "petrol", "O": "misc"}
+INDIA_COLNUM = {"I": 9, "J": 10, "K": 11, "L": 12, "M": 13, "N": 14, "O": 15}
+
+INDIA_CATEGORIES = [
+    ("railway",    "Flights & Rail"),
+    ("intercity",  "Intercity Travel"),
+    ("lodging",    "Lodging"),
+    ("food",       "Food"),
+    ("activities", "Activities"),
+    ("petrol",     "Petrol"),
+    ("misc",       "Misc"),
+]
+
+# State -> (gateway city, IATA, lat, lon). The coordinates drop the dot on the
+# map; the state name itself is what fills the shape.
+STATE_META = {
+    "Punjab":            ("Amritsar", "ATQ", 31.63, 74.87),
+    "Haryana":           ("Kurukshetra", "DEL", 29.97, 76.88),
+    "Himachal Pradesh":  ("Shimla", "SLV", 31.10, 77.17),
+    "Uttarakhand":       ("Haridwar", "DED", 29.95, 78.16),
+    "Rajasthan":         ("Jaipur", "JAI", 26.92, 75.79),
+    "Gujarat":           ("Ahmedabad", "AMD", 23.02, 72.57),
+    "Madhya Pradesh":    ("Bhopal", "BHO", 23.26, 77.41),
+    "Uttar Pradesh":     ("Agra", "AGR", 27.18, 78.02),
+    "Bihar":             ("Patna", "PAT", 25.59, 85.14),
+    "Jharkhand":         ("Ranchi", "IXR", 23.34, 85.31),
+    "West Bengal":       ("Kolkata", "CCU", 22.57, 88.36),
+    "Sikkim":            ("Gangtok", "IXB", 27.33, 88.61),
+    "Assam":             ("Guwahati", "GAU", 26.14, 91.74),
+    "Arunachal Pradesh": ("Tawang", "TEZ", 27.59, 91.87),
+    "Meghalaya":         ("Shillong", "SHL", 25.58, 91.89),
+    "Manipur":           ("Imphal", "IMF", 24.82, 93.94),
+    "Nagaland":          ("Kohima", "DMU", 25.67, 94.11),
+    "Mizoram":           ("Aizawl", "AJL", 23.73, 92.72),
+    "Tripura":           ("Agartala", "IXA", 23.83, 91.28),
+    "Odisha":            ("Bhubaneswar", "BBI", 20.30, 85.82),
+    "Chhattisgarh":      ("Raipur", "RPR", 21.25, 81.63),
+    "Telangana":         ("Hyderabad", "HYD", 17.39, 78.49),
+    "Andhra Pradesh":    ("Visakhapatnam", "VTZ", 17.69, 83.22),
+    "Karnataka":         ("Bangalore", "BLR", 12.97, 77.59),
+    "Kerala":            ("Kochi", "COK", 9.93, 76.27),
+    "Tamil Nadu":        ("Chennai", "MAA", 13.08, 80.27),
+    "Goa":               ("Panaji", "GOI", 15.50, 73.83),
+    "Maharashtra":       ("Mumbai", "BOM", 19.08, 72.88),
+}
+
+
+def read_india_places():
+    """One place per state. Each day row becomes an itinerary entry so the
+    cities, and what you meant to do in them, survive the import."""
+    wb = openpyxl.load_workbook(INDIA_BOOK, data_only=True)
+    ws = wb["India Tour"]
+    places, order, current = [], 0, None
+
+    for row in range(6, 300):
+        state = ws.cell(row=row, column=3).value
+        day = ws.cell(row=row, column=2).value
+        city = ws.cell(row=row, column=4).value
+        note = ws.cell(row=row, column=5).value
+
+        if state and str(state).strip():
+            state = str(state).strip()
+            if state not in STATE_META:
+                print("  ! no metadata for state %r, skipping" % state)
+                current = None
+                continue
+            gateway, iata, lat, lon = STATE_META[state]
+            budget = {cid: 0 for cid, _ in INDIA_CATEGORIES}
+            for letter, cid in INDIA_COLS.items():
+                v = ws.cell(row=row, column=INDIA_COLNUM[letter]).value
+                if isinstance(v, (int, float)):
+                    budget[cid] += int(round(v))
+            order += 1
+            current = {
+                "id": "in_" + slugify(state),
+                "name": state, "country": state, "city": gateway,
+                "iso2": "IN", "iata": iata, "currency": "INR",
+                "lat": lat, "lon": lon,
+                "days": 0, "order": order, "notes": "",
+                "budget": budget, "images": [], "driveLinks": [], "itinerary": [],
+            }
+            places.append(current)
+            continue
+
+        if current is None or not city:
+            continue
+
+        # "Day 1" on the first row, then bare numbers
+        n = len(current["itinerary"]) + 1
+        if isinstance(day, (int, float)):
+            n = int(day)
+        elif isinstance(day, str):
+            digits = "".join(ch for ch in day if ch.isdigit())
+            if digits:
+                n = int(digits)
+        current["itinerary"].append({
+            "id": "it_%s_%d" % (current["id"], n),
+            "day": n,
+            "title": str(city).strip(),
+            "note": str(note).strip() if note else "",
+            "cost": 0,
+            "done": False,
+        })
+        current["days"] = max(current["days"], n)
+
+    for p in places:
+        p["days"] = max(1, p["days"])
+    return places
+
+
+def slugify(v):
+    return "".join(ch if ch.isalnum() else "-" for ch in v.lower()).strip("-")
+
+
 def build():
-    places = read_places()
+    places = read_world_places()
     total = sum(sum(p["budget"].values()) for p in places)
-    print("  %d places, total budget INR %s" % (len(places), format(total, ",")))
+    print("  world : %d countries, INR %s" % (len(places), format(total, ",")))
+
+    india = read_india_places()
+    india_total = sum(sum(p["budget"].values()) for p in india)
+    india_days = sum(p["days"] for p in india)
+    india_cities = sum(len(p["itinerary"]) for p in india)
+    print("  india : %d states, %d days, %d city-days, INR %s"
+          % (len(india), india_days, india_cities, format(india_total, ",")))
 
     seed = {
         "version": 1,
@@ -197,10 +330,10 @@ def build():
                 "name": "Within India",
                 "kind": "domestic",
                 "start": "", "end": "",
-                "note": "Intercity trips at home",
-                "defaultDays": 4,
-                "categories": [{"id": c, "label": l} for c, l in CATEGORIES],
-                "places": [],
+                "note": "Imported from India_tour_budget.xlsx",
+                "defaultDays": 6,
+                "categories": [{"id": c, "label": l} for c, l in INDIA_CATEGORIES],
+                "places": india,
                 "expenses": [],
             },
         ],

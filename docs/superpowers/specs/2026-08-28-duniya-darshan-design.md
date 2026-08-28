@@ -121,3 +121,34 @@ runtime.
 Places carry `lat`/`lon` so cities and countries too small to fill at 110m
 (Singapore, the Faroe Islands) get a dot instead. Coordinates are seeded for the
 36 imported countries and picked up from Wikipedia for anything added later.
+
+
+---
+
+# Revision 2 — 2026-08-28, third pass
+
+Added on request, plus the four usability suggestions from the previous handover.
+
+1. **India sheet imported.** `India_tour_budget.xlsx` -> the Within India trip.
+   One place per **state** (28), because the sheet budgets by state and the map
+   fills by state; each day row becomes an itinerary entry carrying the city and
+   its note. 185 days, 131 distinct towns, ₹11,33,250.
+   The sheet's own total cell (₹9,88,050) is wrong — its SUMIF range stops at row
+   226, excluding Tamil Nadu, Goa and Maharashtra. The app uses the real sum.
+   The India trip has its own seven categories (Petrol instead of Visa/Car Rental).
+2. **Cities page.** Domestic trips only. Flattens every place's itinerary into a
+   searchable, tickable town-by-town list with dates, and a Log button per row.
+   It is the answer to "a section named cities" without breaking the state-level
+   budget or the map.
+3. **India on the world map is a doorway.** Dashed outline, and clicking it
+   switches to the domestic trip and opens its India map.
+4. **Maps pan and zoom.** Wheel/pinch about the pointer, drag to pan, +/−/Reset
+   buttons, translation clamped to the frame. A drag past 8px suppresses the
+   click so panning never opens a country.
+5. **Today panel** — where you are, day n of m, budget left here and per remaining
+   day, what is next, and today's plan items.
+6. **Pacing bar** — expected spend by this day against actual, rate a day, and the
+   projection to the end.
+7. **FX cheat line on every card** — ₹100 in local money, and the reverse stepped
+   up by powers of ten so it is readable.
+8. **Drag to reorder** places on desktop; the arrows remain for touch.

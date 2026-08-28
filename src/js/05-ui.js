@@ -16,13 +16,15 @@
   var NAV = [
     { id: 'front', label: 'Front Page' },
     { id: 'places', label: 'Places', trip: true },
+    { id: 'cities', label: 'Cities', trip: true, domesticOnly: true },
     { id: 'sheet', label: 'The Sheet', trip: true },
     { id: 'itinerary', label: 'Itinerary', trip: true },
     { id: 'data', label: 'Almanac' }
   ];
 
+  /* The India sheet budgets by state, so that is what a domestic place is. */
   function placesLabel() {
-    return DD.store.trip().kind === 'domestic' ? 'Cities' : 'Countries';
+    return DD.store.trip().kind === 'domestic' ? 'States' : 'Countries';
   }
 
   function go(name, arg) {
@@ -110,7 +112,9 @@
     var nav = $('#sections');
     if (nav) {
       DD.clear(nav);
-      NAV.forEach(function (n, i) {
+      var domestic = DD.store.trip().kind === 'domestic';
+      NAV.forEach(function (n) {
+        if (n.domesticOnly && !domestic) return;
         if (n.id === 'data') nav.appendChild(el('span', { class: 'sep' }));
         nav.appendChild(el('a', {
           class: route === n.id ? 'on' : '',
@@ -125,8 +129,11 @@
     var tabs = $('#tabbar');
     if (!tabs) return;
     DD.clear(tabs);
+    var domestic = DD.store.trip().kind === 'domestic';
     [['front', 'Front', 'home'], ['places', placesLabel(), 'map'],
-     ['__log', 'Log', 'plus'], ['sheet', 'Sheet', 'sheet'], ['data', 'More', 'more']
+     ['__log', 'Log', 'plus'],
+     domestic ? ['cities', 'Cities', 'route'] : ['sheet', 'Sheet', 'sheet'],
+     ['data', 'More', 'more']
     ].forEach(function (n) {
       var fab = n[0] === '__log';
       tabs.appendChild(el('button', {
@@ -143,10 +150,13 @@
 
   function moreSheet() {
     var body = el('div', { class: 'list' });
-    [['itinerary', 'Itinerary', 'The route, day by day'],
-     ['sheet', 'The Sheet', 'Budget, actual and variance'],
-     ['data', 'Almanac', 'Rates, categories, links, backup']
-    ].forEach(function (r) {
+    var rows = [['itinerary', 'Itinerary', 'The route, day by day'],
+                ['sheet', 'The Sheet', 'Budget, actual and variance'],
+                ['data', 'Almanac', 'Rates, categories, links, backup']];
+    if (DD.store.trip().kind === 'domestic') {
+      rows.unshift(['cities', 'Cities', 'Every town on the route']);
+    }
+    rows.forEach(function (r) {
       body.appendChild(el('button', {
         class: 'list-row',
         style: { border: 0, background: 'none', width: '100%', textAlign: 'left', cursor: 'pointer' },

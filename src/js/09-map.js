@@ -100,6 +100,8 @@
     });
 
     svg.appendChild(defs());
+    var stage = s('g', { class: 'map-stage' });
+    svg.appendChild(stage);
 
     Object.keys(m.paths).forEach(function (key) {
       var e = byKey[key];
@@ -108,6 +110,10 @@
       if (e) {
         path.addEventListener('click', function () { pick(e); });
         bindTip(path, e);
+      } else if (kind === 'world' && key === 'IN' && opts.onIndia) {
+        path.classList.add('map-home');
+        path.addEventListener('click', function () { opts.onIndia(); });
+        attach(path, 'India', 'Open your travels at home');
       } else if (opts.onBlank) {
         path.style.cursor = 'crosshair';
         path.addEventListener('click', function () {
@@ -115,7 +121,7 @@
         });
         bindTipBlank(path, (m.names && m.names[key]) || key);
       }
-      svg.appendChild(path);
+      stage.appendChild(path);
     });
 
     /* Dots for anywhere too small to fill — Singapore, the Faroes, any city. */
@@ -129,11 +135,12 @@
         class: 'map-dot ' + e.st.state });
       dot.addEventListener('click', function () { pick(e); });
       bindTip(dot, e);
-      svg.appendChild(dot);
+      stage.appendChild(dot);
     });
 
     wrap.appendChild(svg);
     wrap.appendChild(tip);
+    wrap.appendChild(zoomable(wrap, svg, stage, m));
     wrap.appendChild(legend(list));
 
     function pick(e) {
@@ -166,6 +173,141 @@
     }
 
     return wrap;
+  }
+
+  /* Pan and zoom. Wheel or pinch to scale about the pointer, drag to pan,
+     buttons for anyone who would rather not. Purely visual — the underlying
+     coordinates never change. */
+  function zoomable(wrap, svg, stage, m) {
+    var k = 1, tx = 0, ty = 0;
+    var MIN = 1, MAX = 14;
+
+    function apply() {
+      clampPan();
+      stage.setAttribute('transform', 'translate(' + tx.toFixed(2) + ' ' + ty.toFixed(2) + ') scale(' + k.toFixed(4) + ')');
+      wrap.classList.toggle('zoomed', k > 1.01);
+      reset.disabled = k <= 1.01;
+    }
+
+    /* Keep the map inside its frame: at k=1 it is pinned, beyond that it may
+       slide but never past an edge. */
+    function clampPan() {
+      k = Math.max(MIN, Math.min(MAX, k));
+      var maxX = 0, minX = m.width - m.width * k;
+      var maxY = 0, minY = m.height - m.height * k;
+      tx = Math.max(minX, Math.min(maxX, tx));
+      ty = Math.max(minY, Math.min(maxY, ty));
+    }
+
+    /* Pointer position in viewBox units, allowing for the letterboxing that
+       preserveAspectRatio adds when the frame is a different shape. */
+    function toBox(clientX, clientY) {
+      var r = svg.getBoundingClientRect();
+      var sc = Math.min(r.width / m.width, r.height / m.height);
+      return [(clientX - r.left - (r.width - m.width * sc) / 2) / sc,
+              (clientY - r.top - (r.height - m.height * sc) / 2) / sc];
+    }
+
+    function zoomAt(cx, cy, factor) {
+      var before = k;
+      k = Math.max(MIN, Math.min(MAX, k * factor));
+      var f = k / before;
+      tx = cx - (cx - tx) * f;
+      ty = cy - (cy - ty) * f;
+      apply();
+    }
+
+    svg.addEventListener('wheel', function (ev) {
+      ev.preventDefault();
+      var pt = toBox(ev.clientX, ev.clientY);
+      zoomAt(pt[0], pt[1], ev.deltaY < 0 ? 1.16 : 1 / 1.16);
+    }, { passive: false });
+
+    /* Drag to pan, and two fingers to pinch. */
+    var pointers = {}, last = null, pinchGap = 0, moved = 0;
+
+    svg.addEventListener('pointerdown', function (ev) {
+      pointers[ev.pointerId] = { x: ev.clientX, y: ev.clientY };
+      var ids = Object.keys(pointers);
+      moved = 0;
+      if (ids.length === 1) {
+        last = toBox(ev.clientX, ev.clientY);
+        svg.setPointerCapture(ev.pointerId);
+      } else if (ids.length === 2) {
+        pinchGap = gap(ids);
+      }
+    });
+
+    svg.addEventListener('pointermove', function (ev) {
+      if (!pointers[ev.pointerId]) return;
+      var prev = pointers[ev.pointerId];
+      moved += Math.abs(ev.clientX - prev.x) + Math.abs(ev.clientY - prev.y);
+      pointers[ev.pointerId] = { x: ev.clientX, y: ev.clientY };
+      var ids = Object.keys(pointers);
+
+      if (ids.length === 2) {
+        var now = gap(ids);
+        if (pinchGap > 0 && now > 0) {
+          var mid = midpoint(ids);
+          var pt = toBox(mid[0], mid[1]);
+          zoomAt(pt[0], pt[1], now / pinchGap);
+        }
+        pinchGap = now;
+        ev.preventDefault();
+        return;
+      }
+      if (ids.length === 1 && last && k > 1.01) {
+        var p = toBox(ev.clientX, ev.clientY);
+        tx += (p[0] - last[0]) * k;
+        ty += (p[1] - last[1]) * k;
+        last = p;
+        apply();
+        ev.preventDefault();
+      }
+    });
+
+    function release(ev) {
+      delete pointers[ev.pointerId];
+      if (!Object.keys(pointers).length) { last = null; pinchGap = 0; }
+    }
+    svg.addEventListener('pointerup', release);
+    svg.addEventListener('pointercancel', release);
+    svg.addEventListener('pointerleave', release);
+
+    /* A drag should not also count as a click on whatever is underneath. */
+    svg.addEventListener('click', function (ev) {
+      if (moved > 8) { ev.stopPropagation(); ev.preventDefault(); }
+    }, true);
+
+    function gap(ids) {
+      var a = pointers[ids[0]], b = pointers[ids[1]];
+      return Math.hypot(a.x - b.x, a.y - b.y);
+    }
+    function midpoint(ids) {
+      var a = pointers[ids[0]], b = pointers[ids[1]];
+      return [(a.x + b.x) / 2, (a.y + b.y) / 2];
+    }
+
+    /* The buttons zoom about whatever is in the middle of the frame. */
+    function centreZoom(factor) {
+      var r = svg.getBoundingClientRect();
+      var pt = toBox(r.left + r.width / 2, r.top + r.height / 2);
+      zoomAt(pt[0], pt[1], factor);
+    }
+
+    var reset = el('button', { class: 'btn xs', title: 'Reset the view', text: 'Reset',
+      onclick: function () { k = 1; tx = 0; ty = 0; apply(); } });
+
+    var controls = el('div', { class: 'map-zoom' }, [
+      el('button', { class: 'btn xs', 'aria-label': 'Zoom in', text: '+',
+        onclick: function () { centreZoom(1.5); } }),
+      el('button', { class: 'btn xs', 'aria-label': 'Zoom out', text: '\u2212',
+        onclick: function () { centreZoom(1 / 1.5); } }),
+      reset
+    ]);
+
+    apply();
+    return controls;
   }
 
   function rank(state) {

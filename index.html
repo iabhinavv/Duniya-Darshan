@@ -246,6 +246,21 @@ select{
 .map-dot.done{fill:var(--teal-900)}
 .map-dot.over{fill:var(--red)}
 .map-dot:hover{stroke:var(--ink);stroke-width:2}
+.mapwrap svg{touch-action:none;cursor:grab}
+.mapwrap.zoomed svg{cursor:grab}
+.mapwrap.zoomed svg:active{cursor:grabbing}
+.map-stage{transition:transform .1s linear}
+.map-zoom{
+  position:absolute;top:12px;right:14px;z-index:4;display:flex;flex-direction:column;gap:5px;
+}
+.map-zoom .btn{
+  min-width:30px;padding:5px 8px;background:var(--card);border-color:var(--rule-2);
+  box-shadow:0 1px 3px rgba(20,16,13,.14);font-size:13px;line-height:1;
+}
+.map-zoom .btn:disabled{opacity:.4}
+/* India on the world map is a doorway to the trip at home */
+.map-land.map-home{fill:var(--paper-2);stroke:var(--teal-700);stroke-width:1;stroke-dasharray:2.5 2;cursor:pointer}
+.map-land.map-home:hover{fill:var(--teal-100)}
 .map-legend{
   display:flex;flex-wrap:wrap;gap:14px;align-items:center;padding-top:9px;margin-top:8px;
   border-top:1px solid var(--rule-3);font-family:var(--sans);font-size:10.5px;
@@ -408,6 +423,60 @@ td.under{color:var(--green)}
   border-radius:99px;animation:sp .7s linear infinite;display:inline-block;vertical-align:-2px}
 @keyframes sp{to{transform:rotate(360deg)}}
 
+/* today / pacing */
+.today{
+  border:1px solid var(--rule);background:var(--card);display:flex;flex-wrap:wrap;
+  align-items:stretch;margin-bottom:2px;
+}
+.today-mark{
+  background:var(--grad-deep);color:#fff;padding:16px 20px;flex:1 1 260px;min-width:0;
+}
+.today-mark .k{font-family:var(--sans);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--teal-300)}
+.today-mark h3{font-size:30px;margin:4px 0 3px;letter-spacing:-.02em}
+.today-mark .s{font-family:var(--sans);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--teal-100)}
+.today-cols{display:flex;flex:2 1 340px;flex-wrap:wrap}
+.today-col{flex:1 1 150px;padding:14px 18px;border-left:1px solid var(--rule-3);min-width:0}
+.today-col .k{font-family:var(--sans);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:700}
+.today-col .v{font-family:var(--num);font-size:21px;font-weight:800;letter-spacing:-.02em;margin-top:3px}
+.today-col .s{font-size:12px;color:var(--ink-3);font-style:italic;margin-top:2px}
+
+.pace{border:1px solid var(--rule-2);background:var(--card);padding:14px 18px}
+.pace-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:9px}
+.pace-head .verdict{font-weight:700;font-size:17px}
+.pace-head .verdict.ahead{color:var(--green)}
+.pace-head .verdict.behind{color:var(--red)}
+.pace-track{position:relative;height:22px}
+.pace-track .rail{position:absolute;inset:8px 0;background:var(--rule-3);border-radius:2px}
+.pace-track .fill{position:absolute;top:5px;bottom:5px;left:0;background:var(--grad);border-radius:2px}
+.pace-track .fill.over{background:linear-gradient(90deg,var(--teal-800),var(--red))}
+.pace-track .marker{position:absolute;top:0;bottom:0;width:2px;background:var(--ink)}
+.pace-track .marker::after{
+  content:attr(data-label);position:absolute;top:-2px;left:6px;font-family:var(--sans);
+  font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);white-space:nowrap;
+}
+.pace-foot{display:flex;gap:16px;flex-wrap:wrap;margin-top:9px;font-family:var(--sans);font-size:11px;
+  letter-spacing:.06em;color:var(--ink-3);text-transform:uppercase}
+
+/* fx cheat line on a place card */
+.fx-line{
+  font-family:var(--sans);font-size:10.5px;letter-spacing:.05em;color:var(--ink-3);
+  border-top:1px dotted var(--rule-2);padding-top:7px;margin-top:2px;
+}
+.fx-line b{font-family:var(--num);color:var(--ink);font-size:12px;letter-spacing:0}
+
+/* drag to reorder */
+.place[draggable=true]{cursor:grab}
+.place.dragging{opacity:.4}
+.place.drop-before{box-shadow:inset 4px 0 0 var(--teal-600)}
+.place.drop-after{box-shadow:inset -4px 0 0 var(--teal-600)}
+.drag-hint{font-family:var(--sans);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-4)}
+
+/* cities index */
+.city-row .day{
+  font-family:var(--num);font-weight:800;font-size:17px;min-width:34px;text-align:right;color:var(--teal-800);
+}
+.city-note{font-size:13.5px;color:var(--ink-2);white-space:normal;line-height:1.45}
+
 /* trip cards on the front page */
 .trip-card{
   border:1px solid var(--rule);background:var(--card);display:flex;flex-direction:column;cursor:pointer;
@@ -459,6 +528,10 @@ td.under{color:var(--green)}
   .modal-foot{padding-bottom:calc(15px + env(safe-area-inset-bottom))}
   #toast{bottom:calc(80px + env(safe-area-inset-bottom))}
   .drive-embed{height:260px}
+  .today-col{border-left:0;border-top:1px solid var(--rule-3);flex:1 1 50%}
+  .today-mark h3{font-size:25px}
+  .map-zoom{top:8px;right:10px}
+  .map-zoom .btn{min-width:34px;padding:7px 9px}
   table.grid{font-size:13.5px;min-width:620px}
   table.grid th,table.grid td{padding:6px 8px}
   .cell-in{padding:5px 6px}
@@ -1986,16 +2059,16 @@ window.DUNIYA_SEED = {
    "kind": "domestic",
    "start": "",
    "end": "",
-   "note": "Intercity trips at home",
-   "defaultDays": 4,
+   "note": "Imported from India_tour_budget.xlsx",
+   "defaultDays": 6,
    "categories": [
     {
-     "id": "flights",
-     "label": "Flights"
+     "id": "railway",
+     "label": "Flights & Rail"
     },
     {
-     "id": "transport",
-     "label": "Transportation"
+     "id": "intercity",
+     "label": "Intercity Travel"
     },
     {
      "id": "lodging",
@@ -2010,19 +2083,2252 @@ window.DUNIYA_SEED = {
      "label": "Activities"
     },
     {
-     "id": "carRental",
-     "label": "Car Rental"
-    },
-    {
-     "id": "visa",
-     "label": "Visa"
+     "id": "petrol",
+     "label": "Petrol"
     },
     {
      "id": "misc",
      "label": "Misc"
     }
    ],
-   "places": [],
+   "places": [
+    {
+     "id": "in_punjab",
+     "name": "Punjab",
+     "country": "Punjab",
+     "city": "Amritsar",
+     "iso2": "IN",
+     "iata": "ATQ",
+     "currency": "INR",
+     "lat": 31.63,
+     "lon": 74.87,
+     "days": 5,
+     "order": 1,
+     "notes": "",
+     "budget": {
+      "railway": 2000,
+      "intercity": 6000,
+      "lodging": 5000,
+      "food": 1800,
+      "activities": 1000,
+      "petrol": 0,
+      "misc": 600
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_punjab_1",
+       "day": 1,
+       "title": "Amritsar",
+       "note": "Arrive Amritsar; evening at Golden Temple, langar dinner, walk Heritage Street",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_punjab_2",
+       "day": 2,
+       "title": "Amritsar",
+       "note": "Wagah Border retreat ceremony in the evening; Jallianwala Bagh and Partition Museum by day",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_punjab_3",
+       "day": 3,
+       "title": "Ludhiana",
+       "note": "Travel to Ludhiana (~140km); local markets, Punjab Agricultural University campus",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_punjab_4",
+       "day": 4,
+       "title": "Patiala",
+       "note": "Patiala's forts",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_punjab_5",
+       "day": 5,
+       "title": "Anandpur Sahib",
+       "note": "Day trip to Anandpur Sahib (Virasat-e-Khalsa museum)",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_haryana",
+     "name": "Haryana",
+     "country": "Haryana",
+     "city": "Kurukshetra",
+     "iso2": "IN",
+     "iata": "DEL",
+     "currency": "INR",
+     "lat": 29.97,
+     "lon": 76.88,
+     "days": 3,
+     "order": 2,
+     "notes": "",
+     "budget": {
+      "railway": 2000,
+      "intercity": 3600,
+      "lodging": 4000,
+      "food": 1350,
+      "activities": 750,
+      "petrol": 0,
+      "misc": 450
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_haryana_1",
+       "day": 1,
+       "title": "Kurukshetra",
+       "note": "Arrive Kurukshetra; Brahma Sarovar, Jyotisar (Bhagavad Gita site), Panorama Science Centre",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_haryana_2",
+       "day": 2,
+       "title": "Panipat",
+       "note": "Travel to Panipat (~90km); Panipat battlefield memorials, Kabuli Bagh Mosque",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_haryana_3",
+       "day": 3,
+       "title": "Surajkund / Faridabad",
+       "note": "Day trip to Surajkund (crafts mela in Feb); begin return towards Chandigarh",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_himachal-pradesh",
+     "name": "Himachal Pradesh",
+     "country": "Himachal Pradesh",
+     "city": "Shimla",
+     "iso2": "IN",
+     "iata": "SLV",
+     "currency": "INR",
+     "lat": 31.1,
+     "lon": 77.17,
+     "days": 10,
+     "order": 3,
+     "notes": "",
+     "budget": {
+      "railway": 3000,
+      "intercity": 12000,
+      "lodging": 13000,
+      "food": 5500,
+      "activities": 3500,
+      "petrol": 1000,
+      "misc": 1500
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_himachal-pradesh_1",
+       "day": 1,
+       "title": "Shimla",
+       "note": "Arrive Shimla; The Ridge, Mall Road, Christ Church",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_himachal-pradesh_2",
+       "day": 2,
+       "title": "Shimla",
+       "note": "Day trip to Kufri; short trek, snow activities in season",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_himachal-pradesh_3",
+       "day": 3,
+       "title": "Manali",
+       "note": "Travel to Manali via Kullu (~250km, ~8-9hr bus)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_himachal-pradesh_4",
+       "day": 4,
+       "title": "Manali",
+       "note": "Explore Old Manali cafes, Hadimba Temple, Vashisht hot springs",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_himachal-pradesh_5",
+       "day": 5,
+       "title": "Manali (Solang/Rohtang)",
+       "note": "Day trip to Solang Valley / Rohtang Pass (permit needed); paragliding optional",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_himachal-pradesh_6",
+       "day": 6,
+       "title": "Kasol",
+       "note": "Travel to Kasol via Bhuntar (~75km); Parvati Valley cafes",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_himachal-pradesh_7",
+       "day": 7,
+       "title": "Tosh / Kheerganga",
+       "note": "Day hike to Tosh village, or start of Kheerganga trek",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_himachal-pradesh_8",
+       "day": 8,
+       "title": "McLeod Ganj (Dharamshala)",
+       "note": "Travel to McLeod Ganj (~130km); Dalai Lama temple complex, Bhagsu waterfall",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_himachal-pradesh_9",
+       "day": 9,
+       "title": "Dalhousie",
+       "note": "Travel to Dalhousie (~130km); Khajjiar 'Mini Switzerland' day trip",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_himachal-pradesh_10",
+       "day": 10,
+       "title": "Dalhousie",
+       "note": "Dainkund Peak viewpoint, colonial-era architecture; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_uttarakhand",
+     "name": "Uttarakhand",
+     "country": "Uttarakhand",
+     "city": "Haridwar",
+     "iso2": "IN",
+     "iata": "DED",
+     "currency": "INR",
+     "lat": 29.95,
+     "lon": 78.16,
+     "days": 10,
+     "order": 4,
+     "notes": "",
+     "budget": {
+      "railway": 2000,
+      "intercity": 13000,
+      "lodging": 13000,
+      "food": 4500,
+      "activities": 2500,
+      "petrol": 1000,
+      "misc": 1500
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_uttarakhand_1",
+       "day": 1,
+       "title": "Haridwar",
+       "note": "Arrive Haridwar; evening Ganga Aarti at Har Ki Pauri",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttarakhand_2",
+       "day": 2,
+       "title": "Rishikesh",
+       "note": "Travel to Rishikesh (~25km); Laxman Jhula, Ram Jhula, riverside cafes",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttarakhand_3",
+       "day": 3,
+       "title": "Rishikesh",
+       "note": "White-water rafting on the Ganges (budget operator), yoga session at an ashram",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttarakhand_4",
+       "day": 4,
+       "title": "Mussoorie",
+       "note": "Travel to Mussoorie (~80km); Mall Road, Kempty Falls",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttarakhand_5",
+       "day": 5,
+       "title": "Nainital",
+       "note": "Long travel day to Nainital (~280km)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttarakhand_6",
+       "day": 6,
+       "title": "Nainital",
+       "note": "Boating on Naini Lake, Naina Devi Temple, Snow View Point cable car",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttarakhand_7",
+       "day": 7,
+       "title": "Chopta",
+       "note": "Travel towards Chopta/Tungnath region (~230km)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttarakhand_8",
+       "day": 8,
+       "title": "Chopta",
+       "note": "Trek to Tungnath temple and Chandrashila summit",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttarakhand_9",
+       "day": 9,
+       "title": "Auli",
+       "note": "Travel to Auli via Joshimath; cable car ride, valley views",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttarakhand_10",
+       "day": 10,
+       "title": "Joshimath",
+       "note": "Explore Joshimath; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_rajasthan",
+     "name": "Rajasthan",
+     "country": "Rajasthan",
+     "city": "Jaipur",
+     "iso2": "IN",
+     "iata": "JAI",
+     "currency": "INR",
+     "lat": 26.92,
+     "lon": 75.79,
+     "days": 10,
+     "order": 5,
+     "notes": "",
+     "budget": {
+      "railway": 18000,
+      "intercity": 22000,
+      "lodging": 13000,
+      "food": 5500,
+      "activities": 3500,
+      "petrol": 0,
+      "misc": 1500
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_rajasthan_1",
+       "day": 1,
+       "title": "Jaipur",
+       "note": "Arrive Jaipur; Hawa Mahal, City Palace",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_rajasthan_2",
+       "day": 2,
+       "title": "Jaipur",
+       "note": "Amber Fort (walk up), Jal Mahal viewpoint, Nahargarh Fort sunset",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_rajasthan_3",
+       "day": 3,
+       "title": "Pushkar",
+       "note": "Travel to Pushkar (~145km); Pushkar Lake, Brahma Temple, sunset at the ghats",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_rajasthan_4",
+       "day": 4,
+       "title": "Jodhpur",
+       "note": "Travel to Jodhpur (~200km); Blue City lanes",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_rajasthan_5",
+       "day": 5,
+       "title": "Jodhpur",
+       "note": "Mehrangarh Fort, Jaswant Thada, Umaid Bhawan Palace exterior",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_rajasthan_6",
+       "day": 6,
+       "title": "Jaisalmer",
+       "note": "Travel to Jaisalmer (~285km); Golden Fort (Sonar Quila), Patwon Ki Haveli",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_rajasthan_7",
+       "day": 7,
+       "title": "Jaisalmer",
+       "note": "Desert safari and camping at Sam Sand Dunes (budget camel safari)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_rajasthan_8",
+       "day": 8,
+       "title": "Bikaner",
+       "note": "Travel to Bikaner (~330km); Junagarh Fort, Karni Mata Temple",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_rajasthan_9",
+       "day": 9,
+       "title": "Udaipur",
+       "note": "Long travel day to Udaipur (~490km)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_rajasthan_10",
+       "day": 10,
+       "title": "Udaipur",
+       "note": "City Palace, Jagdish Temple, sunset boat ride on Lake Pichola",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_gujarat",
+     "name": "Gujarat",
+     "country": "Gujarat",
+     "city": "Ahmedabad",
+     "iso2": "IN",
+     "iata": "AMD",
+     "currency": "INR",
+     "lat": 23.02,
+     "lon": 72.57,
+     "days": 7,
+     "order": 6,
+     "notes": "",
+     "budget": {
+      "railway": 4000,
+      "intercity": 22000,
+      "lodging": 9000,
+      "food": 3150,
+      "activities": 1750,
+      "petrol": 1000,
+      "misc": 1050
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_gujarat_1",
+       "day": 1,
+       "title": "Ahmedabad",
+       "note": "Arrive Ahmedabad; Sabarmati Ashram, Adalaj stepwell",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_gujarat_2",
+       "day": 2,
+       "title": "Rann of Kutch (Dhordo)",
+       "note": "Travel towards White Rann of Kutch (~400km); Rann Utsav season ideal",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_gujarat_3",
+       "day": 3,
+       "title": "Rann of Kutch",
+       "note": "White salt desert sunset, Kutch handicraft villages",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_gujarat_4",
+       "day": 4,
+       "title": "Dwarka",
+       "note": "Travel to Dwarka (~330km); Dwarkadhish Temple",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_gujarat_5",
+       "day": 5,
+       "title": "Diu",
+       "note": "Travel to Diu (~300km); beaches, Portuguese-era fort",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_gujarat_6",
+       "day": 6,
+       "title": "Gir National Park",
+       "note": "Travel to Gir (~100km); budget jeep safari for Asiatic lions",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_gujarat_7",
+       "day": 7,
+       "title": "Ahmedabad",
+       "note": "Return journey; optional stop at Somnath Temple en route",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_madhya-pradesh",
+     "name": "Madhya Pradesh",
+     "country": "Madhya Pradesh",
+     "city": "Bhopal",
+     "iso2": "IN",
+     "iata": "BHO",
+     "currency": "INR",
+     "lat": 23.26,
+     "lon": 77.41,
+     "days": 8,
+     "order": 7,
+     "notes": "",
+     "budget": {
+      "railway": 4000,
+      "intercity": 14000,
+      "lodging": 14000,
+      "food": 3600,
+      "activities": 2000,
+      "petrol": 0,
+      "misc": 1200
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_madhya-pradesh_1",
+       "day": 1,
+       "title": "Bhopal",
+       "note": "Arrive Bhopal; Upper/Lower Lake boating, old city bazaars",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_madhya-pradesh_2",
+       "day": 2,
+       "title": "Sanchi (day trip)",
+       "note": "Day trip to Sanchi Stupa (~45km) and back",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_madhya-pradesh_3",
+       "day": 3,
+       "title": "Pachmarhi",
+       "note": "Travel to Pachmarhi (~210km); Bee Falls, Pandav Caves",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_madhya-pradesh_4",
+       "day": 4,
+       "title": "Pachmarhi",
+       "note": "Trek to Dhoopgarh sunset point, Jata Shankar caves",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_madhya-pradesh_5",
+       "day": 5,
+       "title": "Khajuraho",
+       "note": "Long travel day to Khajuraho (~350km)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_madhya-pradesh_6",
+       "day": 6,
+       "title": "Khajuraho",
+       "note": "Explore Western Group temples (UNESCO site)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_madhya-pradesh_7",
+       "day": 7,
+       "title": "Orchha",
+       "note": "Travel to Orchha (~180km); riverside cenotaphs, Orchha Fort",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_madhya-pradesh_8",
+       "day": 8,
+       "title": "Orchha",
+       "note": "Ram Raja Temple, sunset at Betwa River; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_uttar-pradesh",
+     "name": "Uttar Pradesh",
+     "country": "Uttar Pradesh",
+     "city": "Agra",
+     "iso2": "IN",
+     "iata": "AGR",
+     "currency": "INR",
+     "lat": 27.18,
+     "lon": 78.02,
+     "days": 8,
+     "order": 8,
+     "notes": "",
+     "budget": {
+      "railway": 2000,
+      "intercity": 13000,
+      "lodging": 16000,
+      "food": 3600,
+      "activities": 2000,
+      "petrol": 0,
+      "misc": 1200
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_uttar-pradesh_1",
+       "day": 1,
+       "title": "Agra",
+       "note": "Arrive Agra; sunrise at Taj Mahal",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttar-pradesh_2",
+       "day": 2,
+       "title": "Agra",
+       "note": "Agra Fort, Fatehpur Sikri day trip (~40km)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttar-pradesh_3",
+       "day": 3,
+       "title": "Mathura / Vrindavan",
+       "note": "Travel to Mathura-Vrindavan (~60km); temple hopping",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttar-pradesh_4",
+       "day": 4,
+       "title": "Lucknow",
+       "note": "Travel to Lucknow (~350km); Bara Imambara, Chota Imambara",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttar-pradesh_5",
+       "day": 5,
+       "title": "Lucknow",
+       "note": "Hazratganj market, Rumi Darwaza, Awadhi food",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttar-pradesh_6",
+       "day": 6,
+       "title": "Ayodhya",
+       "note": "Travel to Ayodhya (~135km); Ram Mandir, Saryu Ghat",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttar-pradesh_7",
+       "day": 7,
+       "title": "Varanasi",
+       "note": "Travel to Varanasi (~200km); evening Ganga Aarti at Dashashwamedh Ghat",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttar-pradesh_8",
+       "day": 8,
+       "title": "Varanasi",
+       "note": "Sunrise boat ride on the Ganges, old city lanes; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_bihar",
+     "name": "Bihar",
+     "country": "Bihar",
+     "city": "Patna",
+     "iso2": "IN",
+     "iata": "PAT",
+     "currency": "INR",
+     "lat": 25.59,
+     "lon": 85.14,
+     "days": 5,
+     "order": 9,
+     "notes": "",
+     "budget": {
+      "railway": 5500,
+      "intercity": 5000,
+      "lodging": 6000,
+      "food": 2000,
+      "activities": 750,
+      "petrol": 0,
+      "misc": 750
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_bihar_1",
+       "day": 1,
+       "title": "Patna",
+       "note": "Arrive Patna; Golghar, Patna Museum, Gandhi Ghat",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_bihar_2",
+       "day": 2,
+       "title": "Nalanda / Rajgir",
+       "note": "Day trip to Nalanda ruins and Rajgir (~90km)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_bihar_3",
+       "day": 3,
+       "title": "Bodh Gaya",
+       "note": "Travel to Bodh Gaya (~70km); Mahabodhi Temple, meditation",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_bihar_4",
+       "day": 4,
+       "title": "Bodh Gaya",
+       "note": "Explore international monasteries around Bodh Gaya",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_bihar_5",
+       "day": 5,
+       "title": "Vaishali",
+       "note": "Day trip to Vaishali (Buddhist/Jain sites); begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_jharkhand",
+     "name": "Jharkhand",
+     "country": "Jharkhand",
+     "city": "Ranchi",
+     "iso2": "IN",
+     "iata": "IXR",
+     "currency": "INR",
+     "lat": 23.34,
+     "lon": 85.31,
+     "days": 4,
+     "order": 10,
+     "notes": "",
+     "budget": {
+      "railway": 6600,
+      "intercity": 8000,
+      "lodging": 4800,
+      "food": 1600,
+      "activities": 600,
+      "petrol": 1000,
+      "misc": 600
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_jharkhand_1",
+       "day": 1,
+       "title": "Ranchi",
+       "note": "Arrive Ranchi; Hundru Falls day trip",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_jharkhand_2",
+       "day": 2,
+       "title": "Netarhat",
+       "note": "Travel to Netarhat hill station (~150km); 'Queen of Chotanagpur' sunset point",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_jharkhand_3",
+       "day": 3,
+       "title": "Betla National Park",
+       "note": "Travel to Betla (~100km); budget jeep safari",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_jharkhand_4",
+       "day": 4,
+       "title": "Deoghar",
+       "note": "Travel towards Deoghar (Baidyanath Temple); begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_west-bengal",
+     "name": "West Bengal",
+     "country": "West Bengal",
+     "city": "Kolkata",
+     "iso2": "IN",
+     "iata": "CCU",
+     "currency": "INR",
+     "lat": 22.57,
+     "lon": 88.36,
+     "days": 8,
+     "order": 11,
+     "notes": "",
+     "budget": {
+      "railway": 13000,
+      "intercity": 25000,
+      "lodging": 9000,
+      "food": 3600,
+      "activities": 2000,
+      "petrol": 0,
+      "misc": 1200
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_west-bengal_1",
+       "day": 1,
+       "title": "Kolkata",
+       "note": "Arrive Kolkata; Victoria Memorial, Howrah Bridge, College Street",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_west-bengal_2",
+       "day": 2,
+       "title": "Kolkata",
+       "note": "Kumartuli potters' quarter, heritage tram ride, Park Street evening",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_west-bengal_3",
+       "day": 3,
+       "title": "Darjeeling",
+       "note": "Overnight train/bus to NJP then shared jeep to Darjeeling (~600km total)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_west-bengal_4",
+       "day": 4,
+       "title": "Darjeeling",
+       "note": "Sunrise at Tiger Hill, toy train (DHR) ride, Peace Pagoda",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_west-bengal_5",
+       "day": 5,
+       "title": "Kalimpong",
+       "note": "Travel to Kalimpong (~50km); monasteries, Delo Park viewpoint",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_west-bengal_6",
+       "day": 6,
+       "title": "Towards NJP/Kolkata",
+       "note": "Begin return route; scenic hill drive",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_west-bengal_7",
+       "day": 7,
+       "title": "Digha (day trip)",
+       "note": "Day trip to Digha beach (~185km) or rest day in Kolkata",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_west-bengal_8",
+       "day": 8,
+       "title": "Sundarbans / Kolkata",
+       "note": "Sundarbans mangrove day tour, or free day; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_sikkim",
+     "name": "Sikkim",
+     "country": "Sikkim",
+     "city": "Gangtok",
+     "iso2": "IN",
+     "iata": "IXB",
+     "currency": "INR",
+     "lat": 27.33,
+     "lon": 88.61,
+     "days": 6,
+     "order": 12,
+     "notes": "",
+     "budget": {
+      "railway": 34000,
+      "intercity": 12000,
+      "lodging": 10000,
+      "food": 3300,
+      "activities": 2100,
+      "petrol": 3000,
+      "misc": 900
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_sikkim_1",
+       "day": 1,
+       "title": "Gangtok",
+       "note": "Arrive via Bagdogra + shared jeep (~125km); explore MG Marg",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_sikkim_2",
+       "day": 2,
+       "title": "Gangtok",
+       "note": "Tsomgo Lake and Baba Mandir day trip (permit + shared taxi required)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_sikkim_3",
+       "day": 3,
+       "title": "Pelling",
+       "note": "Travel to Pelling (~110km); Pemayangtse Monastery, Khecheopalri Lake",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_sikkim_4",
+       "day": 4,
+       "title": "Lachung",
+       "note": "Long travel to North Sikkim's Lachung (~200km, permit required)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_sikkim_5",
+       "day": 5,
+       "title": "Yumthang Valley",
+       "note": "Day trip to Yumthang 'Valley of Flowers' and Zero Point",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_sikkim_6",
+       "day": 6,
+       "title": "Gangtok",
+       "note": "Return journey to Gangtok, then towards Bagdogra",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_assam",
+     "name": "Assam",
+     "country": "Assam",
+     "city": "Guwahati",
+     "iso2": "IN",
+     "iata": "GAU",
+     "currency": "INR",
+     "lat": 26.14,
+     "lon": 91.74,
+     "days": 6,
+     "order": 13,
+     "notes": "",
+     "budget": {
+      "railway": 24000,
+      "intercity": 9000,
+      "lodging": 9000,
+      "food": 2700,
+      "activities": 1500,
+      "petrol": 2000,
+      "misc": 900
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_assam_1",
+       "day": 1,
+       "title": "Guwahati",
+       "note": "Arrive Guwahati; Kamakhya Temple, sunset boat ride on the Brahmaputra",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_assam_2",
+       "day": 2,
+       "title": "Kaziranga",
+       "note": "Travel to Kaziranga National Park (~215km); jeep safari for one-horned rhinos",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_assam_3",
+       "day": 3,
+       "title": "Kaziranga",
+       "note": "Second safari (different range); elephant-back safari optional",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_assam_4",
+       "day": 4,
+       "title": "Majuli",
+       "note": "Travel to Majuli, world's largest river island (~150km + ferry)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_assam_5",
+       "day": 5,
+       "title": "Majuli",
+       "note": "Vaishnavite monasteries (satras), mask-making villages",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_assam_6",
+       "day": 6,
+       "title": "Sivasagar",
+       "note": "Travel to Sivasagar, former Ahom capital; Rang Ghar, Talatal Ghar; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_arunachal-pradesh",
+     "name": "Arunachal Pradesh",
+     "country": "Arunachal Pradesh",
+     "city": "Tawang",
+     "iso2": "IN",
+     "iata": "TEZ",
+     "currency": "INR",
+     "lat": 27.59,
+     "lon": 91.87,
+     "days": 7,
+     "order": 14,
+     "notes": "",
+     "budget": {
+      "railway": 24000,
+      "intercity": 18000,
+      "lodging": 8000,
+      "food": 2800,
+      "activities": 1050,
+      "petrol": 1000,
+      "misc": 1050
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_arunachal-pradesh_1",
+       "day": 1,
+       "title": "Bhalukpong (entry)",
+       "note": "Cross into Arunachal (Inner Line Permit required); travel towards Tawang route",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_arunachal-pradesh_2",
+       "day": 2,
+       "title": "Bomdila (en route)",
+       "note": "Continue mountain drive via Bomdila (scenic, slow roads)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_arunachal-pradesh_3",
+       "day": 3,
+       "title": "Tawang",
+       "note": "Tawang Monastery (one of India's largest), Sela Pass",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_arunachal-pradesh_4",
+       "day": 4,
+       "title": "Bomdila",
+       "note": "Return via Bomdila; explore Bomdila Monastery",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_arunachal-pradesh_5",
+       "day": 5,
+       "title": "Ziro Valley",
+       "note": "Travel towards Ziro Valley (Apatani tribal homeland)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_arunachal-pradesh_6",
+       "day": 6,
+       "title": "Ziro Valley",
+       "note": "Explore Apatani villages, pine-covered valley",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_arunachal-pradesh_7",
+       "day": 7,
+       "title": "Guwahati (return)",
+       "note": "Begin return journey towards Guwahati for onward flight",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_meghalaya",
+     "name": "Meghalaya",
+     "country": "Meghalaya",
+     "city": "Shillong",
+     "iso2": "IN",
+     "iata": "SHL",
+     "currency": "INR",
+     "lat": 25.58,
+     "lon": 91.89,
+     "days": 6,
+     "order": 15,
+     "notes": "",
+     "budget": {
+      "railway": 24000,
+      "intercity": 6000,
+      "lodging": 9000,
+      "food": 2400,
+      "activities": 900,
+      "petrol": 0,
+      "misc": 900
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_meghalaya_1",
+       "day": 1,
+       "title": "Shillong",
+       "note": "Arrive via Guwahati + shared cab (~100km); Ward's Lake, Police Bazar",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_meghalaya_2",
+       "day": 2,
+       "title": "Cherrapunji (Sohra)",
+       "note": "Travel to Cherrapunji (~55km); Nohkalikai Falls",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_meghalaya_3",
+       "day": 3,
+       "title": "Cherrapunji",
+       "note": "Trek to Double Decker Living Root Bridge, Nongriat village",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_meghalaya_4",
+       "day": 4,
+       "title": "Dawki",
+       "note": "Travel to Dawki (~80km); crystal-clear Umngot River boating",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_meghalaya_5",
+       "day": 5,
+       "title": "Mawlynnong",
+       "note": "Visit Mawlynnong, 'cleanest village in Asia'; nearby root bridges",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_meghalaya_6",
+       "day": 6,
+       "title": "Shillong",
+       "note": "Return to Shillong; local markets; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_manipur",
+     "name": "Manipur",
+     "country": "Manipur",
+     "city": "Imphal",
+     "iso2": "IN",
+     "iata": "IMF",
+     "currency": "INR",
+     "lat": 24.82,
+     "lon": 93.94,
+     "days": 4,
+     "order": 16,
+     "notes": "",
+     "budget": {
+      "railway": 20000,
+      "intercity": 3700,
+      "lodging": 4000,
+      "food": 1600,
+      "activities": 600,
+      "petrol": 0,
+      "misc": 600
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_manipur_1",
+       "day": 1,
+       "title": "Imphal",
+       "note": "Arrive Imphal; Kangla Fort, Ima Keithel (all-women's market)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_manipur_2",
+       "day": 2,
+       "title": "Loktak Lake",
+       "note": "Day trip to Loktak Lake (~50km); floating phumdis, Keibul Lamjao park",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_manipur_3",
+       "day": 3,
+       "title": "Moirang",
+       "note": "Explore Moirang war memorial, INA museum",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_manipur_4",
+       "day": 4,
+       "title": "Imphal",
+       "note": "War Cemetery, local markets; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_nagaland",
+     "name": "Nagaland",
+     "country": "Nagaland",
+     "city": "Kohima",
+     "iso2": "IN",
+     "iata": "DMU",
+     "currency": "INR",
+     "lat": 25.67,
+     "lon": 94.11,
+     "days": 5,
+     "order": 17,
+     "notes": "",
+     "budget": {
+      "railway": 21000,
+      "intercity": 9000,
+      "lodging": 6000,
+      "food": 2000,
+      "activities": 750,
+      "petrol": 0,
+      "misc": 750
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_nagaland_1",
+       "day": 1,
+       "title": "Kohima",
+       "note": "Travel from Dimapur to Kohima (~75km); War Cemetery",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_nagaland_2",
+       "day": 2,
+       "title": "Kohima",
+       "note": "Local market, Naga Heritage Village at Kisama",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_nagaland_3",
+       "day": 3,
+       "title": "Khonoma",
+       "note": "Day trip to Khonoma, India's first 'green village'",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_nagaland_4",
+       "day": 4,
+       "title": "Mon",
+       "note": "Long travel to Mon district for Konyak tribal villages (best in Hornbill season)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_nagaland_5",
+       "day": 5,
+       "title": "Mon / Kohima",
+       "note": "Tribal village visit, headhunter history museum; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_mizoram",
+     "name": "Mizoram",
+     "country": "Mizoram",
+     "city": "Aizawl",
+     "iso2": "IN",
+     "iata": "AJL",
+     "currency": "INR",
+     "lat": 23.73,
+     "lon": 92.72,
+     "days": 4,
+     "order": 18,
+     "notes": "",
+     "budget": {
+      "railway": 22000,
+      "intercity": 3000,
+      "lodging": 5000,
+      "food": 1600,
+      "activities": 600,
+      "petrol": 0,
+      "misc": 600
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_mizoram_1",
+       "day": 1,
+       "title": "Aizawl",
+       "note": "Arrive Aizawl; hillside city views, Solomon's Temple viewpoint",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_mizoram_2",
+       "day": 2,
+       "title": "Reiek",
+       "note": "Day trip to Reiek Tlang peak (~30km); trek for valley views",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_mizoram_3",
+       "day": 3,
+       "title": "Aizawl",
+       "note": "Mizoram State Museum, local markets, Mizo cuisine",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_mizoram_4",
+       "day": 4,
+       "title": "Aizawl",
+       "note": "Free day / local exploration; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_tripura",
+     "name": "Tripura",
+     "country": "Tripura",
+     "city": "Agartala",
+     "iso2": "IN",
+     "iata": "IXA",
+     "currency": "INR",
+     "lat": 23.83,
+     "lon": 91.28,
+     "days": 3,
+     "order": 19,
+     "notes": "",
+     "budget": {
+      "railway": 19000,
+      "intercity": 7000,
+      "lodging": 4000,
+      "food": 1200,
+      "activities": 450,
+      "petrol": 0,
+      "misc": 450
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_tripura_1",
+       "day": 1,
+       "title": "Agartala",
+       "note": "Arrive Agartala; Ujjayanta Palace, Jagannath Temple",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_tripura_2",
+       "day": 2,
+       "title": "Unakoti",
+       "note": "Day trip to Unakoti rock-cut sculptures (~180km, long day)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_tripura_3",
+       "day": 3,
+       "title": "Neermahal",
+       "note": "Day trip to Neermahal 'Lake Palace'; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_odisha",
+     "name": "Odisha",
+     "country": "Odisha",
+     "city": "Bhubaneswar",
+     "iso2": "IN",
+     "iata": "BBI",
+     "currency": "INR",
+     "lat": 20.3,
+     "lon": 85.82,
+     "days": 7,
+     "order": 20,
+     "notes": "",
+     "budget": {
+      "railway": 13000,
+      "intercity": 7500,
+      "lodging": 7500,
+      "food": 3150,
+      "activities": 1750,
+      "petrol": 0,
+      "misc": 1200
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_odisha_1",
+       "day": 1,
+       "title": "Bhubaneswar",
+       "note": "Arrive Bhubaneswar; Lingaraj Temple, ancient temple cluster",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_odisha_2",
+       "day": 2,
+       "title": "Konark",
+       "note": "Day trip to Konark Sun Temple (~65km)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_odisha_3",
+       "day": 3,
+       "title": "Puri",
+       "note": "Travel to Puri (~60km); Jagannath Temple, Puri beach",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_odisha_4",
+       "day": 4,
+       "title": "Puri",
+       "note": "Relax at Puri beach, local markets",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_odisha_5",
+       "day": 5,
+       "title": "Chilika Lake",
+       "note": "Day trip to Chilika Lake (~50km); boat ride for Irrawaddy dolphins",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_odisha_6",
+       "day": 6,
+       "title": "Bhubaneswar",
+       "note": "Return; Dhauli Peace Pagoda",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_odisha_7",
+       "day": 7,
+       "title": "Bhubaneswar",
+       "note": "Free day / Pipili applique craft village; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_chhattisgarh",
+     "name": "Chhattisgarh",
+     "country": "Chhattisgarh",
+     "city": "Raipur",
+     "iso2": "IN",
+     "iata": "RPR",
+     "currency": "INR",
+     "lat": 21.25,
+     "lon": 81.63,
+     "days": 5,
+     "order": 21,
+     "notes": "",
+     "budget": {
+      "railway": 5700,
+      "intercity": 7000,
+      "lodging": 7000,
+      "food": 2000,
+      "activities": 750,
+      "petrol": 0,
+      "misc": 1000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_chhattisgarh_1",
+       "day": 1,
+       "title": "Raipur",
+       "note": "Arrive Raipur; Mahant Ghasidas Museum, local markets",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_chhattisgarh_2",
+       "day": 2,
+       "title": "Jagdalpur",
+       "note": "Travel to Jagdalpur (~300km, Bastar region)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_chhattisgarh_3",
+       "day": 3,
+       "title": "Chitrakote Falls",
+       "note": "Day trip to Chitrakote Falls, 'Niagara of India' (~40km)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_chhattisgarh_4",
+       "day": 4,
+       "title": "Jagdalpur",
+       "note": "Bastar tribal markets and craft villages",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_chhattisgarh_5",
+       "day": 5,
+       "title": "Kanger Valley NP",
+       "note": "Explore Kanger Valley caves; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_telangana",
+     "name": "Telangana",
+     "country": "Telangana",
+     "city": "Hyderabad",
+     "iso2": "IN",
+     "iata": "HYD",
+     "currency": "INR",
+     "lat": 17.39,
+     "lon": 78.49,
+     "days": 4,
+     "order": 22,
+     "notes": "",
+     "budget": {
+      "railway": 13000,
+      "intercity": 6000,
+      "lodging": 6000,
+      "food": 1800,
+      "activities": 1000,
+      "petrol": 0,
+      "misc": 600
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_telangana_1",
+       "day": 1,
+       "title": "Hyderabad",
+       "note": "Arrive Hyderabad; Charminar, Laad Bazaar, biryani tasting",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_telangana_2",
+       "day": 2,
+       "title": "Hyderabad",
+       "note": "Golconda Fort sound-and-light show, Chowmahalla Palace",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_telangana_3",
+       "day": 3,
+       "title": "Warangal",
+       "note": "Day trip to Warangal Fort and Thousand Pillar Temple (~145km)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_telangana_4",
+       "day": 4,
+       "title": "Hyderabad",
+       "note": "Hussain Sagar Lake, local markets; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_andhra-pradesh",
+     "name": "Andhra Pradesh",
+     "country": "Andhra Pradesh",
+     "city": "Visakhapatnam",
+     "iso2": "IN",
+     "iata": "VTZ",
+     "currency": "INR",
+     "lat": 17.69,
+     "lon": 83.22,
+     "days": 6,
+     "order": 23,
+     "notes": "",
+     "budget": {
+      "railway": 15000,
+      "intercity": 16000,
+      "lodging": 12000,
+      "food": 2700,
+      "activities": 1500,
+      "petrol": 0,
+      "misc": 900
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_andhra-pradesh_1",
+       "day": 1,
+       "title": "Visakhapatnam",
+       "note": "Arrive Vizag; RK Beach, Kailasagiri hilltop park",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_andhra-pradesh_2",
+       "day": 2,
+       "title": "Araku Valley",
+       "note": "Scenic train ride to Araku Valley (~120km, tribal region)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_andhra-pradesh_3",
+       "day": 3,
+       "title": "Araku Valley",
+       "note": "Coffee plantations, Borra Caves",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_andhra-pradesh_4",
+       "day": 4,
+       "title": "Visakhapatnam",
+       "note": "Return to Vizag; submarine museum",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_andhra-pradesh_5",
+       "day": 5,
+       "title": "Tirupati",
+       "note": "Long travel to Tirupati (~800km; overnight bus/train)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_andhra-pradesh_6",
+       "day": 6,
+       "title": "Tirupati",
+       "note": "Tirumala Venkateswara Temple (early queue for darshan); begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_karnataka",
+     "name": "Karnataka",
+     "country": "Karnataka",
+     "city": "Bangalore",
+     "iso2": "IN",
+     "iata": "BLR",
+     "currency": "INR",
+     "lat": 12.97,
+     "lon": 77.59,
+     "days": 10,
+     "order": 24,
+     "notes": "",
+     "budget": {
+      "railway": 13000,
+      "intercity": 16500,
+      "lodging": 20000,
+      "food": 5500,
+      "activities": 3500,
+      "petrol": 1000,
+      "misc": 1500
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_karnataka_1",
+       "day": 1,
+       "title": "Bangalore",
+       "note": "Arrive Bangalore; Lalbagh Botanical Garden, Cubbon Park",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_karnataka_2",
+       "day": 2,
+       "title": "Mysore",
+       "note": "Travel to Mysore (~145km); Mysore Palace",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_karnataka_3",
+       "day": 3,
+       "title": "Mysore",
+       "note": "Chamundi Hills, Brindavan Gardens",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_karnataka_4",
+       "day": 4,
+       "title": "Coorg (Madikeri)",
+       "note": "Travel to Coorg (~120km); coffee plantations",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_karnataka_5",
+       "day": 5,
+       "title": "Coorg",
+       "note": "Abbey Falls, Talakaveri, trek to Tadiandamol peak",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_karnataka_6",
+       "day": 6,
+       "title": "Hampi",
+       "note": "Long travel to Hampi (~350km via Hassan)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_karnataka_7",
+       "day": 7,
+       "title": "Hampi",
+       "note": "Vijayanagara ruins, Virupaksha Temple, boulder landscape",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_karnataka_8",
+       "day": 8,
+       "title": "Hampi",
+       "note": "Sunset at Matanga Hill; cycle around ruins",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_karnataka_9",
+       "day": 9,
+       "title": "Gokarna",
+       "note": "Travel to Gokarna (~250km); beach town, Om Beach",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_karnataka_10",
+       "day": 10,
+       "title": "Gokarna",
+       "note": "Beach hopping (Kudle, Half Moon, Paradise); begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_kerala",
+     "name": "Kerala",
+     "country": "Kerala",
+     "city": "Kochi",
+     "iso2": "IN",
+     "iata": "COK",
+     "currency": "INR",
+     "lat": 9.93,
+     "lon": 76.27,
+     "days": 10,
+     "order": 25,
+     "notes": "",
+     "budget": {
+      "railway": 18000,
+      "intercity": 12500,
+      "lodging": 18000,
+      "food": 5500,
+      "activities": 3500,
+      "petrol": 1000,
+      "misc": 1500
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_kerala_1",
+       "day": 1,
+       "title": "Kochi",
+       "note": "Arrive Kochi; Fort Kochi, Chinese fishing nets, Mattancherry Palace",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_kerala_2",
+       "day": 2,
+       "title": "Munnar",
+       "note": "Travel to Munnar (~130km); tea plantations",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_kerala_3",
+       "day": 3,
+       "title": "Munnar",
+       "note": "Eravikulam National Park, tea museum, Top Station viewpoint",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_kerala_4",
+       "day": 4,
+       "title": "Thekkady",
+       "note": "Travel to Thekkady (~90km); Periyar Wildlife Sanctuary",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_kerala_5",
+       "day": 5,
+       "title": "Thekkady",
+       "note": "Boat safari on Periyar Lake, spice plantation tour",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_kerala_6",
+       "day": 6,
+       "title": "Alleppey",
+       "note": "Travel to Alleppey (~140km); budget houseboat / day cruise",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_kerala_7",
+       "day": 7,
+       "title": "Alleppey",
+       "note": "Backwater village walk, canoe ride through narrow canals",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_kerala_8",
+       "day": 8,
+       "title": "Varkala",
+       "note": "Travel to Varkala (~150km); cliffside beach town",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_kerala_9",
+       "day": 9,
+       "title": "Varkala",
+       "note": "Relax at Varkala Beach, cliff cafes, Janardanaswamy Temple",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_kerala_10",
+       "day": 10,
+       "title": "Kochi",
+       "note": "Return towards Kochi for departure; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_tamil-nadu",
+     "name": "Tamil Nadu",
+     "country": "Tamil Nadu",
+     "city": "Chennai",
+     "iso2": "IN",
+     "iata": "MAA",
+     "currency": "INR",
+     "lat": 13.08,
+     "lon": 80.27,
+     "days": 10,
+     "order": 26,
+     "notes": "",
+     "budget": {
+      "railway": 15000,
+      "intercity": 20000,
+      "lodging": 16000,
+      "food": 4500,
+      "activities": 2500,
+      "petrol": 0,
+      "misc": 1500
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_tamil-nadu_1",
+       "day": 1,
+       "title": "Chennai",
+       "note": "Arrive Chennai; Marina Beach, Kapaleeshwarar Temple",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_tamil-nadu_2",
+       "day": 2,
+       "title": "Mahabalipuram",
+       "note": "Day trip to Mahabalipuram (~60km); Shore Temple, rock-cut caves",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_tamil-nadu_3",
+       "day": 3,
+       "title": "Pondicherry",
+       "note": "Travel to Pondicherry (~160km); French Quarter, Auroville",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_tamil-nadu_4",
+       "day": 4,
+       "title": "Pondicherry",
+       "note": "Promenade Beach, Auroville visitor center",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_tamil-nadu_5",
+       "day": 5,
+       "title": "Madurai",
+       "note": "Travel to Madurai (~300km); Meenakshi Amman Temple",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_tamil-nadu_6",
+       "day": 6,
+       "title": "Madurai",
+       "note": "Temple complex evening prayers, Thirumalai Nayakkar Palace",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_tamil-nadu_7",
+       "day": 7,
+       "title": "Rameswaram",
+       "note": "Day trip to Rameswaram (~170km); Ramanathaswamy Temple, Dhanushkodi",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_tamil-nadu_8",
+       "day": 8,
+       "title": "Kodaikanal",
+       "note": "Travel to Kodaikanal hill station (~120km)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_tamil-nadu_9",
+       "day": 9,
+       "title": "Kodaikanal",
+       "note": "Boating on Kodai Lake, Coaker's Walk, Pillar Rocks",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_tamil-nadu_10",
+       "day": 10,
+       "title": "Ooty",
+       "note": "Travel to Ooty (~200km); Nilgiri Mountain Railway toy train; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_goa",
+     "name": "Goa",
+     "country": "Goa",
+     "city": "Panaji",
+     "iso2": "IN",
+     "iata": "GOI",
+     "currency": "INR",
+     "lat": 15.5,
+     "lon": 73.83,
+     "days": 6,
+     "order": 27,
+     "notes": "",
+     "budget": {
+      "railway": 17000,
+      "intercity": 4800,
+      "lodging": 10000,
+      "food": 3300,
+      "activities": 2100,
+      "petrol": 1200,
+      "misc": 900
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_goa_1",
+       "day": 1,
+       "title": "North Goa (Baga)",
+       "note": "Arrive Goa; Baga Beach, evening market",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_goa_2",
+       "day": 2,
+       "title": "North Goa (Anjuna)",
+       "note": "Anjuna flea market (Wed), Vagator Beach, Chapora Fort",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_goa_3",
+       "day": 3,
+       "title": "North Goa (Calangute)",
+       "note": "Water sports at Calangute, sunset at Fort Aguada",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_goa_4",
+       "day": 4,
+       "title": "South Goa (Palolem)",
+       "note": "Travel to Palolem Beach (~40km); quieter southern beaches",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_goa_5",
+       "day": 5,
+       "title": "South Goa",
+       "note": "Cola Beach, Agonda Beach; dolphin-spotting boat trip",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_goa_6",
+       "day": 6,
+       "title": "Panaji",
+       "note": "Old Goa churches (UNESCO), Fontainhas Latin Quarter; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_maharashtra",
+     "name": "Maharashtra",
+     "country": "Maharashtra",
+     "city": "Mumbai",
+     "iso2": "IN",
+     "iata": "BOM",
+     "currency": "INR",
+     "lat": 19.08,
+     "lon": 72.88,
+     "days": 8,
+     "order": 28,
+     "notes": "",
+     "budget": {
+      "railway": 16000,
+      "intercity": 11000,
+      "lodging": 11000,
+      "food": 4400,
+      "activities": 2800,
+      "petrol": 0,
+      "misc": 1200
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_maharashtra_1",
+       "day": 1,
+       "title": "Mumbai",
+       "note": "Arrive Mumbai; Gateway of India, Marine Drive",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_maharashtra_2",
+       "day": 2,
+       "title": "Mumbai",
+       "note": "Elephanta Caves ferry trip, Colaba Causeway market",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_maharashtra_3",
+       "day": 3,
+       "title": "Lonavala",
+       "note": "Travel to Lonavala (~85km); Karla/Bhaja Caves, Tiger's Point",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_maharashtra_4",
+       "day": 4,
+       "title": "Pune",
+       "note": "Travel to Pune (~65km); Shaniwar Wada, Aga Khan Palace",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_maharashtra_5",
+       "day": 5,
+       "title": "Aurangabad",
+       "note": "Travel to Aurangabad (~235km)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_maharashtra_6",
+       "day": 6,
+       "title": "Ajanta Caves",
+       "note": "Day trip to Ajanta Caves (~100km); UNESCO Buddhist caves",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_maharashtra_7",
+       "day": 7,
+       "title": "Ellora Caves",
+       "note": "Day trip to Ellora Caves (~30km); Kailasa rock-cut temple",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_maharashtra_8",
+       "day": 8,
+       "title": "Aurangabad",
+       "note": "Bibi Ka Maqbara ('mini Taj'); begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    }
+   ],
    "expenses": []
   }
  ]
@@ -2314,6 +4620,66 @@ window.DUNIYA_SEED = {
     return out;
   }
 
+  /* Where the trip has you today, if it is running. Drives the "Today" panel. */
+  function whereToday(t, iso) {
+    t = t || trip();
+    iso = iso || DD.today();
+    if (!t.start) return null;
+    var sched = schedule(t);
+    var list = places(t);
+    for (var i = 0; i < list.length; i++) {
+      var s = sched[list[i].id];
+      if (!s || !s.start) continue;
+      if (iso >= s.start && iso <= s.end) {
+        return {
+          place: list[i], index: i, next: list[i + 1] || null,
+          dayInPlace: DD.daysBetween(s.start, iso) + 1, daysHere: s.days,
+          start: s.start, end: s.end,
+          dayOfTrip: DD.daysBetween(t.start, iso) + 1
+        };
+      }
+    }
+    return null;
+  }
+
+  /* Budget pacing: what you should have spent by now against what you have.
+     A total on its own never tells you whether you are overspending. */
+  function pacing(t, iso) {
+    t = t || trip();
+    iso = iso || DD.today();
+    var b = tripBudget(t);
+    if (!t.start || !b.days) return null;
+    var end = DD.addDays(t.start, b.days - 1);
+    var elapsed = DD.daysBetween(t.start, iso) + 1;
+    var actual = actuals(t).total;
+    if (elapsed < 1) return { state: 'before', days: b.days, start: t.start, budget: b.total, actual: actual };
+    var done = elapsed > b.days;
+    elapsed = Math.min(elapsed, b.days);
+    var expected = b.total * (elapsed / b.days);
+    var perDay = elapsed ? actual / elapsed : 0;
+    return {
+      state: done ? 'after' : 'running',
+      elapsed: elapsed, days: b.days, end: end,
+      budget: b.total, actual: actual, expected: expected,
+      delta: actual - expected,
+      perDay: perDay,
+      projected: perDay * b.days
+    };
+  }
+
+  /* Drag-and-drop reordering: pull one place out and slot it in at an index. */
+  function reorderPlace(t, id, toIndex) {
+    t = t || trip();
+    var list = places(t);
+    var from = list.findIndex(function (p) { return p.id === id; });
+    if (from < 0 || toIndex < 0 || toIndex >= list.length || from === toIndex) return false;
+    var moved = list.splice(from, 1)[0];
+    list.splice(toIndex, 0, moved);
+    list.forEach(function (p, i) { p.order = i + 1; });
+    save();
+    return true;
+  }
+
   function tripEnd(t) {
     t = t || trip();
     if (!t.start) return '';
@@ -2428,6 +4794,7 @@ window.DUNIYA_SEED = {
     places: places, placeById: placeById, catById: catById, catLabel: catLabel,
     placeBudget: placeBudget, tripBudget: tripBudget, actuals: actuals,
     placeState: placeState, schedule: schedule, tripEnd: tripEnd,
+    whereToday: whereToday, pacing: pacing, reorderPlace: reorderPlace,
     addTrip: addTrip, removeTrip: removeTrip,
     addPlace: addPlace, removePlace: removePlace, movePlace: movePlace,
     addExpense: addExpense, updateExpense: updateExpense, removeExpense: removeExpense,
@@ -2458,13 +4825,15 @@ window.DUNIYA_SEED = {
   var NAV = [
     { id: 'front', label: 'Front Page' },
     { id: 'places', label: 'Places', trip: true },
+    { id: 'cities', label: 'Cities', trip: true, domesticOnly: true },
     { id: 'sheet', label: 'The Sheet', trip: true },
     { id: 'itinerary', label: 'Itinerary', trip: true },
     { id: 'data', label: 'Almanac' }
   ];
 
+  /* The India sheet budgets by state, so that is what a domestic place is. */
   function placesLabel() {
-    return DD.store.trip().kind === 'domestic' ? 'Cities' : 'Countries';
+    return DD.store.trip().kind === 'domestic' ? 'States' : 'Countries';
   }
 
   function go(name, arg) {
@@ -2552,7 +4921,9 @@ window.DUNIYA_SEED = {
     var nav = $('#sections');
     if (nav) {
       DD.clear(nav);
-      NAV.forEach(function (n, i) {
+      var domestic = DD.store.trip().kind === 'domestic';
+      NAV.forEach(function (n) {
+        if (n.domesticOnly && !domestic) return;
         if (n.id === 'data') nav.appendChild(el('span', { class: 'sep' }));
         nav.appendChild(el('a', {
           class: route === n.id ? 'on' : '',
@@ -2567,8 +4938,11 @@ window.DUNIYA_SEED = {
     var tabs = $('#tabbar');
     if (!tabs) return;
     DD.clear(tabs);
+    var domestic = DD.store.trip().kind === 'domestic';
     [['front', 'Front', 'home'], ['places', placesLabel(), 'map'],
-     ['__log', 'Log', 'plus'], ['sheet', 'Sheet', 'sheet'], ['data', 'More', 'more']
+     ['__log', 'Log', 'plus'],
+     domestic ? ['cities', 'Cities', 'route'] : ['sheet', 'Sheet', 'sheet'],
+     ['data', 'More', 'more']
     ].forEach(function (n) {
       var fab = n[0] === '__log';
       tabs.appendChild(el('button', {
@@ -2585,10 +4959,13 @@ window.DUNIYA_SEED = {
 
   function moreSheet() {
     var body = el('div', { class: 'list' });
-    [['itinerary', 'Itinerary', 'The route, day by day'],
-     ['sheet', 'The Sheet', 'Budget, actual and variance'],
-     ['data', 'Almanac', 'Rates, categories, links, backup']
-    ].forEach(function (r) {
+    var rows = [['itinerary', 'Itinerary', 'The route, day by day'],
+                ['sheet', 'The Sheet', 'Budget, actual and variance'],
+                ['data', 'Almanac', 'Rates, categories, links, backup']];
+    if (DD.store.trip().kind === 'domestic') {
+      rows.unshift(['cities', 'Cities', 'Every town on the route']);
+    }
+    rows.forEach(function (r) {
       body.appendChild(el('button', {
         class: 'list-row',
         style: { border: 0, background: 'none', width: '100%', textAlign: 'left', cursor: 'pointer' },
@@ -3237,6 +5614,8 @@ window.DUNIYA_SEED = {
     });
 
     svg.appendChild(defs());
+    var stage = s('g', { class: 'map-stage' });
+    svg.appendChild(stage);
 
     Object.keys(m.paths).forEach(function (key) {
       var e = byKey[key];
@@ -3245,6 +5624,10 @@ window.DUNIYA_SEED = {
       if (e) {
         path.addEventListener('click', function () { pick(e); });
         bindTip(path, e);
+      } else if (kind === 'world' && key === 'IN' && opts.onIndia) {
+        path.classList.add('map-home');
+        path.addEventListener('click', function () { opts.onIndia(); });
+        attach(path, 'India', 'Open your travels at home');
       } else if (opts.onBlank) {
         path.style.cursor = 'crosshair';
         path.addEventListener('click', function () {
@@ -3252,7 +5635,7 @@ window.DUNIYA_SEED = {
         });
         bindTipBlank(path, (m.names && m.names[key]) || key);
       }
-      svg.appendChild(path);
+      stage.appendChild(path);
     });
 
     /* Dots for anywhere too small to fill — Singapore, the Faroes, any city. */
@@ -3266,11 +5649,12 @@ window.DUNIYA_SEED = {
         class: 'map-dot ' + e.st.state });
       dot.addEventListener('click', function () { pick(e); });
       bindTip(dot, e);
-      svg.appendChild(dot);
+      stage.appendChild(dot);
     });
 
     wrap.appendChild(svg);
     wrap.appendChild(tip);
+    wrap.appendChild(zoomable(wrap, svg, stage, m));
     wrap.appendChild(legend(list));
 
     function pick(e) {
@@ -3303,6 +5687,141 @@ window.DUNIYA_SEED = {
     }
 
     return wrap;
+  }
+
+  /* Pan and zoom. Wheel or pinch to scale about the pointer, drag to pan,
+     buttons for anyone who would rather not. Purely visual — the underlying
+     coordinates never change. */
+  function zoomable(wrap, svg, stage, m) {
+    var k = 1, tx = 0, ty = 0;
+    var MIN = 1, MAX = 14;
+
+    function apply() {
+      clampPan();
+      stage.setAttribute('transform', 'translate(' + tx.toFixed(2) + ' ' + ty.toFixed(2) + ') scale(' + k.toFixed(4) + ')');
+      wrap.classList.toggle('zoomed', k > 1.01);
+      reset.disabled = k <= 1.01;
+    }
+
+    /* Keep the map inside its frame: at k=1 it is pinned, beyond that it may
+       slide but never past an edge. */
+    function clampPan() {
+      k = Math.max(MIN, Math.min(MAX, k));
+      var maxX = 0, minX = m.width - m.width * k;
+      var maxY = 0, minY = m.height - m.height * k;
+      tx = Math.max(minX, Math.min(maxX, tx));
+      ty = Math.max(minY, Math.min(maxY, ty));
+    }
+
+    /* Pointer position in viewBox units, allowing for the letterboxing that
+       preserveAspectRatio adds when the frame is a different shape. */
+    function toBox(clientX, clientY) {
+      var r = svg.getBoundingClientRect();
+      var sc = Math.min(r.width / m.width, r.height / m.height);
+      return [(clientX - r.left - (r.width - m.width * sc) / 2) / sc,
+              (clientY - r.top - (r.height - m.height * sc) / 2) / sc];
+    }
+
+    function zoomAt(cx, cy, factor) {
+      var before = k;
+      k = Math.max(MIN, Math.min(MAX, k * factor));
+      var f = k / before;
+      tx = cx - (cx - tx) * f;
+      ty = cy - (cy - ty) * f;
+      apply();
+    }
+
+    svg.addEventListener('wheel', function (ev) {
+      ev.preventDefault();
+      var pt = toBox(ev.clientX, ev.clientY);
+      zoomAt(pt[0], pt[1], ev.deltaY < 0 ? 1.16 : 1 / 1.16);
+    }, { passive: false });
+
+    /* Drag to pan, and two fingers to pinch. */
+    var pointers = {}, last = null, pinchGap = 0, moved = 0;
+
+    svg.addEventListener('pointerdown', function (ev) {
+      pointers[ev.pointerId] = { x: ev.clientX, y: ev.clientY };
+      var ids = Object.keys(pointers);
+      moved = 0;
+      if (ids.length === 1) {
+        last = toBox(ev.clientX, ev.clientY);
+        svg.setPointerCapture(ev.pointerId);
+      } else if (ids.length === 2) {
+        pinchGap = gap(ids);
+      }
+    });
+
+    svg.addEventListener('pointermove', function (ev) {
+      if (!pointers[ev.pointerId]) return;
+      var prev = pointers[ev.pointerId];
+      moved += Math.abs(ev.clientX - prev.x) + Math.abs(ev.clientY - prev.y);
+      pointers[ev.pointerId] = { x: ev.clientX, y: ev.clientY };
+      var ids = Object.keys(pointers);
+
+      if (ids.length === 2) {
+        var now = gap(ids);
+        if (pinchGap > 0 && now > 0) {
+          var mid = midpoint(ids);
+          var pt = toBox(mid[0], mid[1]);
+          zoomAt(pt[0], pt[1], now / pinchGap);
+        }
+        pinchGap = now;
+        ev.preventDefault();
+        return;
+      }
+      if (ids.length === 1 && last && k > 1.01) {
+        var p = toBox(ev.clientX, ev.clientY);
+        tx += (p[0] - last[0]) * k;
+        ty += (p[1] - last[1]) * k;
+        last = p;
+        apply();
+        ev.preventDefault();
+      }
+    });
+
+    function release(ev) {
+      delete pointers[ev.pointerId];
+      if (!Object.keys(pointers).length) { last = null; pinchGap = 0; }
+    }
+    svg.addEventListener('pointerup', release);
+    svg.addEventListener('pointercancel', release);
+    svg.addEventListener('pointerleave', release);
+
+    /* A drag should not also count as a click on whatever is underneath. */
+    svg.addEventListener('click', function (ev) {
+      if (moved > 8) { ev.stopPropagation(); ev.preventDefault(); }
+    }, true);
+
+    function gap(ids) {
+      var a = pointers[ids[0]], b = pointers[ids[1]];
+      return Math.hypot(a.x - b.x, a.y - b.y);
+    }
+    function midpoint(ids) {
+      var a = pointers[ids[0]], b = pointers[ids[1]];
+      return [(a.x + b.x) / 2, (a.y + b.y) / 2];
+    }
+
+    /* The buttons zoom about whatever is in the middle of the frame. */
+    function centreZoom(factor) {
+      var r = svg.getBoundingClientRect();
+      var pt = toBox(r.left + r.width / 2, r.top + r.height / 2);
+      zoomAt(pt[0], pt[1], factor);
+    }
+
+    var reset = el('button', { class: 'btn xs', title: 'Reset the view', text: 'Reset',
+      onclick: function () { k = 1; tx = 0; ty = 0; apply(); } });
+
+    var controls = el('div', { class: 'map-zoom' }, [
+      el('button', { class: 'btn xs', 'aria-label': 'Zoom in', text: '+',
+        onclick: function () { centreZoom(1.5); } }),
+      el('button', { class: 'btn xs', 'aria-label': 'Zoom out', text: '\u2212',
+        onclick: function () { centreZoom(1 / 1.5); } }),
+      reset
+    ]);
+
+    apply();
+    return controls;
   }
 
   function rank(state) {
@@ -3392,6 +5911,23 @@ window.DUNIYA_SEED = {
       DD.stat('Per day', DD.money(days ? budget / days : 0), 'across the whole plan')
     ]));
 
+    /* ---- where you are today, if a trip is running ---- */
+    var live = null;
+    all.forEach(function (t) {
+      if (live) return;
+      var w = S.whereToday(t);
+      if (w) live = { trip: t, where: w };
+    });
+    if (live) host.appendChild(todayPanel(live.trip, live.where));
+
+    /* ---- pacing: are you spending faster than the plan? ---- */
+    var paceTrip = live ? live.trip : S.trip();
+    var pace = S.pacing(paceTrip);
+    if (pace && pace.state !== 'before') {
+      host.appendChild(DD.sectionHead(paceTrip.name, 'Are you on budget?'));
+      host.appendChild(paceBar(paceTrip, pace));
+    }
+
     /* ---- the map ---- */
     var worldTrips = all.filter(function (t) { return t.kind !== 'domestic'; });
     if (worldTrips.length) {
@@ -3403,8 +5939,11 @@ window.DUNIYA_SEED = {
         kind: 'world',
         trips: worldTrips,
         onPick: function (e) { openPlace(e); },
+        onIndia: openHomeTrip,
         onBlank: function (key, name) { offerAdd(key, name); }
       }));
+      host.appendChild(el('p', { class: 'tiny muted', style: { marginTop: '8px' } },
+        'Scroll or pinch to zoom, drag to move around. India opens your travels at home.'));
     }
 
     /* ---- trips ---- */
@@ -3498,6 +6037,119 @@ window.DUNIYA_SEED = {
       });
       host.appendChild(ul);
     }
+  }
+
+  /* ----------------------------------------------------------- today */
+  function todayPanel(t, w) {
+    var st = S.placeState(t, w.place);
+    var left = st.budget - st.spent;
+    var daysLeftHere = w.daysHere - w.dayInPlace + 1;
+    var todaysPlan = (w.place.itinerary || []).filter(function (i) { return i.day === w.dayInPlace; });
+
+    var cols = el('div', { class: 'today-cols' }, [
+      el('div', { class: 'today-col' }, [
+        el('div', { class: 'k', text: 'Day' }),
+        el('div', { class: 'v', text: w.dayInPlace + ' of ' + w.daysHere }),
+        el('div', { class: 's', text: DD.plural(daysLeftHere, 'day') + ' left here' })
+      ]),
+      el('div', { class: 'today-col' }, [
+        el('div', { class: 'k', text: left >= 0 ? 'Left here' : 'Over here' }),
+        el('div', { class: 'v', style: { color: left >= 0 ? 'var(--green)' : 'var(--red)' },
+          text: DD.money(Math.abs(left)) }),
+        el('div', { class: 's', text: daysLeftHere > 0
+          ? DD.money(Math.max(0, left) / daysLeftHere) + ' a day from here'
+          : 'last day' })
+      ]),
+      el('div', { class: 'today-col' }, [
+        el('div', { class: 'k', text: 'Next' }),
+        el('div', { class: 'v', style: { fontSize: '17px' }, text: w.next ? w.next.name : 'Home' }),
+        el('div', { class: 's', text: w.next ? DD.plural(w.next.days, 'day') + ' there' : 'end of the trip' })
+      ])
+    ]);
+
+    var panel = el('div', { class: 'today' }, [
+      el('div', { class: 'today-mark' }, [
+        el('div', { class: 'k', text: 'Today · day ' + w.dayOfTrip + ' of ' + t.name }),
+        el('h3', { text: w.place.name }),
+        el('div', { class: 's', text: (w.place.city && w.place.city !== w.place.name ? w.place.city + ' · ' : '')
+          + DD.niceDate(DD.today()) })
+      ]),
+      cols
+    ]);
+
+    var wrap = el('div', {}, [
+      DD.sectionHead('Where you are', 'Today',
+        el('button', {
+          class: 'btn sm pri',
+          onclick: function () { S.setTrip(t.id); DD.logForm({ trip: t, placeId: w.place.id }); }
+        }, [DD.icon('plus', 14), 'Log spend here'])),
+      panel
+    ]);
+
+    if (todaysPlan.length) {
+      var list = el('div', { class: 'card list', style: { borderTop: '0' } });
+      todaysPlan.forEach(function (it) {
+        list.appendChild(el('div', { class: 'list-row' }, [
+          el('label', { class: 'inline-check', style: { margin: 0 } }, [
+            el('input', { type: 'checkbox', checked: !!it.done,
+              onchange: function () { it.done = this.checked; S.save(); DD.render(); } })
+          ]),
+          el('div', { class: 'grow' }, [
+            el('div', { class: 't', text: it.title,
+              style: it.done ? { textDecoration: 'line-through', color: 'var(--ink-3)' } : {} }),
+            it.note ? el('div', { class: 's city-note', text: it.note }) : null
+          ]),
+          it.cost ? el('span', { class: 'amt small', text: DD.money(it.cost) }) : null
+        ]));
+      });
+      wrap.appendChild(list);
+    }
+    return wrap;
+  }
+
+  /* ---------------------------------------------------------- pacing */
+  function paceBar(t, pace) {
+    var ahead = pace.delta <= 0;
+    var scale = Math.max(pace.budget, pace.actual, pace.expected) || 1;
+    var over = pace.actual > pace.expected;
+
+    return el('div', { class: 'pace' }, [
+      el('div', { class: 'pace-head' }, [
+        el('span', { class: 'verdict ' + (ahead ? 'ahead' : 'behind'),
+          text: pace.state === 'after'
+            ? (ahead ? 'Came in under budget' : 'Finished over budget')
+            : (ahead ? DD.money(Math.abs(pace.delta)) + ' in hand' : DD.money(pace.delta) + ' ahead of the plan') }),
+        el('span', { class: 'muted small', style: { fontStyle: 'italic' },
+          text: pace.state === 'after'
+            ? 'The ' + DD.plural(pace.days, 'day') + ' are up.'
+            : 'By day ' + pace.elapsed + ' of ' + pace.days + ' you would expect to have spent '
+              + DD.money(pace.expected) + '. You have spent ' + DD.money(pace.actual) + '.' })
+      ]),
+      el('div', { class: 'pace-track' }, [
+        el('div', { class: 'rail' }),
+        el('div', { class: 'fill' + (over ? ' over' : ''),
+          style: { width: Math.min(100, pace.actual / scale * 100) + '%' } }),
+        el('div', { class: 'marker', 'data-label': 'on plan',
+          style: { left: Math.min(99, pace.expected / scale * 100) + '%' } })
+      ]),
+      el('div', { class: 'pace-foot' }, [
+        el('span', { text: DD.money(pace.perDay) + ' a day so far' }),
+        el('span', { text: 'at this rate, ' + DD.money(pace.projected) + ' by the end' }),
+        el('span', { text: 'budget ' + DD.money(pace.budget) })
+      ])
+    ]);
+  }
+
+  /* Clicking India on the world map is a doorway to the trip at home. */
+  function openHomeTrip() {
+    var home = S.db().trips.filter(function (t) { return t.kind === 'domestic'; })[0];
+    if (!home) {
+      DD.toast('No trip at home yet — make one from the trips below', true);
+      return;
+    }
+    S.setTrip(home.id);
+    DD.go('places');
+    DD.toast('Within India');
   }
 
   /* --------------------------------------------------------- trip card */
@@ -3663,6 +6315,9 @@ window.DUNIYA_SEED = {
   }
 
   DD.newTrip = newTrip;
+  DD.openHomeTrip = openHomeTrip;
+  DD.paceBar = paceBar;
+  DD.todayPanel = todayPanel;
 })();
 
 
@@ -3710,6 +6365,20 @@ window.DUNIYA_SEED = {
       DD.stat(isCity ? 'Cities' : 'Countries', String(list.length), started + ' under way')
     ]));
 
+    var pace = S.pacing(t);
+    if (pace && pace.state !== 'before' && DD.paceBar) {
+      host.appendChild(el('div', { style: { marginTop: '16px' } }, [DD.paceBar(t, pace)]));
+    }
+
+    var w = S.whereToday(t);
+    if (w) {
+      host.appendChild(el('div', { class: 'banner info', style: { marginTop: '16px' } }, [
+        el('div', {}, ['You are in ', el('strong', { text: w.place.name }), ' today — day ',
+          String(w.dayInPlace), ' of ', String(w.daysHere), '. ',
+          el('button', { class: 'btn xs', onclick: function () { editor(t, w.place); } }, 'Open it')])
+      ]));
+    }
+
     /* ---- the trip's own map ---- */
     var kind = isCity ? 'india' : 'world';
     host.appendChild(DD.sectionHead(t.name, isCity ? 'The route through India' : 'The route',
@@ -3721,15 +6390,22 @@ window.DUNIYA_SEED = {
       kind: kind,
       trips: [t],
       onPick: function (e) { editor(t, e.place); },
+      onIndia: kind === 'world' ? DD.openHomeTrip : null,
       onBlank: kind === 'world' ? function (key, name) { offerAdd(t, key, name); } : null
     }));
+    host.appendChild(el('p', { class: 'tiny muted', style: { marginTop: '8px' } },
+      'Scroll or pinch to zoom, drag to move around.'
+      + (kind === 'world' ? ' India opens your travels at home.' : '')));
 
     /* ---- the places ---- */
     host.appendChild(DD.sectionHead('In order', isCity ? 'The cities' : 'The countries',
       el('span', { class: 'chip', text: DD.plural(list.length, noun[0], noun[1]) })));
     var grid = el('div', { class: 'places' });
     list.forEach(function (p, i) { grid.appendChild(card(t, p, i, list.length)); });
+    makeSortable(grid, t);
     host.appendChild(grid);
+    host.appendChild(el('p', { class: 'drag-hint', style: { marginTop: '9px' } },
+      'Drag a card to reorder the route. The arrows do the same thing on a phone.'));
 
     host.appendChild(el('div', { style: { marginTop: '16px', textAlign: 'center' } }, [
       el('button', { class: 'btn', onclick: addDialog }, [icon('plus', 14), 'Add another ' + noun[0]])
@@ -3740,6 +6416,58 @@ window.DUNIYA_SEED = {
       el('button', { class: 'btn sm pri', onclick: function () { DD.logForm({ trip: t }); } },
         [icon('plus', 14), 'Log spend'])));
     host.appendChild(DD.expenseLedger(t));
+  }
+
+  /* Drag a card on to another to slot it in there. Touch keeps the arrows. */
+  function makeSortable(grid, t) {
+    var dragId = null;
+
+    DD.$$('.place', grid).forEach(function (node) {
+      node.draggable = true;
+
+      node.addEventListener('dragstart', function (ev) {
+        dragId = node.dataset.place;
+        node.classList.add('dragging');
+        ev.dataTransfer.effectAllowed = 'move';
+        try { ev.dataTransfer.setData('text/plain', dragId); } catch (e) { /* IE-ism */ }
+      });
+
+      node.addEventListener('dragend', function () {
+        dragId = null;
+        DD.$$('.place', grid).forEach(function (n) {
+          n.classList.remove('dragging', 'drop-before', 'drop-after');
+        });
+      });
+
+      node.addEventListener('dragover', function (ev) {
+        if (!dragId || node.dataset.place === dragId) return;
+        ev.preventDefault();
+        ev.dataTransfer.dropEffect = 'move';
+        var r = node.getBoundingClientRect();
+        var after = (ev.clientX - r.left) > r.width / 2;
+        node.classList.toggle('drop-after', after);
+        node.classList.toggle('drop-before', !after);
+      });
+
+      node.addEventListener('dragleave', function () {
+        node.classList.remove('drop-before', 'drop-after');
+      });
+
+      node.addEventListener('drop', function (ev) {
+        ev.preventDefault();
+        if (!dragId || node.dataset.place === dragId) return;
+        var list = S.places(t);
+        var to = list.findIndex(function (p) { return p.id === node.dataset.place; });
+        var from = list.findIndex(function (p) { return p.id === dragId; });
+        if (to < 0 || from < 0) return;
+        if (node.classList.contains('drop-after') && from > to) to += 1;
+        if (node.classList.contains('drop-before') && from < to) to -= 1;
+        if (S.reorderPlace(t, dragId, to)) {
+          DD.render();
+          DD.toast('Route reordered');
+        }
+      });
+    });
   }
 
   /* --------------------------------------------------------------- card */
@@ -3782,6 +6510,7 @@ window.DUNIYA_SEED = {
         el('span', { class: 'chip', text: p.currency }),
         el('span', { class: 'chip', text: DD.money(p.days ? bud.total / p.days : 0) + '/day' })
       ]),
+      fxLine(p),
       el('div', { class: 'place-acts' }, [
         el('button', { class: 'btn xs pri', onclick: function () { DD.logForm({ trip: t, placeId: p.id }); } },
           [icon('plus', 12), 'Log']),
@@ -3795,7 +6524,25 @@ window.DUNIYA_SEED = {
       ])
     ]);
 
-    return el('div', { class: 'place' }, [photo, body]);
+    return el('div', { class: 'place', 'data-place': p.id }, [photo, body]);
+  }
+
+  /* The mental-arithmetic line: what ₹100 buys, for use at a counter. */
+  function fxLine(p) {
+    if (!p.currency || p.currency === 'INR') return null;
+    var rate = DD.rateFor(p.currency, S.db().currencies);
+    if (!rate || rate === 1) return null;
+    var hundred = 100 * rate;
+    /* Going the other way, one dong is worth ₹0.004 — useless. Step the unit up
+       by powers of ten until the rupee figure is a number you can hold in mind. */
+    var unit = 1 / rate, mult = 1;
+    while (unit * mult < 1 && mult < 1000000) mult *= 10;
+    var back = unit * mult;
+    return el('div', { class: 'fx-line' }, [
+      '₹100 = ', el('b', { text: DD.num(hundred, hundred < 10 ? 2 : 0) + ' ' + p.currency }),
+      '   ·   ' + DD.num(mult) + ' ' + p.currency + ' = ',
+      el('b', { text: '₹' + DD.num(back, back < 100 ? 2 : 0) })
+    ]);
   }
 
   /* Whichever of city / region is not already the card's title. */
@@ -4239,6 +6986,146 @@ window.DUNIYA_SEED = {
 })();
 
 
+/* ===== 25-cities.js ===== */
+/* 25-cities — every city on a trip at home, read back out of the day-by-day
+   itinerary. The India sheet budgets by state, so a state is the unit that
+   carries money; this is the page that answers "which towns, and when?". */
+'use strict';
+
+(function () {
+  var el = DD.el, S = DD.store;
+  var query = '';
+
+  DD.register('cities', {
+    title: 'Cities',
+    render: render
+  });
+
+  /* Flatten every place's itinerary into one list of city-days. */
+  function cityDays(t) {
+    var sched = S.schedule(t);
+    var out = [];
+    S.places(t).forEach(function (p) {
+      (p.itinerary || []).slice().sort(DD.by('day')).forEach(function (it) {
+        var s = sched[p.id];
+        out.push({
+          place: p, it: it,
+          date: s && s.start ? DD.addDays(s.start, Math.max(0, (it.day || 1) - 1)) : ''
+        });
+      });
+    });
+    return out;
+  }
+
+  function render(host) {
+    var t = S.trip();
+
+    if (t.kind !== 'domestic') {
+      host.appendChild(DD.emptyState('Cities live on trips at home',
+        'This page reads the day-by-day cities out of a domestic trip. Switch to one to see it.',
+        'Go to the front page', function () { DD.go('front'); }));
+      return;
+    }
+
+    var all = cityDays(t);
+    if (!all.length) {
+      host.appendChild(DD.emptyState('No cities yet',
+        'Add a state on the ' + DD.placesLabel() + ' page, then list its cities day by day under Plan.',
+        'Open ' + DD.placesLabel(), function () { DD.go('places'); }));
+      return;
+    }
+
+    /* one entry per distinct city name, so repeats across days collapse */
+    var distinct = {};
+    all.forEach(function (r) { distinct[r.it.title] = 1; });
+    var done = all.filter(function (r) { return r.it.done; }).length;
+
+    host.appendChild(el('p', { class: 'lede' },
+      'The route runs through ' + DD.plural(Object.keys(distinct).length, 'town') + ' across '
+      + DD.plural(S.places(t).length, 'state') + ' — ' + DD.plural(all.length, 'day')
+      + ' in all. Tick them off as you go.'));
+
+    host.appendChild(DD.statStrip([
+      DD.stat('Towns', String(Object.keys(distinct).length), 'distinct stops', 'hero'),
+      DD.stat('City-days', String(all.length), DD.plural(done, 'ticked off')),
+      DD.stat('States', String(S.places(t).length), 'each with its own budget'),
+      DD.stat('Budget', DD.money(S.tripBudget(t).total, { compact: true }), 'across the whole route')
+    ]));
+
+    var search = el('input', {
+      type: 'text', placeholder: 'Find a town, a state, or something to do…', value: query,
+      oninput: DD.debounce(function () { query = search.value; paint(); }, 180)
+    });
+    host.appendChild(DD.sectionHead(t.name, 'Town by town',
+      el('span', { class: 'chip', text: DD.plural(all.length, 'day') })));
+    host.appendChild(el('div', { style: { marginBottom: '14px' } }, [search]));
+
+    var body = el('div', {});
+    host.appendChild(body);
+
+    function paint() {
+      DD.clear(body);
+      var q = query.trim().toLowerCase();
+      var shown = 0;
+
+      S.places(t).forEach(function (p) {
+        var rows = (p.itinerary || []).slice().sort(DD.by('day')).filter(function (it) {
+          if (!q) return true;
+          return (it.title + ' ' + (it.note || '') + ' ' + p.name).toLowerCase().indexOf(q) >= 0;
+        });
+        if (!rows.length) return;
+        shown += rows.length;
+
+        var st = S.placeState(t, p);
+        var sched = S.schedule(t)[p.id];
+        var card = el('div', { class: 'card', style: { marginBottom: '14px', overflow: 'hidden' } });
+
+        card.appendChild(el('div', { class: 'day-head', style: { borderTop: 0 } }, [
+          el('span', { text: p.name }),
+          el('span', { class: 'muted', style: { fontWeight: '400', textTransform: 'none', letterSpacing: '0' },
+            text: DD.plural(rows.length, 'day') + (sched && sched.start
+              ? ' · ' + DD.shortDate(sched.start) + '–' + DD.shortDate(sched.end) : '') }),
+          el('span', { class: 'spacer' }),
+          el('span', { class: 'num', style: { textTransform: 'none' },
+            text: DD.money(st.budget, { compact: true }) }),
+          el('button', { class: 'btn xs', onclick: function () { DD.placeEditor(t, p); } }, 'Open')
+        ]));
+
+        rows.forEach(function (it) {
+          var date = sched && sched.start ? DD.addDays(sched.start, Math.max(0, (it.day || 1) - 1)) : '';
+          card.appendChild(el('div', { class: 'list-row city-row' }, [
+            el('label', { class: 'inline-check', style: { margin: 0 } }, [
+              el('input', { type: 'checkbox', checked: !!it.done,
+                onchange: function () { it.done = this.checked; S.save(); paint(); } })
+            ]),
+            el('span', { class: 'day', text: String(it.day) }),
+            el('div', { class: 'grow' }, [
+              el('div', { class: 't', style: it.done
+                ? { textDecoration: 'line-through', color: 'var(--ink-3)' } : {}, text: it.title }),
+              it.note ? el('div', { class: 'city-note', text: it.note }) : null,
+              date ? el('div', { class: 's', text: DD.niceDate(date, true) }) : null
+            ]),
+            el('button', { class: 'btn xs', onclick: function () {
+              DD.logForm({ trip: t, placeId: p.id, note: it.title });
+            } }, 'Log')
+          ]));
+        });
+        body.appendChild(card);
+      });
+
+      if (!shown) {
+        body.appendChild(el('div', { class: 'card empty' }, [
+          el('p', { style: { margin: 0 }, text: 'Nothing matches “' + query + '”.' })
+        ]));
+      }
+    }
+    paint();
+  }
+
+  DD.cityDays = cityDays;
+})();
+
+
 /* ===== 30-sheet.js ===== */
 /* 30-sheet — the spreadsheet view: places down, categories across. */
 'use strict';
@@ -4510,7 +7397,8 @@ window.DUNIYA_SEED = {
     });
     var catSel = DD.selectOf(t.categories.map(function (c) { return [c.id, c.label]; }), x ? x.category : 'food');
     var dateIn = el('input', { type: 'date', value: x ? x.date : DD.today() });
-    var noteIn = el('input', { type: 'text', placeholder: 'What was it?', value: x ? x.note : '' });
+    var noteIn = el('input', { type: 'text', placeholder: 'What was it?',
+      value: x ? x.note : (opts.note || '') });
     var conv = el('div', { class: 'tiny muted sans',
       style: { marginTop: '-9px', marginBottom: '14px', minHeight: '17px', letterSpacing: '.03em' } });
 

@@ -282,6 +282,66 @@
     return out;
   }
 
+  /* Where the trip has you today, if it is running. Drives the "Today" panel. */
+  function whereToday(t, iso) {
+    t = t || trip();
+    iso = iso || DD.today();
+    if (!t.start) return null;
+    var sched = schedule(t);
+    var list = places(t);
+    for (var i = 0; i < list.length; i++) {
+      var s = sched[list[i].id];
+      if (!s || !s.start) continue;
+      if (iso >= s.start && iso <= s.end) {
+        return {
+          place: list[i], index: i, next: list[i + 1] || null,
+          dayInPlace: DD.daysBetween(s.start, iso) + 1, daysHere: s.days,
+          start: s.start, end: s.end,
+          dayOfTrip: DD.daysBetween(t.start, iso) + 1
+        };
+      }
+    }
+    return null;
+  }
+
+  /* Budget pacing: what you should have spent by now against what you have.
+     A total on its own never tells you whether you are overspending. */
+  function pacing(t, iso) {
+    t = t || trip();
+    iso = iso || DD.today();
+    var b = tripBudget(t);
+    if (!t.start || !b.days) return null;
+    var end = DD.addDays(t.start, b.days - 1);
+    var elapsed = DD.daysBetween(t.start, iso) + 1;
+    var actual = actuals(t).total;
+    if (elapsed < 1) return { state: 'before', days: b.days, start: t.start, budget: b.total, actual: actual };
+    var done = elapsed > b.days;
+    elapsed = Math.min(elapsed, b.days);
+    var expected = b.total * (elapsed / b.days);
+    var perDay = elapsed ? actual / elapsed : 0;
+    return {
+      state: done ? 'after' : 'running',
+      elapsed: elapsed, days: b.days, end: end,
+      budget: b.total, actual: actual, expected: expected,
+      delta: actual - expected,
+      perDay: perDay,
+      projected: perDay * b.days
+    };
+  }
+
+  /* Drag-and-drop reordering: pull one place out and slot it in at an index. */
+  function reorderPlace(t, id, toIndex) {
+    t = t || trip();
+    var list = places(t);
+    var from = list.findIndex(function (p) { return p.id === id; });
+    if (from < 0 || toIndex < 0 || toIndex >= list.length || from === toIndex) return false;
+    var moved = list.splice(from, 1)[0];
+    list.splice(toIndex, 0, moved);
+    list.forEach(function (p, i) { p.order = i + 1; });
+    save();
+    return true;
+  }
+
   function tripEnd(t) {
     t = t || trip();
     if (!t.start) return '';
@@ -396,6 +456,7 @@
     places: places, placeById: placeById, catById: catById, catLabel: catLabel,
     placeBudget: placeBudget, tripBudget: tripBudget, actuals: actuals,
     placeState: placeState, schedule: schedule, tripEnd: tripEnd,
+    whereToday: whereToday, pacing: pacing, reorderPlace: reorderPlace,
     addTrip: addTrip, removeTrip: removeTrip,
     addPlace: addPlace, removePlace: removePlace, movePlace: movePlace,
     addExpense: addExpense, updateExpense: updateExpense, removeExpense: removeExpense,

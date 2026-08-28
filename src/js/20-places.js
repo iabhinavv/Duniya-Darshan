@@ -41,6 +41,20 @@
       DD.stat(isCity ? 'Cities' : 'Countries', String(list.length), started + ' under way')
     ]));
 
+    var pace = S.pacing(t);
+    if (pace && pace.state !== 'before' && DD.paceBar) {
+      host.appendChild(el('div', { style: { marginTop: '16px' } }, [DD.paceBar(t, pace)]));
+    }
+
+    var w = S.whereToday(t);
+    if (w) {
+      host.appendChild(el('div', { class: 'banner info', style: { marginTop: '16px' } }, [
+        el('div', {}, ['You are in ', el('strong', { text: w.place.name }), ' today — day ',
+          String(w.dayInPlace), ' of ', String(w.daysHere), '. ',
+          el('button', { class: 'btn xs', onclick: function () { editor(t, w.place); } }, 'Open it')])
+      ]));
+    }
+
     /* ---- the trip's own map ---- */
     var kind = isCity ? 'india' : 'world';
     host.appendChild(DD.sectionHead(t.name, isCity ? 'The route through India' : 'The route',
@@ -52,15 +66,22 @@
       kind: kind,
       trips: [t],
       onPick: function (e) { editor(t, e.place); },
+      onIndia: kind === 'world' ? DD.openHomeTrip : null,
       onBlank: kind === 'world' ? function (key, name) { offerAdd(t, key, name); } : null
     }));
+    host.appendChild(el('p', { class: 'tiny muted', style: { marginTop: '8px' } },
+      'Scroll or pinch to zoom, drag to move around.'
+      + (kind === 'world' ? ' India opens your travels at home.' : '')));
 
     /* ---- the places ---- */
     host.appendChild(DD.sectionHead('In order', isCity ? 'The cities' : 'The countries',
       el('span', { class: 'chip', text: DD.plural(list.length, noun[0], noun[1]) })));
     var grid = el('div', { class: 'places' });
     list.forEach(function (p, i) { grid.appendChild(card(t, p, i, list.length)); });
+    makeSortable(grid, t);
     host.appendChild(grid);
+    host.appendChild(el('p', { class: 'drag-hint', style: { marginTop: '9px' } },
+      'Drag a card to reorder the route. The arrows do the same thing on a phone.'));
 
     host.appendChild(el('div', { style: { marginTop: '16px', textAlign: 'center' } }, [
       el('button', { class: 'btn', onclick: addDialog }, [icon('plus', 14), 'Add another ' + noun[0]])
@@ -71,6 +92,58 @@
       el('button', { class: 'btn sm pri', onclick: function () { DD.logForm({ trip: t }); } },
         [icon('plus', 14), 'Log spend'])));
     host.appendChild(DD.expenseLedger(t));
+  }
+
+  /* Drag a card on to another to slot it in there. Touch keeps the arrows. */
+  function makeSortable(grid, t) {
+    var dragId = null;
+
+    DD.$$('.place', grid).forEach(function (node) {
+      node.draggable = true;
+
+      node.addEventListener('dragstart', function (ev) {
+        dragId = node.dataset.place;
+        node.classList.add('dragging');
+        ev.dataTransfer.effectAllowed = 'move';
+        try { ev.dataTransfer.setData('text/plain', dragId); } catch (e) { /* IE-ism */ }
+      });
+
+      node.addEventListener('dragend', function () {
+        dragId = null;
+        DD.$$('.place', grid).forEach(function (n) {
+          n.classList.remove('dragging', 'drop-before', 'drop-after');
+        });
+      });
+
+      node.addEventListener('dragover', function (ev) {
+        if (!dragId || node.dataset.place === dragId) return;
+        ev.preventDefault();
+        ev.dataTransfer.dropEffect = 'move';
+        var r = node.getBoundingClientRect();
+        var after = (ev.clientX - r.left) > r.width / 2;
+        node.classList.toggle('drop-after', after);
+        node.classList.toggle('drop-before', !after);
+      });
+
+      node.addEventListener('dragleave', function () {
+        node.classList.remove('drop-before', 'drop-after');
+      });
+
+      node.addEventListener('drop', function (ev) {
+        ev.preventDefault();
+        if (!dragId || node.dataset.place === dragId) return;
+        var list = S.places(t);
+        var to = list.findIndex(function (p) { return p.id === node.dataset.place; });
+        var from = list.findIndex(function (p) { return p.id === dragId; });
+        if (to < 0 || from < 0) return;
+        if (node.classList.contains('drop-after') && from > to) to += 1;
+        if (node.classList.contains('drop-before') && from < to) to -= 1;
+        if (S.reorderPlace(t, dragId, to)) {
+          DD.render();
+          DD.toast('Route reordered');
+        }
+      });
+    });
   }
 
   /* --------------------------------------------------------------- card */
@@ -113,6 +186,7 @@
         el('span', { class: 'chip', text: p.currency }),
         el('span', { class: 'chip', text: DD.money(p.days ? bud.total / p.days : 0) + '/day' })
       ]),
+      fxLine(p),
       el('div', { class: 'place-acts' }, [
         el('button', { class: 'btn xs pri', onclick: function () { DD.logForm({ trip: t, placeId: p.id }); } },
           [icon('plus', 12), 'Log']),
@@ -126,7 +200,25 @@
       ])
     ]);
 
-    return el('div', { class: 'place' }, [photo, body]);
+    return el('div', { class: 'place', 'data-place': p.id }, [photo, body]);
+  }
+
+  /* The mental-arithmetic line: what ₹100 buys, for use at a counter. */
+  function fxLine(p) {
+    if (!p.currency || p.currency === 'INR') return null;
+    var rate = DD.rateFor(p.currency, S.db().currencies);
+    if (!rate || rate === 1) return null;
+    var hundred = 100 * rate;
+    /* Going the other way, one dong is worth ₹0.004 — useless. Step the unit up
+       by powers of ten until the rupee figure is a number you can hold in mind. */
+    var unit = 1 / rate, mult = 1;
+    while (unit * mult < 1 && mult < 1000000) mult *= 10;
+    var back = unit * mult;
+    return el('div', { class: 'fx-line' }, [
+      '₹100 = ', el('b', { text: DD.num(hundred, hundred < 10 ? 2 : 0) + ' ' + p.currency }),
+      '   ·   ' + DD.num(mult) + ' ' + p.currency + ' = ',
+      el('b', { text: '₹' + DD.num(back, back < 100 ? 2 : 0) })
+    ]);
   }
 
   /* Whichever of city / region is not already the card's title. */

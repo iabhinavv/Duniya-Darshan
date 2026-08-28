@@ -39,6 +39,23 @@
       DD.stat('Per day', DD.money(days ? budget / days : 0), 'across the whole plan')
     ]));
 
+    /* ---- where you are today, if a trip is running ---- */
+    var live = null;
+    all.forEach(function (t) {
+      if (live) return;
+      var w = S.whereToday(t);
+      if (w) live = { trip: t, where: w };
+    });
+    if (live) host.appendChild(todayPanel(live.trip, live.where));
+
+    /* ---- pacing: are you spending faster than the plan? ---- */
+    var paceTrip = live ? live.trip : S.trip();
+    var pace = S.pacing(paceTrip);
+    if (pace && pace.state !== 'before') {
+      host.appendChild(DD.sectionHead(paceTrip.name, 'Are you on budget?'));
+      host.appendChild(paceBar(paceTrip, pace));
+    }
+
     /* ---- the map ---- */
     var worldTrips = all.filter(function (t) { return t.kind !== 'domestic'; });
     if (worldTrips.length) {
@@ -50,8 +67,11 @@
         kind: 'world',
         trips: worldTrips,
         onPick: function (e) { openPlace(e); },
+        onIndia: openHomeTrip,
         onBlank: function (key, name) { offerAdd(key, name); }
       }));
+      host.appendChild(el('p', { class: 'tiny muted', style: { marginTop: '8px' } },
+        'Scroll or pinch to zoom, drag to move around. India opens your travels at home.'));
     }
 
     /* ---- trips ---- */
@@ -145,6 +165,119 @@
       });
       host.appendChild(ul);
     }
+  }
+
+  /* ----------------------------------------------------------- today */
+  function todayPanel(t, w) {
+    var st = S.placeState(t, w.place);
+    var left = st.budget - st.spent;
+    var daysLeftHere = w.daysHere - w.dayInPlace + 1;
+    var todaysPlan = (w.place.itinerary || []).filter(function (i) { return i.day === w.dayInPlace; });
+
+    var cols = el('div', { class: 'today-cols' }, [
+      el('div', { class: 'today-col' }, [
+        el('div', { class: 'k', text: 'Day' }),
+        el('div', { class: 'v', text: w.dayInPlace + ' of ' + w.daysHere }),
+        el('div', { class: 's', text: DD.plural(daysLeftHere, 'day') + ' left here' })
+      ]),
+      el('div', { class: 'today-col' }, [
+        el('div', { class: 'k', text: left >= 0 ? 'Left here' : 'Over here' }),
+        el('div', { class: 'v', style: { color: left >= 0 ? 'var(--green)' : 'var(--red)' },
+          text: DD.money(Math.abs(left)) }),
+        el('div', { class: 's', text: daysLeftHere > 0
+          ? DD.money(Math.max(0, left) / daysLeftHere) + ' a day from here'
+          : 'last day' })
+      ]),
+      el('div', { class: 'today-col' }, [
+        el('div', { class: 'k', text: 'Next' }),
+        el('div', { class: 'v', style: { fontSize: '17px' }, text: w.next ? w.next.name : 'Home' }),
+        el('div', { class: 's', text: w.next ? DD.plural(w.next.days, 'day') + ' there' : 'end of the trip' })
+      ])
+    ]);
+
+    var panel = el('div', { class: 'today' }, [
+      el('div', { class: 'today-mark' }, [
+        el('div', { class: 'k', text: 'Today · day ' + w.dayOfTrip + ' of ' + t.name }),
+        el('h3', { text: w.place.name }),
+        el('div', { class: 's', text: (w.place.city && w.place.city !== w.place.name ? w.place.city + ' · ' : '')
+          + DD.niceDate(DD.today()) })
+      ]),
+      cols
+    ]);
+
+    var wrap = el('div', {}, [
+      DD.sectionHead('Where you are', 'Today',
+        el('button', {
+          class: 'btn sm pri',
+          onclick: function () { S.setTrip(t.id); DD.logForm({ trip: t, placeId: w.place.id }); }
+        }, [DD.icon('plus', 14), 'Log spend here'])),
+      panel
+    ]);
+
+    if (todaysPlan.length) {
+      var list = el('div', { class: 'card list', style: { borderTop: '0' } });
+      todaysPlan.forEach(function (it) {
+        list.appendChild(el('div', { class: 'list-row' }, [
+          el('label', { class: 'inline-check', style: { margin: 0 } }, [
+            el('input', { type: 'checkbox', checked: !!it.done,
+              onchange: function () { it.done = this.checked; S.save(); DD.render(); } })
+          ]),
+          el('div', { class: 'grow' }, [
+            el('div', { class: 't', text: it.title,
+              style: it.done ? { textDecoration: 'line-through', color: 'var(--ink-3)' } : {} }),
+            it.note ? el('div', { class: 's city-note', text: it.note }) : null
+          ]),
+          it.cost ? el('span', { class: 'amt small', text: DD.money(it.cost) }) : null
+        ]));
+      });
+      wrap.appendChild(list);
+    }
+    return wrap;
+  }
+
+  /* ---------------------------------------------------------- pacing */
+  function paceBar(t, pace) {
+    var ahead = pace.delta <= 0;
+    var scale = Math.max(pace.budget, pace.actual, pace.expected) || 1;
+    var over = pace.actual > pace.expected;
+
+    return el('div', { class: 'pace' }, [
+      el('div', { class: 'pace-head' }, [
+        el('span', { class: 'verdict ' + (ahead ? 'ahead' : 'behind'),
+          text: pace.state === 'after'
+            ? (ahead ? 'Came in under budget' : 'Finished over budget')
+            : (ahead ? DD.money(Math.abs(pace.delta)) + ' in hand' : DD.money(pace.delta) + ' ahead of the plan') }),
+        el('span', { class: 'muted small', style: { fontStyle: 'italic' },
+          text: pace.state === 'after'
+            ? 'The ' + DD.plural(pace.days, 'day') + ' are up.'
+            : 'By day ' + pace.elapsed + ' of ' + pace.days + ' you would expect to have spent '
+              + DD.money(pace.expected) + '. You have spent ' + DD.money(pace.actual) + '.' })
+      ]),
+      el('div', { class: 'pace-track' }, [
+        el('div', { class: 'rail' }),
+        el('div', { class: 'fill' + (over ? ' over' : ''),
+          style: { width: Math.min(100, pace.actual / scale * 100) + '%' } }),
+        el('div', { class: 'marker', 'data-label': 'on plan',
+          style: { left: Math.min(99, pace.expected / scale * 100) + '%' } })
+      ]),
+      el('div', { class: 'pace-foot' }, [
+        el('span', { text: DD.money(pace.perDay) + ' a day so far' }),
+        el('span', { text: 'at this rate, ' + DD.money(pace.projected) + ' by the end' }),
+        el('span', { text: 'budget ' + DD.money(pace.budget) })
+      ])
+    ]);
+  }
+
+  /* Clicking India on the world map is a doorway to the trip at home. */
+  function openHomeTrip() {
+    var home = S.db().trips.filter(function (t) { return t.kind === 'domestic'; })[0];
+    if (!home) {
+      DD.toast('No trip at home yet — make one from the trips below', true);
+      return;
+    }
+    S.setTrip(home.id);
+    DD.go('places');
+    DD.toast('Within India');
   }
 
   /* --------------------------------------------------------- trip card */
@@ -310,4 +443,7 @@
   }
 
   DD.newTrip = newTrip;
+  DD.openHomeTrip = openHomeTrip;
+  DD.paceBar = paceBar;
+  DD.todayPanel = todayPanel;
 })();

@@ -7,15 +7,21 @@ keep the itinerary — and watch the world map fill in as you go.
 No account, no server, no install. Your data is a file in this repo — clone it,
 open one file, and it is all there.
 
-Built from `World_tour_budget.xlsx`: 36 countries, ₹38,92,400, ten days apiece,
-all editable.
+Built from your two spreadsheets:
+
+- `World_tour_budget.xlsx` — **36 countries, ₹38,92,400**, ten days apiece.
+- `India_tour_budget.xlsx` — **28 states, 185 days, ₹11,33,250**, with all 131
+  towns and their day-by-day notes carried across.
+
+All of it editable.
 
 ```
 Traveller Budget App/
 ├── index.html              ← the whole app. Open this. That's it.
 ├── data/
 │   └── trip-data.js        ← your trips, committed with the repo
-├── World_tour_budget.xlsx  ← the sheet this started from
+├── World_tour_budget.xlsx  ← the world sheet this started from
+├── India_tour_budget.xlsx  ← the India sheet
 ├── README.md               ← this file
 ├── serve.py                ← optional; gives you an http:// origin
 ├── build.py                ← rebuilds index.html from src/ (only if you edit the code)
@@ -81,10 +87,23 @@ world map, and the trips themselves. Click a trip to go straight to its places.
 
 Two trips come set up:
 
-- **World Tour** — the spreadsheet, 36 countries.
-- **Within India** — empty, for intercity trips at home. Its places are cities
-  rather than countries, it defaults to 4 days a stop, and it gets a map of India
-  instead of the world.
+- **World Tour** — 36 countries from the world sheet.
+- **Within India** — 28 states from the India sheet, with a map of India instead
+  of the world.
+
+### Today
+
+Give a trip a start date and, while it is running, the front page leads with
+**where you are right now** — the place, which day of how many, what is left of
+that place's budget, what that leaves you a day, where you go next, and whatever
+you had planned for today, tickable.
+
+### Are you on budget?
+
+A total on its own never tells you whether you are overspending. The pacing bar
+works out what you *should* have spent by this day of the trip and compares it
+with what you have: **"₹81,588 in hand"** or **"₹12,400 ahead of the plan"**, with
+your rate a day so far and where that rate lands you by the end.
 
 Make as many as you like. **Duplicate** copies a trip's places and budget but
 clears its spending — handy for planning the same route again, or for turning a
@@ -104,7 +123,12 @@ work the same way.
 
 A dot marks each city, and stands in for countries too small to fill at this
 scale — Singapore, the Faroes. Hover for the figures; click to open the place.
-On the world map, **clicking an empty country offers to add it to the trip**.
+On the world map, **clicking an empty country offers to add it to the trip**, and
+**clicking India takes you to your travels at home** and its map of the states.
+
+**Both maps zoom.** Scroll or pinch to zoom about the pointer, drag to pan, or use
+the +/− and Reset buttons in the corner. A drag never counts as a click on the
+country underneath.
 
 Boundaries are Natural Earth 1:110m and a public-domain set of Indian state
 outlines, baked into the file by `make_maps.py`. Nothing is fetched at runtime,
@@ -117,7 +141,8 @@ so the maps work with no network at all.
 | | |
 |---|---|
 | **Front Page** | Everything at once: totals across all trips, the world map, the trips, where the money is budgeted, the latest spending, what is coming up |
-| **Countries / Cities** | The trip itself — its map, a card per place, and the trip's whole ledger of spending at the bottom |
+| **Countries / States** | The trip itself — its map, a card per place, and the trip's whole ledger of spending at the bottom. Drag a card to reorder the route |
+| **Cities** | Trips at home only: all 131 towns, in order, with the day, the date and what you meant to do there. Searchable, tickable, and each row logs spending straight to its state |
 | **The Sheet** | Your spreadsheet — places down, categories across, Budget / Actual / Variance, CSV out |
 | **Itinerary** | The whole route day by day, dated from the trip start |
 | **Almanac** | Backup, exchange rates, categories, booking links, reset |
@@ -130,6 +155,13 @@ logs from anywhere.
 Keyboard on a desktop: <kbd>F</kbd> front page, <kbd>P</kbd> places, <kbd>S</kbd>
 sheet, <kbd>I</kbd> itinerary, <kbd>L</kbd> log spend, <kbd>Esc</kbd> closes a dialog.
 
+### Why states and not cities at home
+
+Your India sheet budgets **by state** — one row of figures for Kerala, one for
+Rajasthan — and the map fills by state too. So a state is the thing that carries
+money, and the cities live inside it as the day-by-day plan. The **Cities** page
+reads them straight back out, which is why both views exist.
+
 ---
 
 ## 6. Money
@@ -141,7 +173,12 @@ page, which came from column B of your sheet ("how many of these do I get for on
 rupee"). Edit a rate any time; **already-logged expenses never move**, because
 each one remembers the rate it was booked at.
 
-The eight spend heads are yours to rename, remove or add to, per trip.
+Every place card carries the line you actually want at a counter:
+**₹100 = 27,319 VND · 1,000 VND = ₹3.66**. The reverse rate steps up by powers of
+ten so it is never a useless "1 VND = ₹0".
+
+Spend heads are per trip and yours to rename, remove or add to. The world trip has
+eight; the India trip has the seven from your sheet, Petrol included.
 
 ---
 
@@ -195,13 +232,20 @@ the files already in `geodata/`.
 All 36 budgets, the eight spend heads, the day counts and every exchange rate are
 exactly as you had them — the total still comes to ₹38,92,400.
 
-Four corrections on import:
+From the world sheet, four corrections on import:
 
 - `Indonisia` → Indonesia, `Phillipines` → Philippines, `Columbia` → Colombia.
 - `Copenhagen` sat in the country column; it is now **Denmark**, city Copenhagen.
 - Croatia's and Germany's Euro rate pointed at the GBP cell. Set to a real Euro rate.
 - Every country got a capital, a country code (for the flag) and an airport code
   (for the flight link).
+
+From the India sheet, one correction worth knowing about:
+
+- Its own total cell reads **₹9,88,050**, but the `SUMIF` behind it only ranges to
+  row 226 — so **Tamil Nadu, Goa and Maharashtra were being left out of it**. The
+  real total across all 28 states is **₹11,33,250**, and that is what the app
+  shows. Nothing else was changed; every state's own figures are yours as written.
 
 ---
 

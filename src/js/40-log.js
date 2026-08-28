@@ -99,7 +99,8 @@
     });
     var catSel = DD.selectOf(t.categories.map(function (c) { return [c.id, c.label]; }), x ? x.category : 'food');
     var dateIn = el('input', { type: 'date', value: x ? x.date : DD.today() });
-    var noteIn = el('input', { type: 'text', placeholder: 'What was it?', value: x ? x.note : '' });
+    var noteIn = el('input', { type: 'text', placeholder: 'What was it?',
+      value: x ? x.note : (opts.note || '') });
     var conv = el('div', { class: 'tiny muted sans',
       style: { marginTop: '-9px', marginBottom: '14px', minHeight: '17px', letterSpacing: '.03em' } });
 

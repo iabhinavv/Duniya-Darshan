@@ -229,6 +229,21 @@ select{
 .map-dot.done{fill:var(--teal-900)}
 .map-dot.over{fill:var(--red)}
 .map-dot:hover{stroke:var(--ink);stroke-width:2}
+.mapwrap svg{touch-action:none;cursor:grab}
+.mapwrap.zoomed svg{cursor:grab}
+.mapwrap.zoomed svg:active{cursor:grabbing}
+.map-stage{transition:transform .1s linear}
+.map-zoom{
+  position:absolute;top:12px;right:14px;z-index:4;display:flex;flex-direction:column;gap:5px;
+}
+.map-zoom .btn{
+  min-width:30px;padding:5px 8px;background:var(--card);border-color:var(--rule-2);
+  box-shadow:0 1px 3px rgba(20,16,13,.14);font-size:13px;line-height:1;
+}
+.map-zoom .btn:disabled{opacity:.4}
+/* India on the world map is a doorway to the trip at home */
+.map-land.map-home{fill:var(--paper-2);stroke:var(--teal-700);stroke-width:1;stroke-dasharray:2.5 2;cursor:pointer}
+.map-land.map-home:hover{fill:var(--teal-100)}
 .map-legend{
   display:flex;flex-wrap:wrap;gap:14px;align-items:center;padding-top:9px;margin-top:8px;
   border-top:1px solid var(--rule-3);font-family:var(--sans);font-size:10.5px;
@@ -391,6 +406,60 @@ td.under{color:var(--green)}
   border-radius:99px;animation:sp .7s linear infinite;display:inline-block;vertical-align:-2px}
 @keyframes sp{to{transform:rotate(360deg)}}
 
+/* today / pacing */
+.today{
+  border:1px solid var(--rule);background:var(--card);display:flex;flex-wrap:wrap;
+  align-items:stretch;margin-bottom:2px;
+}
+.today-mark{
+  background:var(--grad-deep);color:#fff;padding:16px 20px;flex:1 1 260px;min-width:0;
+}
+.today-mark .k{font-family:var(--sans);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--teal-300)}
+.today-mark h3{font-size:30px;margin:4px 0 3px;letter-spacing:-.02em}
+.today-mark .s{font-family:var(--sans);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--teal-100)}
+.today-cols{display:flex;flex:2 1 340px;flex-wrap:wrap}
+.today-col{flex:1 1 150px;padding:14px 18px;border-left:1px solid var(--rule-3);min-width:0}
+.today-col .k{font-family:var(--sans);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:700}
+.today-col .v{font-family:var(--num);font-size:21px;font-weight:800;letter-spacing:-.02em;margin-top:3px}
+.today-col .s{font-size:12px;color:var(--ink-3);font-style:italic;margin-top:2px}
+
+.pace{border:1px solid var(--rule-2);background:var(--card);padding:14px 18px}
+.pace-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:9px}
+.pace-head .verdict{font-weight:700;font-size:17px}
+.pace-head .verdict.ahead{color:var(--green)}
+.pace-head .verdict.behind{color:var(--red)}
+.pace-track{position:relative;height:22px}
+.pace-track .rail{position:absolute;inset:8px 0;background:var(--rule-3);border-radius:2px}
+.pace-track .fill{position:absolute;top:5px;bottom:5px;left:0;background:var(--grad);border-radius:2px}
+.pace-track .fill.over{background:linear-gradient(90deg,var(--teal-800),var(--red))}
+.pace-track .marker{position:absolute;top:0;bottom:0;width:2px;background:var(--ink)}
+.pace-track .marker::after{
+  content:attr(data-label);position:absolute;top:-2px;left:6px;font-family:var(--sans);
+  font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);white-space:nowrap;
+}
+.pace-foot{display:flex;gap:16px;flex-wrap:wrap;margin-top:9px;font-family:var(--sans);font-size:11px;
+  letter-spacing:.06em;color:var(--ink-3);text-transform:uppercase}
+
+/* fx cheat line on a place card */
+.fx-line{
+  font-family:var(--sans);font-size:10.5px;letter-spacing:.05em;color:var(--ink-3);
+  border-top:1px dotted var(--rule-2);padding-top:7px;margin-top:2px;
+}
+.fx-line b{font-family:var(--num);color:var(--ink);font-size:12px;letter-spacing:0}
+
+/* drag to reorder */
+.place[draggable=true]{cursor:grab}
+.place.dragging{opacity:.4}
+.place.drop-before{box-shadow:inset 4px 0 0 var(--teal-600)}
+.place.drop-after{box-shadow:inset -4px 0 0 var(--teal-600)}
+.drag-hint{font-family:var(--sans);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-4)}
+
+/* cities index */
+.city-row .day{
+  font-family:var(--num);font-weight:800;font-size:17px;min-width:34px;text-align:right;color:var(--teal-800);
+}
+.city-note{font-size:13.5px;color:var(--ink-2);white-space:normal;line-height:1.45}
+
 /* trip cards on the front page */
 .trip-card{
   border:1px solid var(--rule);background:var(--card);display:flex;flex-direction:column;cursor:pointer;
@@ -442,6 +511,10 @@ td.under{color:var(--green)}
   .modal-foot{padding-bottom:calc(15px + env(safe-area-inset-bottom))}
   #toast{bottom:calc(80px + env(safe-area-inset-bottom))}
   .drive-embed{height:260px}
+  .today-col{border-left:0;border-top:1px solid var(--rule-3);flex:1 1 50%}
+  .today-mark h3{font-size:25px}
+  .map-zoom{top:8px;right:10px}
+  .map-zoom .btn{min-width:34px;padding:7px 9px}
   table.grid{font-size:13.5px;min-width:620px}
   table.grid th,table.grid td{padding:6px 8px}
   .cell-in{padding:5px 6px}

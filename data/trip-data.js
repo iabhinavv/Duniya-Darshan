@@ -1198,16 +1198,16 @@ window.DUNIYA_DATA = {
    "kind": "domestic",
    "start": "",
    "end": "",
-   "note": "Intercity trips at home",
-   "defaultDays": 4,
+   "note": "Imported from India_tour_budget.xlsx",
+   "defaultDays": 6,
    "categories": [
     {
-     "id": "flights",
-     "label": "Flights"
+     "id": "railway",
+     "label": "Flights & Rail"
     },
     {
-     "id": "transport",
-     "label": "Transportation"
+     "id": "intercity",
+     "label": "Intercity Travel"
     },
     {
      "id": "lodging",
@@ -1222,19 +1222,2252 @@ window.DUNIYA_DATA = {
      "label": "Activities"
     },
     {
-     "id": "carRental",
-     "label": "Car Rental"
-    },
-    {
-     "id": "visa",
-     "label": "Visa"
+     "id": "petrol",
+     "label": "Petrol"
     },
     {
      "id": "misc",
      "label": "Misc"
     }
    ],
-   "places": [],
+   "places": [
+    {
+     "id": "in_punjab",
+     "name": "Punjab",
+     "country": "Punjab",
+     "city": "Amritsar",
+     "iso2": "IN",
+     "iata": "ATQ",
+     "currency": "INR",
+     "lat": 31.63,
+     "lon": 74.87,
+     "days": 5,
+     "order": 1,
+     "notes": "",
+     "budget": {
+      "railway": 2000,
+      "intercity": 6000,
+      "lodging": 5000,
+      "food": 1800,
+      "activities": 1000,
+      "petrol": 0,
+      "misc": 600
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_punjab_1",
+       "day": 1,
+       "title": "Amritsar",
+       "note": "Arrive Amritsar; evening at Golden Temple, langar dinner, walk Heritage Street",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_punjab_2",
+       "day": 2,
+       "title": "Amritsar",
+       "note": "Wagah Border retreat ceremony in the evening; Jallianwala Bagh and Partition Museum by day",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_punjab_3",
+       "day": 3,
+       "title": "Ludhiana",
+       "note": "Travel to Ludhiana (~140km); local markets, Punjab Agricultural University campus",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_punjab_4",
+       "day": 4,
+       "title": "Patiala",
+       "note": "Patiala's forts",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_punjab_5",
+       "day": 5,
+       "title": "Anandpur Sahib",
+       "note": "Day trip to Anandpur Sahib (Virasat-e-Khalsa museum)",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_haryana",
+     "name": "Haryana",
+     "country": "Haryana",
+     "city": "Kurukshetra",
+     "iso2": "IN",
+     "iata": "DEL",
+     "currency": "INR",
+     "lat": 29.97,
+     "lon": 76.88,
+     "days": 3,
+     "order": 2,
+     "notes": "",
+     "budget": {
+      "railway": 2000,
+      "intercity": 3600,
+      "lodging": 4000,
+      "food": 1350,
+      "activities": 750,
+      "petrol": 0,
+      "misc": 450
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_haryana_1",
+       "day": 1,
+       "title": "Kurukshetra",
+       "note": "Arrive Kurukshetra; Brahma Sarovar, Jyotisar (Bhagavad Gita site), Panorama Science Centre",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_haryana_2",
+       "day": 2,
+       "title": "Panipat",
+       "note": "Travel to Panipat (~90km); Panipat battlefield memorials, Kabuli Bagh Mosque",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_haryana_3",
+       "day": 3,
+       "title": "Surajkund / Faridabad",
+       "note": "Day trip to Surajkund (crafts mela in Feb); begin return towards Chandigarh",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_himachal-pradesh",
+     "name": "Himachal Pradesh",
+     "country": "Himachal Pradesh",
+     "city": "Shimla",
+     "iso2": "IN",
+     "iata": "SLV",
+     "currency": "INR",
+     "lat": 31.1,
+     "lon": 77.17,
+     "days": 10,
+     "order": 3,
+     "notes": "",
+     "budget": {
+      "railway": 3000,
+      "intercity": 12000,
+      "lodging": 13000,
+      "food": 5500,
+      "activities": 3500,
+      "petrol": 1000,
+      "misc": 1500
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_himachal-pradesh_1",
+       "day": 1,
+       "title": "Shimla",
+       "note": "Arrive Shimla; The Ridge, Mall Road, Christ Church",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_himachal-pradesh_2",
+       "day": 2,
+       "title": "Shimla",
+       "note": "Day trip to Kufri; short trek, snow activities in season",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_himachal-pradesh_3",
+       "day": 3,
+       "title": "Manali",
+       "note": "Travel to Manali via Kullu (~250km, ~8-9hr bus)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_himachal-pradesh_4",
+       "day": 4,
+       "title": "Manali",
+       "note": "Explore Old Manali cafes, Hadimba Temple, Vashisht hot springs",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_himachal-pradesh_5",
+       "day": 5,
+       "title": "Manali (Solang/Rohtang)",
+       "note": "Day trip to Solang Valley / Rohtang Pass (permit needed); paragliding optional",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_himachal-pradesh_6",
+       "day": 6,
+       "title": "Kasol",
+       "note": "Travel to Kasol via Bhuntar (~75km); Parvati Valley cafes",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_himachal-pradesh_7",
+       "day": 7,
+       "title": "Tosh / Kheerganga",
+       "note": "Day hike to Tosh village, or start of Kheerganga trek",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_himachal-pradesh_8",
+       "day": 8,
+       "title": "McLeod Ganj (Dharamshala)",
+       "note": "Travel to McLeod Ganj (~130km); Dalai Lama temple complex, Bhagsu waterfall",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_himachal-pradesh_9",
+       "day": 9,
+       "title": "Dalhousie",
+       "note": "Travel to Dalhousie (~130km); Khajjiar 'Mini Switzerland' day trip",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_himachal-pradesh_10",
+       "day": 10,
+       "title": "Dalhousie",
+       "note": "Dainkund Peak viewpoint, colonial-era architecture; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_uttarakhand",
+     "name": "Uttarakhand",
+     "country": "Uttarakhand",
+     "city": "Haridwar",
+     "iso2": "IN",
+     "iata": "DED",
+     "currency": "INR",
+     "lat": 29.95,
+     "lon": 78.16,
+     "days": 10,
+     "order": 4,
+     "notes": "",
+     "budget": {
+      "railway": 2000,
+      "intercity": 13000,
+      "lodging": 13000,
+      "food": 4500,
+      "activities": 2500,
+      "petrol": 1000,
+      "misc": 1500
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_uttarakhand_1",
+       "day": 1,
+       "title": "Haridwar",
+       "note": "Arrive Haridwar; evening Ganga Aarti at Har Ki Pauri",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttarakhand_2",
+       "day": 2,
+       "title": "Rishikesh",
+       "note": "Travel to Rishikesh (~25km); Laxman Jhula, Ram Jhula, riverside cafes",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttarakhand_3",
+       "day": 3,
+       "title": "Rishikesh",
+       "note": "White-water rafting on the Ganges (budget operator), yoga session at an ashram",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttarakhand_4",
+       "day": 4,
+       "title": "Mussoorie",
+       "note": "Travel to Mussoorie (~80km); Mall Road, Kempty Falls",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttarakhand_5",
+       "day": 5,
+       "title": "Nainital",
+       "note": "Long travel day to Nainital (~280km)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttarakhand_6",
+       "day": 6,
+       "title": "Nainital",
+       "note": "Boating on Naini Lake, Naina Devi Temple, Snow View Point cable car",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttarakhand_7",
+       "day": 7,
+       "title": "Chopta",
+       "note": "Travel towards Chopta/Tungnath region (~230km)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttarakhand_8",
+       "day": 8,
+       "title": "Chopta",
+       "note": "Trek to Tungnath temple and Chandrashila summit",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttarakhand_9",
+       "day": 9,
+       "title": "Auli",
+       "note": "Travel to Auli via Joshimath; cable car ride, valley views",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttarakhand_10",
+       "day": 10,
+       "title": "Joshimath",
+       "note": "Explore Joshimath; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_rajasthan",
+     "name": "Rajasthan",
+     "country": "Rajasthan",
+     "city": "Jaipur",
+     "iso2": "IN",
+     "iata": "JAI",
+     "currency": "INR",
+     "lat": 26.92,
+     "lon": 75.79,
+     "days": 10,
+     "order": 5,
+     "notes": "",
+     "budget": {
+      "railway": 18000,
+      "intercity": 22000,
+      "lodging": 13000,
+      "food": 5500,
+      "activities": 3500,
+      "petrol": 0,
+      "misc": 1500
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_rajasthan_1",
+       "day": 1,
+       "title": "Jaipur",
+       "note": "Arrive Jaipur; Hawa Mahal, City Palace",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_rajasthan_2",
+       "day": 2,
+       "title": "Jaipur",
+       "note": "Amber Fort (walk up), Jal Mahal viewpoint, Nahargarh Fort sunset",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_rajasthan_3",
+       "day": 3,
+       "title": "Pushkar",
+       "note": "Travel to Pushkar (~145km); Pushkar Lake, Brahma Temple, sunset at the ghats",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_rajasthan_4",
+       "day": 4,
+       "title": "Jodhpur",
+       "note": "Travel to Jodhpur (~200km); Blue City lanes",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_rajasthan_5",
+       "day": 5,
+       "title": "Jodhpur",
+       "note": "Mehrangarh Fort, Jaswant Thada, Umaid Bhawan Palace exterior",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_rajasthan_6",
+       "day": 6,
+       "title": "Jaisalmer",
+       "note": "Travel to Jaisalmer (~285km); Golden Fort (Sonar Quila), Patwon Ki Haveli",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_rajasthan_7",
+       "day": 7,
+       "title": "Jaisalmer",
+       "note": "Desert safari and camping at Sam Sand Dunes (budget camel safari)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_rajasthan_8",
+       "day": 8,
+       "title": "Bikaner",
+       "note": "Travel to Bikaner (~330km); Junagarh Fort, Karni Mata Temple",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_rajasthan_9",
+       "day": 9,
+       "title": "Udaipur",
+       "note": "Long travel day to Udaipur (~490km)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_rajasthan_10",
+       "day": 10,
+       "title": "Udaipur",
+       "note": "City Palace, Jagdish Temple, sunset boat ride on Lake Pichola",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_gujarat",
+     "name": "Gujarat",
+     "country": "Gujarat",
+     "city": "Ahmedabad",
+     "iso2": "IN",
+     "iata": "AMD",
+     "currency": "INR",
+     "lat": 23.02,
+     "lon": 72.57,
+     "days": 7,
+     "order": 6,
+     "notes": "",
+     "budget": {
+      "railway": 4000,
+      "intercity": 22000,
+      "lodging": 9000,
+      "food": 3150,
+      "activities": 1750,
+      "petrol": 1000,
+      "misc": 1050
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_gujarat_1",
+       "day": 1,
+       "title": "Ahmedabad",
+       "note": "Arrive Ahmedabad; Sabarmati Ashram, Adalaj stepwell",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_gujarat_2",
+       "day": 2,
+       "title": "Rann of Kutch (Dhordo)",
+       "note": "Travel towards White Rann of Kutch (~400km); Rann Utsav season ideal",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_gujarat_3",
+       "day": 3,
+       "title": "Rann of Kutch",
+       "note": "White salt desert sunset, Kutch handicraft villages",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_gujarat_4",
+       "day": 4,
+       "title": "Dwarka",
+       "note": "Travel to Dwarka (~330km); Dwarkadhish Temple",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_gujarat_5",
+       "day": 5,
+       "title": "Diu",
+       "note": "Travel to Diu (~300km); beaches, Portuguese-era fort",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_gujarat_6",
+       "day": 6,
+       "title": "Gir National Park",
+       "note": "Travel to Gir (~100km); budget jeep safari for Asiatic lions",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_gujarat_7",
+       "day": 7,
+       "title": "Ahmedabad",
+       "note": "Return journey; optional stop at Somnath Temple en route",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_madhya-pradesh",
+     "name": "Madhya Pradesh",
+     "country": "Madhya Pradesh",
+     "city": "Bhopal",
+     "iso2": "IN",
+     "iata": "BHO",
+     "currency": "INR",
+     "lat": 23.26,
+     "lon": 77.41,
+     "days": 8,
+     "order": 7,
+     "notes": "",
+     "budget": {
+      "railway": 4000,
+      "intercity": 14000,
+      "lodging": 14000,
+      "food": 3600,
+      "activities": 2000,
+      "petrol": 0,
+      "misc": 1200
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_madhya-pradesh_1",
+       "day": 1,
+       "title": "Bhopal",
+       "note": "Arrive Bhopal; Upper/Lower Lake boating, old city bazaars",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_madhya-pradesh_2",
+       "day": 2,
+       "title": "Sanchi (day trip)",
+       "note": "Day trip to Sanchi Stupa (~45km) and back",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_madhya-pradesh_3",
+       "day": 3,
+       "title": "Pachmarhi",
+       "note": "Travel to Pachmarhi (~210km); Bee Falls, Pandav Caves",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_madhya-pradesh_4",
+       "day": 4,
+       "title": "Pachmarhi",
+       "note": "Trek to Dhoopgarh sunset point, Jata Shankar caves",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_madhya-pradesh_5",
+       "day": 5,
+       "title": "Khajuraho",
+       "note": "Long travel day to Khajuraho (~350km)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_madhya-pradesh_6",
+       "day": 6,
+       "title": "Khajuraho",
+       "note": "Explore Western Group temples (UNESCO site)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_madhya-pradesh_7",
+       "day": 7,
+       "title": "Orchha",
+       "note": "Travel to Orchha (~180km); riverside cenotaphs, Orchha Fort",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_madhya-pradesh_8",
+       "day": 8,
+       "title": "Orchha",
+       "note": "Ram Raja Temple, sunset at Betwa River; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_uttar-pradesh",
+     "name": "Uttar Pradesh",
+     "country": "Uttar Pradesh",
+     "city": "Agra",
+     "iso2": "IN",
+     "iata": "AGR",
+     "currency": "INR",
+     "lat": 27.18,
+     "lon": 78.02,
+     "days": 8,
+     "order": 8,
+     "notes": "",
+     "budget": {
+      "railway": 2000,
+      "intercity": 13000,
+      "lodging": 16000,
+      "food": 3600,
+      "activities": 2000,
+      "petrol": 0,
+      "misc": 1200
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_uttar-pradesh_1",
+       "day": 1,
+       "title": "Agra",
+       "note": "Arrive Agra; sunrise at Taj Mahal",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttar-pradesh_2",
+       "day": 2,
+       "title": "Agra",
+       "note": "Agra Fort, Fatehpur Sikri day trip (~40km)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttar-pradesh_3",
+       "day": 3,
+       "title": "Mathura / Vrindavan",
+       "note": "Travel to Mathura-Vrindavan (~60km); temple hopping",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttar-pradesh_4",
+       "day": 4,
+       "title": "Lucknow",
+       "note": "Travel to Lucknow (~350km); Bara Imambara, Chota Imambara",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttar-pradesh_5",
+       "day": 5,
+       "title": "Lucknow",
+       "note": "Hazratganj market, Rumi Darwaza, Awadhi food",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttar-pradesh_6",
+       "day": 6,
+       "title": "Ayodhya",
+       "note": "Travel to Ayodhya (~135km); Ram Mandir, Saryu Ghat",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttar-pradesh_7",
+       "day": 7,
+       "title": "Varanasi",
+       "note": "Travel to Varanasi (~200km); evening Ganga Aarti at Dashashwamedh Ghat",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_uttar-pradesh_8",
+       "day": 8,
+       "title": "Varanasi",
+       "note": "Sunrise boat ride on the Ganges, old city lanes; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_bihar",
+     "name": "Bihar",
+     "country": "Bihar",
+     "city": "Patna",
+     "iso2": "IN",
+     "iata": "PAT",
+     "currency": "INR",
+     "lat": 25.59,
+     "lon": 85.14,
+     "days": 5,
+     "order": 9,
+     "notes": "",
+     "budget": {
+      "railway": 5500,
+      "intercity": 5000,
+      "lodging": 6000,
+      "food": 2000,
+      "activities": 750,
+      "petrol": 0,
+      "misc": 750
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_bihar_1",
+       "day": 1,
+       "title": "Patna",
+       "note": "Arrive Patna; Golghar, Patna Museum, Gandhi Ghat",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_bihar_2",
+       "day": 2,
+       "title": "Nalanda / Rajgir",
+       "note": "Day trip to Nalanda ruins and Rajgir (~90km)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_bihar_3",
+       "day": 3,
+       "title": "Bodh Gaya",
+       "note": "Travel to Bodh Gaya (~70km); Mahabodhi Temple, meditation",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_bihar_4",
+       "day": 4,
+       "title": "Bodh Gaya",
+       "note": "Explore international monasteries around Bodh Gaya",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_bihar_5",
+       "day": 5,
+       "title": "Vaishali",
+       "note": "Day trip to Vaishali (Buddhist/Jain sites); begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_jharkhand",
+     "name": "Jharkhand",
+     "country": "Jharkhand",
+     "city": "Ranchi",
+     "iso2": "IN",
+     "iata": "IXR",
+     "currency": "INR",
+     "lat": 23.34,
+     "lon": 85.31,
+     "days": 4,
+     "order": 10,
+     "notes": "",
+     "budget": {
+      "railway": 6600,
+      "intercity": 8000,
+      "lodging": 4800,
+      "food": 1600,
+      "activities": 600,
+      "petrol": 1000,
+      "misc": 600
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_jharkhand_1",
+       "day": 1,
+       "title": "Ranchi",
+       "note": "Arrive Ranchi; Hundru Falls day trip",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_jharkhand_2",
+       "day": 2,
+       "title": "Netarhat",
+       "note": "Travel to Netarhat hill station (~150km); 'Queen of Chotanagpur' sunset point",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_jharkhand_3",
+       "day": 3,
+       "title": "Betla National Park",
+       "note": "Travel to Betla (~100km); budget jeep safari",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_jharkhand_4",
+       "day": 4,
+       "title": "Deoghar",
+       "note": "Travel towards Deoghar (Baidyanath Temple); begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_west-bengal",
+     "name": "West Bengal",
+     "country": "West Bengal",
+     "city": "Kolkata",
+     "iso2": "IN",
+     "iata": "CCU",
+     "currency": "INR",
+     "lat": 22.57,
+     "lon": 88.36,
+     "days": 8,
+     "order": 11,
+     "notes": "",
+     "budget": {
+      "railway": 13000,
+      "intercity": 25000,
+      "lodging": 9000,
+      "food": 3600,
+      "activities": 2000,
+      "petrol": 0,
+      "misc": 1200
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_west-bengal_1",
+       "day": 1,
+       "title": "Kolkata",
+       "note": "Arrive Kolkata; Victoria Memorial, Howrah Bridge, College Street",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_west-bengal_2",
+       "day": 2,
+       "title": "Kolkata",
+       "note": "Kumartuli potters' quarter, heritage tram ride, Park Street evening",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_west-bengal_3",
+       "day": 3,
+       "title": "Darjeeling",
+       "note": "Overnight train/bus to NJP then shared jeep to Darjeeling (~600km total)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_west-bengal_4",
+       "day": 4,
+       "title": "Darjeeling",
+       "note": "Sunrise at Tiger Hill, toy train (DHR) ride, Peace Pagoda",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_west-bengal_5",
+       "day": 5,
+       "title": "Kalimpong",
+       "note": "Travel to Kalimpong (~50km); monasteries, Delo Park viewpoint",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_west-bengal_6",
+       "day": 6,
+       "title": "Towards NJP/Kolkata",
+       "note": "Begin return route; scenic hill drive",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_west-bengal_7",
+       "day": 7,
+       "title": "Digha (day trip)",
+       "note": "Day trip to Digha beach (~185km) or rest day in Kolkata",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_west-bengal_8",
+       "day": 8,
+       "title": "Sundarbans / Kolkata",
+       "note": "Sundarbans mangrove day tour, or free day; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_sikkim",
+     "name": "Sikkim",
+     "country": "Sikkim",
+     "city": "Gangtok",
+     "iso2": "IN",
+     "iata": "IXB",
+     "currency": "INR",
+     "lat": 27.33,
+     "lon": 88.61,
+     "days": 6,
+     "order": 12,
+     "notes": "",
+     "budget": {
+      "railway": 34000,
+      "intercity": 12000,
+      "lodging": 10000,
+      "food": 3300,
+      "activities": 2100,
+      "petrol": 3000,
+      "misc": 900
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_sikkim_1",
+       "day": 1,
+       "title": "Gangtok",
+       "note": "Arrive via Bagdogra + shared jeep (~125km); explore MG Marg",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_sikkim_2",
+       "day": 2,
+       "title": "Gangtok",
+       "note": "Tsomgo Lake and Baba Mandir day trip (permit + shared taxi required)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_sikkim_3",
+       "day": 3,
+       "title": "Pelling",
+       "note": "Travel to Pelling (~110km); Pemayangtse Monastery, Khecheopalri Lake",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_sikkim_4",
+       "day": 4,
+       "title": "Lachung",
+       "note": "Long travel to North Sikkim's Lachung (~200km, permit required)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_sikkim_5",
+       "day": 5,
+       "title": "Yumthang Valley",
+       "note": "Day trip to Yumthang 'Valley of Flowers' and Zero Point",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_sikkim_6",
+       "day": 6,
+       "title": "Gangtok",
+       "note": "Return journey to Gangtok, then towards Bagdogra",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_assam",
+     "name": "Assam",
+     "country": "Assam",
+     "city": "Guwahati",
+     "iso2": "IN",
+     "iata": "GAU",
+     "currency": "INR",
+     "lat": 26.14,
+     "lon": 91.74,
+     "days": 6,
+     "order": 13,
+     "notes": "",
+     "budget": {
+      "railway": 24000,
+      "intercity": 9000,
+      "lodging": 9000,
+      "food": 2700,
+      "activities": 1500,
+      "petrol": 2000,
+      "misc": 900
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_assam_1",
+       "day": 1,
+       "title": "Guwahati",
+       "note": "Arrive Guwahati; Kamakhya Temple, sunset boat ride on the Brahmaputra",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_assam_2",
+       "day": 2,
+       "title": "Kaziranga",
+       "note": "Travel to Kaziranga National Park (~215km); jeep safari for one-horned rhinos",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_assam_3",
+       "day": 3,
+       "title": "Kaziranga",
+       "note": "Second safari (different range); elephant-back safari optional",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_assam_4",
+       "day": 4,
+       "title": "Majuli",
+       "note": "Travel to Majuli, world's largest river island (~150km + ferry)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_assam_5",
+       "day": 5,
+       "title": "Majuli",
+       "note": "Vaishnavite monasteries (satras), mask-making villages",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_assam_6",
+       "day": 6,
+       "title": "Sivasagar",
+       "note": "Travel to Sivasagar, former Ahom capital; Rang Ghar, Talatal Ghar; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_arunachal-pradesh",
+     "name": "Arunachal Pradesh",
+     "country": "Arunachal Pradesh",
+     "city": "Tawang",
+     "iso2": "IN",
+     "iata": "TEZ",
+     "currency": "INR",
+     "lat": 27.59,
+     "lon": 91.87,
+     "days": 7,
+     "order": 14,
+     "notes": "",
+     "budget": {
+      "railway": 24000,
+      "intercity": 18000,
+      "lodging": 8000,
+      "food": 2800,
+      "activities": 1050,
+      "petrol": 1000,
+      "misc": 1050
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_arunachal-pradesh_1",
+       "day": 1,
+       "title": "Bhalukpong (entry)",
+       "note": "Cross into Arunachal (Inner Line Permit required); travel towards Tawang route",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_arunachal-pradesh_2",
+       "day": 2,
+       "title": "Bomdila (en route)",
+       "note": "Continue mountain drive via Bomdila (scenic, slow roads)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_arunachal-pradesh_3",
+       "day": 3,
+       "title": "Tawang",
+       "note": "Tawang Monastery (one of India's largest), Sela Pass",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_arunachal-pradesh_4",
+       "day": 4,
+       "title": "Bomdila",
+       "note": "Return via Bomdila; explore Bomdila Monastery",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_arunachal-pradesh_5",
+       "day": 5,
+       "title": "Ziro Valley",
+       "note": "Travel towards Ziro Valley (Apatani tribal homeland)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_arunachal-pradesh_6",
+       "day": 6,
+       "title": "Ziro Valley",
+       "note": "Explore Apatani villages, pine-covered valley",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_arunachal-pradesh_7",
+       "day": 7,
+       "title": "Guwahati (return)",
+       "note": "Begin return journey towards Guwahati for onward flight",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_meghalaya",
+     "name": "Meghalaya",
+     "country": "Meghalaya",
+     "city": "Shillong",
+     "iso2": "IN",
+     "iata": "SHL",
+     "currency": "INR",
+     "lat": 25.58,
+     "lon": 91.89,
+     "days": 6,
+     "order": 15,
+     "notes": "",
+     "budget": {
+      "railway": 24000,
+      "intercity": 6000,
+      "lodging": 9000,
+      "food": 2400,
+      "activities": 900,
+      "petrol": 0,
+      "misc": 900
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_meghalaya_1",
+       "day": 1,
+       "title": "Shillong",
+       "note": "Arrive via Guwahati + shared cab (~100km); Ward's Lake, Police Bazar",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_meghalaya_2",
+       "day": 2,
+       "title": "Cherrapunji (Sohra)",
+       "note": "Travel to Cherrapunji (~55km); Nohkalikai Falls",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_meghalaya_3",
+       "day": 3,
+       "title": "Cherrapunji",
+       "note": "Trek to Double Decker Living Root Bridge, Nongriat village",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_meghalaya_4",
+       "day": 4,
+       "title": "Dawki",
+       "note": "Travel to Dawki (~80km); crystal-clear Umngot River boating",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_meghalaya_5",
+       "day": 5,
+       "title": "Mawlynnong",
+       "note": "Visit Mawlynnong, 'cleanest village in Asia'; nearby root bridges",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_meghalaya_6",
+       "day": 6,
+       "title": "Shillong",
+       "note": "Return to Shillong; local markets; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_manipur",
+     "name": "Manipur",
+     "country": "Manipur",
+     "city": "Imphal",
+     "iso2": "IN",
+     "iata": "IMF",
+     "currency": "INR",
+     "lat": 24.82,
+     "lon": 93.94,
+     "days": 4,
+     "order": 16,
+     "notes": "",
+     "budget": {
+      "railway": 20000,
+      "intercity": 3700,
+      "lodging": 4000,
+      "food": 1600,
+      "activities": 600,
+      "petrol": 0,
+      "misc": 600
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_manipur_1",
+       "day": 1,
+       "title": "Imphal",
+       "note": "Arrive Imphal; Kangla Fort, Ima Keithel (all-women's market)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_manipur_2",
+       "day": 2,
+       "title": "Loktak Lake",
+       "note": "Day trip to Loktak Lake (~50km); floating phumdis, Keibul Lamjao park",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_manipur_3",
+       "day": 3,
+       "title": "Moirang",
+       "note": "Explore Moirang war memorial, INA museum",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_manipur_4",
+       "day": 4,
+       "title": "Imphal",
+       "note": "War Cemetery, local markets; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_nagaland",
+     "name": "Nagaland",
+     "country": "Nagaland",
+     "city": "Kohima",
+     "iso2": "IN",
+     "iata": "DMU",
+     "currency": "INR",
+     "lat": 25.67,
+     "lon": 94.11,
+     "days": 5,
+     "order": 17,
+     "notes": "",
+     "budget": {
+      "railway": 21000,
+      "intercity": 9000,
+      "lodging": 6000,
+      "food": 2000,
+      "activities": 750,
+      "petrol": 0,
+      "misc": 750
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_nagaland_1",
+       "day": 1,
+       "title": "Kohima",
+       "note": "Travel from Dimapur to Kohima (~75km); War Cemetery",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_nagaland_2",
+       "day": 2,
+       "title": "Kohima",
+       "note": "Local market, Naga Heritage Village at Kisama",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_nagaland_3",
+       "day": 3,
+       "title": "Khonoma",
+       "note": "Day trip to Khonoma, India's first 'green village'",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_nagaland_4",
+       "day": 4,
+       "title": "Mon",
+       "note": "Long travel to Mon district for Konyak tribal villages (best in Hornbill season)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_nagaland_5",
+       "day": 5,
+       "title": "Mon / Kohima",
+       "note": "Tribal village visit, headhunter history museum; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_mizoram",
+     "name": "Mizoram",
+     "country": "Mizoram",
+     "city": "Aizawl",
+     "iso2": "IN",
+     "iata": "AJL",
+     "currency": "INR",
+     "lat": 23.73,
+     "lon": 92.72,
+     "days": 4,
+     "order": 18,
+     "notes": "",
+     "budget": {
+      "railway": 22000,
+      "intercity": 3000,
+      "lodging": 5000,
+      "food": 1600,
+      "activities": 600,
+      "petrol": 0,
+      "misc": 600
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_mizoram_1",
+       "day": 1,
+       "title": "Aizawl",
+       "note": "Arrive Aizawl; hillside city views, Solomon's Temple viewpoint",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_mizoram_2",
+       "day": 2,
+       "title": "Reiek",
+       "note": "Day trip to Reiek Tlang peak (~30km); trek for valley views",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_mizoram_3",
+       "day": 3,
+       "title": "Aizawl",
+       "note": "Mizoram State Museum, local markets, Mizo cuisine",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_mizoram_4",
+       "day": 4,
+       "title": "Aizawl",
+       "note": "Free day / local exploration; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_tripura",
+     "name": "Tripura",
+     "country": "Tripura",
+     "city": "Agartala",
+     "iso2": "IN",
+     "iata": "IXA",
+     "currency": "INR",
+     "lat": 23.83,
+     "lon": 91.28,
+     "days": 3,
+     "order": 19,
+     "notes": "",
+     "budget": {
+      "railway": 19000,
+      "intercity": 7000,
+      "lodging": 4000,
+      "food": 1200,
+      "activities": 450,
+      "petrol": 0,
+      "misc": 450
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_tripura_1",
+       "day": 1,
+       "title": "Agartala",
+       "note": "Arrive Agartala; Ujjayanta Palace, Jagannath Temple",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_tripura_2",
+       "day": 2,
+       "title": "Unakoti",
+       "note": "Day trip to Unakoti rock-cut sculptures (~180km, long day)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_tripura_3",
+       "day": 3,
+       "title": "Neermahal",
+       "note": "Day trip to Neermahal 'Lake Palace'; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_odisha",
+     "name": "Odisha",
+     "country": "Odisha",
+     "city": "Bhubaneswar",
+     "iso2": "IN",
+     "iata": "BBI",
+     "currency": "INR",
+     "lat": 20.3,
+     "lon": 85.82,
+     "days": 7,
+     "order": 20,
+     "notes": "",
+     "budget": {
+      "railway": 13000,
+      "intercity": 7500,
+      "lodging": 7500,
+      "food": 3150,
+      "activities": 1750,
+      "petrol": 0,
+      "misc": 1200
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_odisha_1",
+       "day": 1,
+       "title": "Bhubaneswar",
+       "note": "Arrive Bhubaneswar; Lingaraj Temple, ancient temple cluster",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_odisha_2",
+       "day": 2,
+       "title": "Konark",
+       "note": "Day trip to Konark Sun Temple (~65km)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_odisha_3",
+       "day": 3,
+       "title": "Puri",
+       "note": "Travel to Puri (~60km); Jagannath Temple, Puri beach",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_odisha_4",
+       "day": 4,
+       "title": "Puri",
+       "note": "Relax at Puri beach, local markets",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_odisha_5",
+       "day": 5,
+       "title": "Chilika Lake",
+       "note": "Day trip to Chilika Lake (~50km); boat ride for Irrawaddy dolphins",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_odisha_6",
+       "day": 6,
+       "title": "Bhubaneswar",
+       "note": "Return; Dhauli Peace Pagoda",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_odisha_7",
+       "day": 7,
+       "title": "Bhubaneswar",
+       "note": "Free day / Pipili applique craft village; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_chhattisgarh",
+     "name": "Chhattisgarh",
+     "country": "Chhattisgarh",
+     "city": "Raipur",
+     "iso2": "IN",
+     "iata": "RPR",
+     "currency": "INR",
+     "lat": 21.25,
+     "lon": 81.63,
+     "days": 5,
+     "order": 21,
+     "notes": "",
+     "budget": {
+      "railway": 5700,
+      "intercity": 7000,
+      "lodging": 7000,
+      "food": 2000,
+      "activities": 750,
+      "petrol": 0,
+      "misc": 1000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_chhattisgarh_1",
+       "day": 1,
+       "title": "Raipur",
+       "note": "Arrive Raipur; Mahant Ghasidas Museum, local markets",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_chhattisgarh_2",
+       "day": 2,
+       "title": "Jagdalpur",
+       "note": "Travel to Jagdalpur (~300km, Bastar region)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_chhattisgarh_3",
+       "day": 3,
+       "title": "Chitrakote Falls",
+       "note": "Day trip to Chitrakote Falls, 'Niagara of India' (~40km)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_chhattisgarh_4",
+       "day": 4,
+       "title": "Jagdalpur",
+       "note": "Bastar tribal markets and craft villages",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_chhattisgarh_5",
+       "day": 5,
+       "title": "Kanger Valley NP",
+       "note": "Explore Kanger Valley caves; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_telangana",
+     "name": "Telangana",
+     "country": "Telangana",
+     "city": "Hyderabad",
+     "iso2": "IN",
+     "iata": "HYD",
+     "currency": "INR",
+     "lat": 17.39,
+     "lon": 78.49,
+     "days": 4,
+     "order": 22,
+     "notes": "",
+     "budget": {
+      "railway": 13000,
+      "intercity": 6000,
+      "lodging": 6000,
+      "food": 1800,
+      "activities": 1000,
+      "petrol": 0,
+      "misc": 600
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_telangana_1",
+       "day": 1,
+       "title": "Hyderabad",
+       "note": "Arrive Hyderabad; Charminar, Laad Bazaar, biryani tasting",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_telangana_2",
+       "day": 2,
+       "title": "Hyderabad",
+       "note": "Golconda Fort sound-and-light show, Chowmahalla Palace",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_telangana_3",
+       "day": 3,
+       "title": "Warangal",
+       "note": "Day trip to Warangal Fort and Thousand Pillar Temple (~145km)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_telangana_4",
+       "day": 4,
+       "title": "Hyderabad",
+       "note": "Hussain Sagar Lake, local markets; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_andhra-pradesh",
+     "name": "Andhra Pradesh",
+     "country": "Andhra Pradesh",
+     "city": "Visakhapatnam",
+     "iso2": "IN",
+     "iata": "VTZ",
+     "currency": "INR",
+     "lat": 17.69,
+     "lon": 83.22,
+     "days": 6,
+     "order": 23,
+     "notes": "",
+     "budget": {
+      "railway": 15000,
+      "intercity": 16000,
+      "lodging": 12000,
+      "food": 2700,
+      "activities": 1500,
+      "petrol": 0,
+      "misc": 900
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_andhra-pradesh_1",
+       "day": 1,
+       "title": "Visakhapatnam",
+       "note": "Arrive Vizag; RK Beach, Kailasagiri hilltop park",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_andhra-pradesh_2",
+       "day": 2,
+       "title": "Araku Valley",
+       "note": "Scenic train ride to Araku Valley (~120km, tribal region)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_andhra-pradesh_3",
+       "day": 3,
+       "title": "Araku Valley",
+       "note": "Coffee plantations, Borra Caves",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_andhra-pradesh_4",
+       "day": 4,
+       "title": "Visakhapatnam",
+       "note": "Return to Vizag; submarine museum",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_andhra-pradesh_5",
+       "day": 5,
+       "title": "Tirupati",
+       "note": "Long travel to Tirupati (~800km; overnight bus/train)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_andhra-pradesh_6",
+       "day": 6,
+       "title": "Tirupati",
+       "note": "Tirumala Venkateswara Temple (early queue for darshan); begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_karnataka",
+     "name": "Karnataka",
+     "country": "Karnataka",
+     "city": "Bangalore",
+     "iso2": "IN",
+     "iata": "BLR",
+     "currency": "INR",
+     "lat": 12.97,
+     "lon": 77.59,
+     "days": 10,
+     "order": 24,
+     "notes": "",
+     "budget": {
+      "railway": 13000,
+      "intercity": 16500,
+      "lodging": 20000,
+      "food": 5500,
+      "activities": 3500,
+      "petrol": 1000,
+      "misc": 1500
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_karnataka_1",
+       "day": 1,
+       "title": "Bangalore",
+       "note": "Arrive Bangalore; Lalbagh Botanical Garden, Cubbon Park",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_karnataka_2",
+       "day": 2,
+       "title": "Mysore",
+       "note": "Travel to Mysore (~145km); Mysore Palace",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_karnataka_3",
+       "day": 3,
+       "title": "Mysore",
+       "note": "Chamundi Hills, Brindavan Gardens",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_karnataka_4",
+       "day": 4,
+       "title": "Coorg (Madikeri)",
+       "note": "Travel to Coorg (~120km); coffee plantations",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_karnataka_5",
+       "day": 5,
+       "title": "Coorg",
+       "note": "Abbey Falls, Talakaveri, trek to Tadiandamol peak",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_karnataka_6",
+       "day": 6,
+       "title": "Hampi",
+       "note": "Long travel to Hampi (~350km via Hassan)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_karnataka_7",
+       "day": 7,
+       "title": "Hampi",
+       "note": "Vijayanagara ruins, Virupaksha Temple, boulder landscape",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_karnataka_8",
+       "day": 8,
+       "title": "Hampi",
+       "note": "Sunset at Matanga Hill; cycle around ruins",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_karnataka_9",
+       "day": 9,
+       "title": "Gokarna",
+       "note": "Travel to Gokarna (~250km); beach town, Om Beach",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_karnataka_10",
+       "day": 10,
+       "title": "Gokarna",
+       "note": "Beach hopping (Kudle, Half Moon, Paradise); begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_kerala",
+     "name": "Kerala",
+     "country": "Kerala",
+     "city": "Kochi",
+     "iso2": "IN",
+     "iata": "COK",
+     "currency": "INR",
+     "lat": 9.93,
+     "lon": 76.27,
+     "days": 10,
+     "order": 25,
+     "notes": "",
+     "budget": {
+      "railway": 18000,
+      "intercity": 12500,
+      "lodging": 18000,
+      "food": 5500,
+      "activities": 3500,
+      "petrol": 1000,
+      "misc": 1500
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_kerala_1",
+       "day": 1,
+       "title": "Kochi",
+       "note": "Arrive Kochi; Fort Kochi, Chinese fishing nets, Mattancherry Palace",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_kerala_2",
+       "day": 2,
+       "title": "Munnar",
+       "note": "Travel to Munnar (~130km); tea plantations",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_kerala_3",
+       "day": 3,
+       "title": "Munnar",
+       "note": "Eravikulam National Park, tea museum, Top Station viewpoint",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_kerala_4",
+       "day": 4,
+       "title": "Thekkady",
+       "note": "Travel to Thekkady (~90km); Periyar Wildlife Sanctuary",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_kerala_5",
+       "day": 5,
+       "title": "Thekkady",
+       "note": "Boat safari on Periyar Lake, spice plantation tour",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_kerala_6",
+       "day": 6,
+       "title": "Alleppey",
+       "note": "Travel to Alleppey (~140km); budget houseboat / day cruise",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_kerala_7",
+       "day": 7,
+       "title": "Alleppey",
+       "note": "Backwater village walk, canoe ride through narrow canals",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_kerala_8",
+       "day": 8,
+       "title": "Varkala",
+       "note": "Travel to Varkala (~150km); cliffside beach town",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_kerala_9",
+       "day": 9,
+       "title": "Varkala",
+       "note": "Relax at Varkala Beach, cliff cafes, Janardanaswamy Temple",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_kerala_10",
+       "day": 10,
+       "title": "Kochi",
+       "note": "Return towards Kochi for departure; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_tamil-nadu",
+     "name": "Tamil Nadu",
+     "country": "Tamil Nadu",
+     "city": "Chennai",
+     "iso2": "IN",
+     "iata": "MAA",
+     "currency": "INR",
+     "lat": 13.08,
+     "lon": 80.27,
+     "days": 10,
+     "order": 26,
+     "notes": "",
+     "budget": {
+      "railway": 15000,
+      "intercity": 20000,
+      "lodging": 16000,
+      "food": 4500,
+      "activities": 2500,
+      "petrol": 0,
+      "misc": 1500
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_tamil-nadu_1",
+       "day": 1,
+       "title": "Chennai",
+       "note": "Arrive Chennai; Marina Beach, Kapaleeshwarar Temple",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_tamil-nadu_2",
+       "day": 2,
+       "title": "Mahabalipuram",
+       "note": "Day trip to Mahabalipuram (~60km); Shore Temple, rock-cut caves",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_tamil-nadu_3",
+       "day": 3,
+       "title": "Pondicherry",
+       "note": "Travel to Pondicherry (~160km); French Quarter, Auroville",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_tamil-nadu_4",
+       "day": 4,
+       "title": "Pondicherry",
+       "note": "Promenade Beach, Auroville visitor center",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_tamil-nadu_5",
+       "day": 5,
+       "title": "Madurai",
+       "note": "Travel to Madurai (~300km); Meenakshi Amman Temple",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_tamil-nadu_6",
+       "day": 6,
+       "title": "Madurai",
+       "note": "Temple complex evening prayers, Thirumalai Nayakkar Palace",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_tamil-nadu_7",
+       "day": 7,
+       "title": "Rameswaram",
+       "note": "Day trip to Rameswaram (~170km); Ramanathaswamy Temple, Dhanushkodi",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_tamil-nadu_8",
+       "day": 8,
+       "title": "Kodaikanal",
+       "note": "Travel to Kodaikanal hill station (~120km)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_tamil-nadu_9",
+       "day": 9,
+       "title": "Kodaikanal",
+       "note": "Boating on Kodai Lake, Coaker's Walk, Pillar Rocks",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_tamil-nadu_10",
+       "day": 10,
+       "title": "Ooty",
+       "note": "Travel to Ooty (~200km); Nilgiri Mountain Railway toy train; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_goa",
+     "name": "Goa",
+     "country": "Goa",
+     "city": "Panaji",
+     "iso2": "IN",
+     "iata": "GOI",
+     "currency": "INR",
+     "lat": 15.5,
+     "lon": 73.83,
+     "days": 6,
+     "order": 27,
+     "notes": "",
+     "budget": {
+      "railway": 17000,
+      "intercity": 4800,
+      "lodging": 10000,
+      "food": 3300,
+      "activities": 2100,
+      "petrol": 1200,
+      "misc": 900
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_goa_1",
+       "day": 1,
+       "title": "North Goa (Baga)",
+       "note": "Arrive Goa; Baga Beach, evening market",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_goa_2",
+       "day": 2,
+       "title": "North Goa (Anjuna)",
+       "note": "Anjuna flea market (Wed), Vagator Beach, Chapora Fort",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_goa_3",
+       "day": 3,
+       "title": "North Goa (Calangute)",
+       "note": "Water sports at Calangute, sunset at Fort Aguada",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_goa_4",
+       "day": 4,
+       "title": "South Goa (Palolem)",
+       "note": "Travel to Palolem Beach (~40km); quieter southern beaches",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_goa_5",
+       "day": 5,
+       "title": "South Goa",
+       "note": "Cola Beach, Agonda Beach; dolphin-spotting boat trip",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_goa_6",
+       "day": 6,
+       "title": "Panaji",
+       "note": "Old Goa churches (UNESCO), Fontainhas Latin Quarter; begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    },
+    {
+     "id": "in_maharashtra",
+     "name": "Maharashtra",
+     "country": "Maharashtra",
+     "city": "Mumbai",
+     "iso2": "IN",
+     "iata": "BOM",
+     "currency": "INR",
+     "lat": 19.08,
+     "lon": 72.88,
+     "days": 8,
+     "order": 28,
+     "notes": "",
+     "budget": {
+      "railway": 16000,
+      "intercity": 11000,
+      "lodging": 11000,
+      "food": 4400,
+      "activities": 2800,
+      "petrol": 0,
+      "misc": 1200
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_maharashtra_1",
+       "day": 1,
+       "title": "Mumbai",
+       "note": "Arrive Mumbai; Gateway of India, Marine Drive",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_maharashtra_2",
+       "day": 2,
+       "title": "Mumbai",
+       "note": "Elephanta Caves ferry trip, Colaba Causeway market",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_maharashtra_3",
+       "day": 3,
+       "title": "Lonavala",
+       "note": "Travel to Lonavala (~85km); Karla/Bhaja Caves, Tiger's Point",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_maharashtra_4",
+       "day": 4,
+       "title": "Pune",
+       "note": "Travel to Pune (~65km); Shaniwar Wada, Aga Khan Palace",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_maharashtra_5",
+       "day": 5,
+       "title": "Aurangabad",
+       "note": "Travel to Aurangabad (~235km)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_maharashtra_6",
+       "day": 6,
+       "title": "Ajanta Caves",
+       "note": "Day trip to Ajanta Caves (~100km); UNESCO Buddhist caves",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_maharashtra_7",
+       "day": 7,
+       "title": "Ellora Caves",
+       "note": "Day trip to Ellora Caves (~30km); Kailasa rock-cut temple",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_maharashtra_8",
+       "day": 8,
+       "title": "Aurangabad",
+       "note": "Bibi Ka Maqbara ('mini Taj'); begin return journey",
+       "cost": 0,
+       "done": false
+      }
+     ]
+    }
+   ],
    "expenses": []
   }
  ]
