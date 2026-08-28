@@ -83,9 +83,17 @@
   }
 
   /* ------------------------------------------------------------- saving */
+  var warnedStorage = false;
   function save() {
     try { localStorage.setItem(STORE_KEY, JSON.stringify(DB)); }
-    catch (e) { DD.toast('Could not save locally — storage may be full', true); }
+    catch (e) {
+      /* Full quota, or a browser with site data switched off. Say so once —
+         not on every keystroke — and keep working in memory. */
+      if (!warnedStorage) {
+        warnedStorage = true;
+        DD.toast('Cannot save in this browser — use Data \u2192 JSON backup before you close the tab', true);
+      }
+    }
     dirty = true;
     scheduleFileWrite();
     DD.emit('change');
