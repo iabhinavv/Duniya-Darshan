@@ -1,0 +1,1198 @@
+/* Your trips. Written by the app; safe to commit, diff and pull. */
+window.DUNIYA_DATA = {
+ "version": 1,
+ "settings": {
+  "name": "",
+  "symbol": "₹",
+  "homeAirport": "DEL",
+  "homeCity": "Delhi",
+  "adults": 1,
+  "linkTemplates": {
+   "flights": {
+    "label": "Skyscanner",
+    "url": "https://www.skyscanner.co.in/transport/flights/{home}/{iata}/{yymmdd}/"
+   },
+   "stays": {
+    "label": "Booking.com",
+    "url": "https://www.booking.com/searchresults.html?ss={city}%2C+{country}&checkin={in}&checkout={out}&group_adults={adults}"
+   },
+   "activities": {
+    "label": "GetYourGuide",
+    "url": "https://www.getyourguide.com/s/?q={city}"
+   }
+  }
+ },
+ "currencies": {
+  "INR": {
+   "name": "Indian Rupee",
+   "perINR": 1.0
+  },
+  "NPR": {
+   "name": "Nepalese Rupee",
+   "perINR": 1.6
+  },
+  "BTN": {
+   "name": "Ngultrum",
+   "perINR": 1.0
+  },
+  "VND": {
+   "name": "Vietnamese Dong",
+   "perINR": 273.19
+  },
+  "LKR": {
+   "name": "Sri Lankan Rupee",
+   "perINR": 3.43
+  },
+  "IDR": {
+   "name": "Indonesian Rupiah",
+   "perINR": 185.67
+  },
+  "THB": {
+   "name": "Thai Baht",
+   "perINR": 0.35
+  },
+  "KHR": {
+   "name": "Cambodian Riel",
+   "perINR": 42.42
+  },
+  "LAK": {
+   "name": "Lao Kip",
+   "perINR": 235.0
+  },
+  "MYR": {
+   "name": "Malaysian Ringgit",
+   "perINR": 0.042
+  },
+  "PHP": {
+   "name": "Philippine Peso",
+   "perINR": 0.65
+  },
+  "EGP": {
+   "name": "Egyptian Pound",
+   "perINR": 0.532
+  },
+  "JOD": {
+   "name": "Jordanian Dinar",
+   "perINR": 0.0074
+  },
+  "CZK": {
+   "name": "Czech Koruna",
+   "perINR": 0.218
+  },
+  "CNY": {
+   "name": "Renminbi",
+   "perINR": 0.07
+  },
+  "SGD": {
+   "name": "Singapore Dollar",
+   "perINR": 0.013
+  },
+  "JPY": {
+   "name": "Japanese Yen",
+   "perINR": 1.67
+  },
+  "HUF": {
+   "name": "Hungarian Forint",
+   "perINR": 3.3
+  },
+  "EUR": {
+   "name": "Euro",
+   "perINR": 0.00901
+  },
+  "DKK": {
+   "name": "Danish Krone",
+   "perINR": 0.0674
+  },
+  "TRY": {
+   "name": "Turkish Lira",
+   "perINR": 0.505
+  },
+  "GEL": {
+   "name": "Georgian Lari",
+   "perINR": 0.028
+  },
+  "ZAR": {
+   "name": "South African Rand",
+   "perINR": 0.169
+  },
+  "COP": {
+   "name": "Colombian Peso",
+   "perINR": 33.39
+  },
+  "PEN": {
+   "name": "Peruvian Sol",
+   "perINR": 0.035
+  },
+  "USD": {
+   "name": "US Dollar",
+   "perINR": 0.010477787091366304
+  },
+  "BOB": {
+   "name": "Boliviano",
+   "perINR": 0.072
+  },
+  "GTQ": {
+   "name": "Guatemalan Quetzal",
+   "perINR": 0.081
+  },
+  "NIO": {
+   "name": "Nicaraguan Cordoba",
+   "perINR": 0.383
+  },
+  "MXN": {
+   "name": "Mexican Peso",
+   "perINR": 0.178
+  },
+  "KGS": {
+   "name": "Kyrgyzstani Som",
+   "perINR": 0.916
+  },
+  "UZS": {
+   "name": "Uzbekistani Som",
+   "perINR": 124.5
+  },
+  "TJS": {
+   "name": "Tajikistani Somoni",
+   "perINR": 0.114
+  },
+  "KZT": {
+   "name": "Kazakhstani Tenge",
+   "perINR": 4.86
+  },
+  "AMD": {
+   "name": "Armenian Dram",
+   "perINR": 4.03
+  },
+  "GBP": {
+   "name": "Pound Sterling",
+   "perINR": 0.00771604938271605
+  },
+  "AED": {
+   "name": "UAE Dirham",
+   "perINR": 0.0385
+  }
+ },
+ "people": [
+  {
+   "id": "me",
+   "name": "Me",
+   "colour": "#0F766E"
+  }
+ ],
+ "activeTrip": "trip_world",
+ "trips": [
+  {
+   "id": "trip_world",
+   "name": "World Tour",
+   "kind": "world",
+   "start": "",
+   "end": "",
+   "note": "Imported from World_tour_budget.xlsx",
+   "travellerIds": [
+    "me"
+   ],
+   "defaultDays": 10,
+   "categories": [
+    {
+     "id": "flights",
+     "label": "Flights",
+     "shared": false
+    },
+    {
+     "id": "transport",
+     "label": "Transportation",
+     "shared": true
+    },
+    {
+     "id": "lodging",
+     "label": "Lodging",
+     "shared": true
+    },
+    {
+     "id": "food",
+     "label": "Food",
+     "shared": false
+    },
+    {
+     "id": "activities",
+     "label": "Activities",
+     "shared": false
+    },
+    {
+     "id": "carRental",
+     "label": "Car Rental",
+     "shared": true
+    },
+    {
+     "id": "visa",
+     "label": "Visa",
+     "shared": false
+    },
+    {
+     "id": "misc",
+     "label": "Misc",
+     "shared": false
+    }
+   ],
+   "places": [
+    {
+     "id": "p_np",
+     "name": "Nepal",
+     "country": "Nepal",
+     "city": "Kathmandu",
+     "iso2": "NP",
+     "iata": "KTM",
+     "currency": "NPR",
+     "days": 10,
+     "order": 1,
+     "notes": "",
+     "budget": {
+      "flights": 14000,
+      "transport": 8000,
+      "lodging": 18500,
+      "food": 9000,
+      "activities": 14000,
+      "carRental": 0,
+      "visa": 3000,
+      "misc": 3000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_bt",
+     "name": "Bhutan",
+     "country": "Bhutan",
+     "city": "Thimphu",
+     "iso2": "BT",
+     "iata": "PBH",
+     "currency": "BTN",
+     "days": 10,
+     "order": 2,
+     "notes": "",
+     "budget": {
+      "flights": 28000,
+      "transport": 8000,
+      "lodging": 25000,
+      "food": 12000,
+      "activities": 2000,
+      "carRental": 8000,
+      "visa": 12000,
+      "misc": 0
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_vn",
+     "name": "Vietnam",
+     "country": "Vietnam",
+     "city": "Hanoi",
+     "iso2": "VN",
+     "iata": "HAN",
+     "currency": "VND",
+     "days": 10,
+     "order": 3,
+     "notes": "",
+     "budget": {
+      "flights": 32000,
+      "transport": 14500,
+      "lodging": 11500,
+      "food": 8000,
+      "activities": 10000,
+      "carRental": 3000,
+      "visa": 2200,
+      "misc": 4000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_lk",
+     "name": "Sri Lanka",
+     "country": "Sri Lanka",
+     "city": "Colombo",
+     "iso2": "LK",
+     "iata": "CMB",
+     "currency": "LKR",
+     "days": 10,
+     "order": 4,
+     "notes": "",
+     "budget": {
+      "flights": 14000,
+      "transport": 5000,
+      "lodging": 14000,
+      "food": 9000,
+      "activities": 0,
+      "carRental": 7000,
+      "visa": 2000,
+      "misc": 3000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_id",
+     "name": "Indonesia",
+     "country": "Indonesia",
+     "city": "Bali",
+     "iso2": "ID",
+     "iata": "DPS",
+     "currency": "IDR",
+     "days": 10,
+     "order": 5,
+     "notes": "",
+     "budget": {
+      "flights": 40000,
+      "transport": 5000,
+      "lodging": 14500,
+      "food": 9000,
+      "activities": 10000,
+      "carRental": 5000,
+      "visa": 4000,
+      "misc": 3000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_th",
+     "name": "Thailand",
+     "country": "Thailand",
+     "city": "Bangkok",
+     "iso2": "TH",
+     "iata": "BKK",
+     "currency": "THB",
+     "days": 10,
+     "order": 6,
+     "notes": "",
+     "budget": {
+      "flights": 28000,
+      "transport": 5000,
+      "lodging": 10000,
+      "food": 8000,
+      "activities": 0,
+      "carRental": 4000,
+      "visa": 4000,
+      "misc": 3000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_kh",
+     "name": "Cambodia",
+     "country": "Cambodia",
+     "city": "Siem Reap",
+     "iso2": "KH",
+     "iata": "REP",
+     "currency": "KHR",
+     "days": 10,
+     "order": 7,
+     "notes": "",
+     "budget": {
+      "flights": 35000,
+      "transport": 4000,
+      "lodging": 14000,
+      "food": 7000,
+      "activities": 5300,
+      "carRental": 4500,
+      "visa": 2600,
+      "misc": 3000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_la",
+     "name": "Laos",
+     "country": "Laos",
+     "city": "Luang Prabang",
+     "iso2": "LA",
+     "iata": "LPQ",
+     "currency": "LAK",
+     "days": 10,
+     "order": 8,
+     "notes": "",
+     "budget": {
+      "flights": 38000,
+      "transport": 14000,
+      "lodging": 13000,
+      "food": 6000,
+      "activities": 0,
+      "carRental": 4000,
+      "visa": 3000,
+      "misc": 3000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_my",
+     "name": "Malaysia",
+     "country": "Malaysia",
+     "city": "Kuala Lumpur",
+     "iso2": "MY",
+     "iata": "KUL",
+     "currency": "MYR",
+     "days": 10,
+     "order": 9,
+     "notes": "",
+     "budget": {
+      "flights": 24000,
+      "transport": 4500,
+      "lodging": 18000,
+      "food": 9000,
+      "activities": 0,
+      "carRental": 5000,
+      "visa": 0,
+      "misc": 3000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_ph",
+     "name": "Philippines",
+     "country": "Philippines",
+     "city": "Manila",
+     "iso2": "PH",
+     "iata": "MNL",
+     "currency": "PHP",
+     "days": 10,
+     "order": 10,
+     "notes": "",
+     "budget": {
+      "flights": 42000,
+      "transport": 15000,
+      "lodging": 20000,
+      "food": 9000,
+      "activities": 5000,
+      "carRental": 5000,
+      "visa": 0,
+      "misc": 3000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_eg",
+     "name": "Egypt",
+     "country": "Egypt",
+     "city": "Cairo",
+     "iso2": "EG",
+     "iata": "CAI",
+     "currency": "EGP",
+     "days": 10,
+     "order": 11,
+     "notes": "",
+     "budget": {
+      "flights": 48000,
+      "transport": 9000,
+      "lodging": 14000,
+      "food": 8500,
+      "activities": 2000,
+      "carRental": 5000,
+      "visa": 2200,
+      "misc": 3000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_jo",
+     "name": "Jordan",
+     "country": "Jordan",
+     "city": "Amman",
+     "iso2": "JO",
+     "iata": "AMM",
+     "currency": "JOD",
+     "days": 10,
+     "order": 12,
+     "notes": "",
+     "budget": {
+      "flights": 45000,
+      "transport": 12000,
+      "lodging": 25000,
+      "food": 10000,
+      "activities": 0,
+      "carRental": 7000,
+      "visa": 5000,
+      "misc": 3000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_cz",
+     "name": "Czech Republic",
+     "country": "Czech Republic",
+     "city": "Prague",
+     "iso2": "CZ",
+     "iata": "PRG",
+     "currency": "CZK",
+     "days": 10,
+     "order": 13,
+     "notes": "",
+     "budget": {
+      "flights": 65000,
+      "transport": 7000,
+      "lodging": 35000,
+      "food": 18000,
+      "activities": 0,
+      "carRental": 0,
+      "visa": 12000,
+      "misc": 3000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_cn",
+     "name": "China",
+     "country": "China",
+     "city": "Beijing",
+     "iso2": "CN",
+     "iata": "PEK",
+     "currency": "CNY",
+     "days": 10,
+     "order": 14,
+     "notes": "",
+     "budget": {
+      "flights": 42000,
+      "transport": 10000,
+      "lodging": 23000,
+      "food": 10000,
+      "activities": 25000,
+      "carRental": 0,
+      "visa": 6000,
+      "misc": 3000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_sg",
+     "name": "Singapore",
+     "country": "Singapore",
+     "city": "Singapore",
+     "iso2": "SG",
+     "iata": "SIN",
+     "currency": "SGD",
+     "days": 10,
+     "order": 15,
+     "notes": "",
+     "budget": {
+      "flights": 35000,
+      "transport": 5000,
+      "lodging": 28000,
+      "food": 15000,
+      "activities": 11000,
+      "carRental": 0,
+      "visa": 2500,
+      "misc": 3000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_jp",
+     "name": "Japan",
+     "country": "Japan",
+     "city": "Tokyo",
+     "iso2": "JP",
+     "iata": "TYO",
+     "currency": "JPY",
+     "days": 10,
+     "order": 16,
+     "notes": "",
+     "budget": {
+      "flights": 65000,
+      "transport": 25000,
+      "lodging": 30000,
+      "food": 16000,
+      "activities": 0,
+      "carRental": 12000,
+      "visa": 3000,
+      "misc": 3000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_hu",
+     "name": "Hungary",
+     "country": "Hungary",
+     "city": "Budapest",
+     "iso2": "HU",
+     "iata": "BUD",
+     "currency": "HUF",
+     "days": 10,
+     "order": 17,
+     "notes": "",
+     "budget": {
+      "flights": 65000,
+      "transport": 4000,
+      "lodging": 12000,
+      "food": 14000,
+      "activities": 0,
+      "carRental": 0,
+      "visa": 10000,
+      "misc": 3000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_hr",
+     "name": "Croatia",
+     "country": "Croatia",
+     "city": "Dubrovnik",
+     "iso2": "HR",
+     "iata": "DBV",
+     "currency": "EUR",
+     "days": 10,
+     "order": 18,
+     "notes": "",
+     "budget": {
+      "flights": 65000,
+      "transport": 10000,
+      "lodging": 16000,
+      "food": 16000,
+      "activities": 0,
+      "carRental": 8000,
+      "visa": 10000,
+      "misc": 3000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_de",
+     "name": "Germany",
+     "country": "Germany",
+     "city": "Berlin",
+     "iso2": "DE",
+     "iata": "BER",
+     "currency": "EUR",
+     "days": 10,
+     "order": 19,
+     "notes": "",
+     "budget": {
+      "flights": 65000,
+      "transport": 5000,
+      "lodging": 17000,
+      "food": 16000,
+      "activities": 0,
+      "carRental": 0,
+      "visa": 10000,
+      "misc": 15000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_dk",
+     "name": "Denmark",
+     "country": "Denmark",
+     "city": "Copenhagen",
+     "iso2": "DK",
+     "iata": "CPH",
+     "currency": "DKK",
+     "days": 10,
+     "order": 20,
+     "notes": "",
+     "budget": {
+      "flights": 65000,
+      "transport": 6000,
+      "lodging": 26000,
+      "food": 22000,
+      "activities": 0,
+      "carRental": 0,
+      "visa": 10000,
+      "misc": 3000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_fo",
+     "name": "Faroe Islands",
+     "country": "Faroe Islands",
+     "city": "Torshavn",
+     "iso2": "FO",
+     "iata": "FAE",
+     "currency": "DKK",
+     "days": 10,
+     "order": 21,
+     "notes": "",
+     "budget": {
+      "flights": 28000,
+      "transport": 0,
+      "lodging": 40000,
+      "food": 30000,
+      "activities": 0,
+      "carRental": 15000,
+      "visa": 10000,
+      "misc": 3000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_tr",
+     "name": "Turkey",
+     "country": "Turkey",
+     "city": "Istanbul",
+     "iso2": "TR",
+     "iata": "IST",
+     "currency": "TRY",
+     "days": 10,
+     "order": 22,
+     "notes": "",
+     "budget": {
+      "flights": 50000,
+      "transport": 4500,
+      "lodging": 25000,
+      "food": 11000,
+      "activities": 0,
+      "carRental": 8000,
+      "visa": 4400,
+      "misc": 3000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_ge",
+     "name": "Georgia",
+     "country": "Georgia",
+     "city": "Tbilisi",
+     "iso2": "GE",
+     "iata": "TBS",
+     "currency": "GEL",
+     "days": 10,
+     "order": 23,
+     "notes": "",
+     "budget": {
+      "flights": 38000,
+      "transport": 4000,
+      "lodging": 17000,
+      "food": 9000,
+      "activities": 0,
+      "carRental": 7000,
+      "visa": 3000,
+      "misc": 3000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_za",
+     "name": "South Africa",
+     "country": "South Africa",
+     "city": "Cape Town",
+     "iso2": "ZA",
+     "iata": "CPT",
+     "currency": "ZAR",
+     "days": 10,
+     "order": 24,
+     "notes": "",
+     "budget": {
+      "flights": 75000,
+      "transport": 5000,
+      "lodging": 28000,
+      "food": 13000,
+      "activities": 0,
+      "carRental": 15000,
+      "visa": 3000,
+      "misc": 3000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_co",
+     "name": "Colombia",
+     "country": "Colombia",
+     "city": "Bogota",
+     "iso2": "CO",
+     "iata": "BOG",
+     "currency": "COP",
+     "days": 10,
+     "order": 25,
+     "notes": "",
+     "budget": {
+      "flights": 100000,
+      "transport": 15000,
+      "lodging": 20000,
+      "food": 9000,
+      "activities": 0,
+      "carRental": 0,
+      "visa": 4400,
+      "misc": 3000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_pe",
+     "name": "Peru",
+     "country": "Peru",
+     "city": "Cusco",
+     "iso2": "PE",
+     "iata": "CUZ",
+     "currency": "PEN",
+     "days": 10,
+     "order": 26,
+     "notes": "",
+     "budget": {
+      "flights": 110000,
+      "transport": 16500,
+      "lodging": 19000,
+      "food": 9000,
+      "activities": 2800,
+      "carRental": 0,
+      "visa": 0,
+      "misc": 3000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_ec",
+     "name": "Ecuador",
+     "country": "Ecuador",
+     "city": "Quito",
+     "iso2": "EC",
+     "iata": "UIO",
+     "currency": "USD",
+     "days": 10,
+     "order": 27,
+     "notes": "",
+     "budget": {
+      "flights": 115000,
+      "transport": 4000,
+      "lodging": 18000,
+      "food": 9000,
+      "activities": 4000,
+      "carRental": 0,
+      "visa": 0,
+      "misc": 3000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_bo",
+     "name": "Bolivia",
+     "country": "Bolivia",
+     "city": "La Paz",
+     "iso2": "BO",
+     "iata": "LPB",
+     "currency": "BOB",
+     "days": 10,
+     "order": 28,
+     "notes": "",
+     "budget": {
+      "flights": 110000,
+      "transport": 3500,
+      "lodging": 7000,
+      "food": 7000,
+      "activities": 10000,
+      "carRental": 0,
+      "visa": 8800,
+      "misc": 0
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_gt",
+     "name": "Guatemala",
+     "country": "Guatemala",
+     "city": "Antigua Guatemala",
+     "iso2": "GT",
+     "iata": "GUA",
+     "currency": "GTQ",
+     "days": 10,
+     "order": 29,
+     "notes": "",
+     "budget": {
+      "flights": 120000,
+      "transport": 4000,
+      "lodging": 7500,
+      "food": 7000,
+      "activities": 7800,
+      "carRental": 0,
+      "visa": 4500,
+      "misc": 2500
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_ni",
+     "name": "Nicaragua",
+     "country": "Nicaragua",
+     "city": "Granada",
+     "iso2": "NI",
+     "iata": "MGA",
+     "currency": "NIO",
+     "days": 10,
+     "order": 30,
+     "notes": "",
+     "budget": {
+      "flights": 120000,
+      "transport": 3500,
+      "lodging": 6500,
+      "food": 6500,
+      "activities": 2000,
+      "carRental": 0,
+      "visa": 3000,
+      "misc": 2500
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_mx",
+     "name": "Mexico",
+     "country": "Mexico",
+     "city": "Mexico City",
+     "iso2": "MX",
+     "iata": "MEX",
+     "currency": "MXN",
+     "days": 10,
+     "order": 31,
+     "notes": "",
+     "budget": {
+      "flights": 100000,
+      "transport": 4500,
+      "lodging": 14500,
+      "food": 9000,
+      "activities": 4000,
+      "carRental": 7000,
+      "visa": 4800,
+      "misc": 3000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_kg",
+     "name": "Kyrgyzstan",
+     "country": "Kyrgyzstan",
+     "city": "Bishkek",
+     "iso2": "KG",
+     "iata": "FRU",
+     "currency": "KGS",
+     "days": 10,
+     "order": 32,
+     "notes": "",
+     "budget": {
+      "flights": 32000,
+      "transport": 8000,
+      "lodging": 13000,
+      "food": 7000,
+      "activities": 6000,
+      "carRental": 8000,
+      "visa": 0,
+      "misc": 2500
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_uz",
+     "name": "Uzbekistan",
+     "country": "Uzbekistan",
+     "city": "Tashkent",
+     "iso2": "UZ",
+     "iata": "TAS",
+     "currency": "UZS",
+     "days": 10,
+     "order": 33,
+     "notes": "",
+     "budget": {
+      "flights": 30000,
+      "transport": 14000,
+      "lodging": 14000,
+      "food": 7000,
+      "activities": 2000,
+      "carRental": 0,
+      "visa": 3000,
+      "misc": 2500
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_tj",
+     "name": "Tajikistan",
+     "country": "Tajikistan",
+     "city": "Dushanbe",
+     "iso2": "TJ",
+     "iata": "DYU",
+     "currency": "TJS",
+     "days": 10,
+     "order": 34,
+     "notes": "",
+     "budget": {
+      "flights": 40000,
+      "transport": 9500,
+      "lodging": 9000,
+      "food": 6000,
+      "activities": 3000,
+      "carRental": 11000,
+      "visa": 4000,
+      "misc": 3000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_kz",
+     "name": "Kazakhstan",
+     "country": "Kazakhstan",
+     "city": "Almaty",
+     "iso2": "KZ",
+     "iata": "ALA",
+     "currency": "KZT",
+     "days": 10,
+     "order": 35,
+     "notes": "",
+     "budget": {
+      "flights": 30000,
+      "transport": 4500,
+      "lodging": 17000,
+      "food": 9000,
+      "activities": 4300,
+      "carRental": 8000,
+      "visa": 0,
+      "misc": 3000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    },
+    {
+     "id": "p_am",
+     "name": "Armenia",
+     "country": "Armenia",
+     "city": "Yerevan",
+     "iso2": "AM",
+     "iata": "EVN",
+     "currency": "AMD",
+     "days": 10,
+     "order": 36,
+     "notes": "",
+     "budget": {
+      "flights": 45000,
+      "transport": 5500,
+      "lodging": 18000,
+      "food": 8000,
+      "activities": 3800,
+      "carRental": 7000,
+      "visa": 0,
+      "misc": 2500
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": []
+    }
+   ],
+   "expenses": []
+  },
+  {
+   "id": "trip_india",
+   "name": "Within India",
+   "kind": "domestic",
+   "start": "",
+   "end": "",
+   "note": "Intercity trips at home",
+   "travellerIds": [
+    "me"
+   ],
+   "defaultDays": 4,
+   "categories": [
+    {
+     "id": "flights",
+     "label": "Flights",
+     "shared": false
+    },
+    {
+     "id": "transport",
+     "label": "Transportation",
+     "shared": true
+    },
+    {
+     "id": "lodging",
+     "label": "Lodging",
+     "shared": true
+    },
+    {
+     "id": "food",
+     "label": "Food",
+     "shared": false
+    },
+    {
+     "id": "activities",
+     "label": "Activities",
+     "shared": false
+    },
+    {
+     "id": "carRental",
+     "label": "Car Rental",
+     "shared": true
+    },
+    {
+     "id": "visa",
+     "label": "Visa",
+     "shared": false
+    },
+    {
+     "id": "misc",
+     "label": "Misc",
+     "shared": false
+    }
+   ],
+   "places": [],
+   "expenses": []
+  }
+ ]
+};

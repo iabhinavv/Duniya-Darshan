@@ -1,0 +1,7 @@
+# data/trip-data.js is meant to be committed — that is the point of it.
+# These are not.
+.DS_Store
+*.tmp
+*.pyc
+__pycache__/
+data/backups/
