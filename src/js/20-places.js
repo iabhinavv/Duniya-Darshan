@@ -64,6 +64,46 @@
       ]));
     }
 
+    /* ---- trip level charts ---- */
+    if (b.total > 0) {
+      host.appendChild(DD.sectionHead('Overview', 'Category breakdown'));
+      var tripMode = a.total > 0 ? 'spent' : 'budget';
+      var tripBody = el('div', { class: 'card card-pad', style: { marginBottom: '16px' } });
+      var tripInner = el('div', { style: { display: 'flex', gap: '24px', alignItems: 'center', flexWrap: 'wrap' } });
+      
+      var paintTrip = function(which) {
+        DD.clear(tripInner);
+        var src = which === 'spent' ? a.byCat : b.byCat;
+        var data = t.categories.map(function(c, i) {
+          return { id: c.id, label: c.label, value: src[c.id] || 0, colour: DD.charts.colourFor(c.id, i) };
+        }).filter(function(d) { return d.value > 0; }).sort(DD.by('value', 'desc'));
+        
+        tripInner.appendChild(el('div', { style: { flex: '0 0 auto', margin: '0 auto' } }, [
+          DD.charts.donut(data, {
+            centre: DD.money(DD.sum(data, function (d) { return d.value; }), { compact: true }),
+            centreSub: which === 'spent' ? 'spent' : 'budget'
+          })
+        ]));
+        
+        var barsData = t.categories.map(function(c) {
+          return { label: c.label, budget: b.byCat[c.id] || 0, actual: a.byCat[c.id] || 0 };
+        }).filter(function(r) { return r.budget > 0 || r.actual > 0; });
+        
+        var detailsCol = el('div', { style: { flex: '1 1 240px', minWidth: '0' } });
+        detailsCol.appendChild(DD.charts.compareBars(barsData));
+        tripInner.appendChild(detailsCol);
+      };
+      
+      paintTrip(tripMode);
+      if (a.total > 0) {
+        DD.append(tripBody, el('div', { style: { marginBottom: '14px' } }, [
+          DD.segmented([['budget', 'Budget'], ['spent', 'Spent']], tripMode, paintTrip)
+        ]));
+      }
+      tripBody.appendChild(tripInner);
+      host.appendChild(tripBody);
+    }
+
     /* ---- the trip's own map ---- */
     var kind = isCity ? 'india' : 'world';
     host.appendChild(DD.sectionHead(t.name, isCity ? 'The route through India' : 'The route',
@@ -586,6 +626,46 @@
       DD.stat(st.spent > st.budget ? 'Over' : 'Left', DD.money(Math.abs(st.budget - st.spent)), '',
         st.spent > st.budget ? 'neg' : 'pos')
     ]));
+
+    var pB = S.placeBudget(t, p);
+    if (pB.total > 0) {
+      var pChartMode = st.spent > 0 ? 'spent' : 'budget';
+      var pChartWrap = el('div', { class: 'card card-pad', style: { margin: '20px 0' } });
+      var placeCharts = el('div', { style: { display: 'flex', gap: '24px', alignItems: 'center', flexWrap: 'wrap' } });
+      
+      var paintPlace = function(which) {
+        DD.clear(placeCharts);
+        var src = which === 'spent' ? st.byCat : p.budget;
+        var totalVal = which === 'spent' ? st.spent : pB.total;
+        var placeData = t.categories.map(function(c, i) {
+          return { id: c.id, label: c.label, value: src[c.id] || 0, colour: DD.charts.colourFor(c.id, i) };
+        }).filter(function(d) { return d.value > 0; }).sort(DD.by('value', 'desc'));
+        
+        placeCharts.appendChild(el('div', { style: { flex: '0 0 auto', margin: '0 auto' } }, [
+          DD.charts.donut(placeData, {
+            centre: DD.money(totalVal, { compact: true }),
+            centreSub: which === 'spent' ? 'spent' : 'budget'
+          })
+        ]));
+        
+        var pBarsData = t.categories.map(function(c) {
+          return { label: c.label, budget: p.budget[c.id] || 0, actual: st.byCat[c.id] || 0 };
+        }).filter(function(r) { return r.budget > 0 || r.actual > 0; });
+        
+        var pDetailsCol = el('div', { style: { flex: '1 1 240px', minWidth: '0' } });
+        pDetailsCol.appendChild(DD.charts.compareBars(pBarsData));
+        placeCharts.appendChild(pDetailsCol);
+      };
+      
+      paintPlace(pChartMode);
+      if (st.spent > 0) {
+        DD.append(pChartWrap, el('div', { style: { marginBottom: '14px' } }, [
+          DD.segmented([['budget', 'Budget'], ['spent', 'Spent']], pChartMode, paintPlace)
+        ]));
+      }
+      pChartWrap.appendChild(placeCharts);
+      host.appendChild(pChartWrap);
+    }
     host.appendChild(el('div', { style: { margin: '14px 0' } }, [
       el('button', { class: 'btn pri block', onclick: function () {
         DD.logForm({ trip: t, placeId: p.id, after: function () { spendRefresh(t, p, host); } });

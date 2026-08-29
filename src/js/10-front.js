@@ -39,6 +39,49 @@
       DD.stat('Per day', DD.money(days ? budget / days : 0), 'across the whole plan')
     ]));
 
+    /* ---- global charts ---- */
+    if (all.length > 0 && budget > 0) {
+      host.appendChild(DD.sectionHead('Overview', 'Total across all trips'));
+      
+      var globalMode = spent > 0 ? 'spent' : 'budget';
+      var globalBody = el('div', { class: 'card card-pad' });
+      var globalInner = el('div', { style: { display: 'flex', gap: '24px', alignItems: 'center', flexWrap: 'wrap' } });
+      
+      var paintGlobal = function(which) {
+        DD.clear(globalInner);
+        var gData = all.map(function(tr, i) {
+          var tb = S.tripBudget(tr), ta = S.actuals(tr);
+          var val = which === 'spent' ? ta.total : tb.total;
+          return { id: tr.id, label: tr.name, budget: tb.total, actual: ta.total, value: val, colour: DD.charts.colourFor('t_' + i, i) };
+        }).filter(function(d) { return d.value > 0; }).sort(DD.by('value', 'desc'));
+        
+        globalInner.appendChild(el('div', { style: { flex: '0 0 auto', margin: '0 auto' } }, [
+          DD.charts.donut(gData, {
+            centre: DD.money(DD.sum(gData, function (d) { return d.value; }), { compact: true }),
+            centreSub: which === 'spent' ? 'spent' : 'budget'
+          })
+        ]));
+        
+        var barsData = all.map(function(tr) {
+          var tb = S.tripBudget(tr), ta = S.actuals(tr);
+          return { label: tr.name, budget: tb.total, actual: ta.total };
+        }).filter(function(r) { return r.budget > 0 || r.actual > 0; });
+        
+        var detailsCol = el('div', { style: { flex: '1 1 240px', minWidth: '0' } });
+        detailsCol.appendChild(DD.charts.compareBars(barsData));
+        globalInner.appendChild(detailsCol);
+      };
+      
+      paintGlobal(globalMode);
+      if (spent > 0) {
+        DD.append(globalBody, el('div', { style: { marginBottom: '14px' } }, [
+          DD.segmented([['budget', 'Budget'], ['spent', 'Spent']], globalMode, paintGlobal)
+        ]));
+      }
+      globalBody.appendChild(globalInner);
+      host.appendChild(globalBody);
+    }
+
     /* ---- where you are today, if a trip is running ---- */
     var live = null;
     all.forEach(function (t) {
@@ -107,7 +150,14 @@
             centreSub: which === 'spent' ? 'spent' : 'budget'
           })
         ]));
-        inner.appendChild(el('div', { style: { flex: '1 1 240px', minWidth: '0' } }, [DD.charts.legend(data)]));
+        
+        var barsData = t.categories.map(function(c) {
+          return { label: c.label, budget: tb.byCat[c.id] || 0, actual: ta.byCat[c.id] || 0 };
+        }).filter(function(r) { return r.budget > 0 || r.actual > 0; });
+        
+        var rightCol = el('div', { style: { flex: '1 1 240px', minWidth: '0' } });
+        rightCol.appendChild(DD.charts.compareBars(barsData));
+        inner.appendChild(rightCol);
       }
       paint(mode);
       DD.append(body, ta.count

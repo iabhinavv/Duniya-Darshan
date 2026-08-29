@@ -5815,20 +5815,24 @@ window.DUNIYA_SEED = {
         var showText = currentZoom >= 4.5;
         
         var markerColor = feature.get('markerColor');
+        var pinSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="36" viewBox="0 0 24 36"><path fill="' + markerColor + '" stroke="#fff" stroke-width="2" d="M12,1 C5.925,1 1,5.925 1,12 C1,20.25 12,35 12,35 C12,35 23,20.25 23,12 C23,5.925 18.075,1 12,1 Z"/><circle cx="12" cy="12" r="4.5" fill="#fff"/></svg>';
+        var pinSrc = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(pinSvg);
+
         var styles = [
           new ol.style.Style({
-            image: new ol.style.Circle({
-              radius: 8,
-              fill: new ol.style.Fill({ color: markerColor }),
-              stroke: new ol.style.Stroke({ color: '#fff', width: 2 })
+            image: new ol.style.Icon({
+              src: pinSrc,
+              anchor: [0.5, 1],
+              scale: 0.9
             })
           })
         ];
         
         if (showText) {
-          var line = data.st.count
-            ? DD.money(data.st.spent) + ' spent of ' + DD.money(data.st.budget)
-            : DD.money(data.st.budget) + ' budgeted';
+          var line = data.place.days ? 'Days: ' + data.place.days + '\n' : '';
+          line += data.st.count
+            ? 'Budget: ' + DD.money(data.st.budget) + ' | Spent: ' + DD.money(data.st.spent)
+            : 'Budget: ' + DD.money(data.st.budget);
             
           styles.push(new ol.style.Style({
             text: new ol.style.Text({
@@ -5838,7 +5842,7 @@ window.DUNIYA_SEED = {
               backgroundFill: new ol.style.Fill({ color: 'rgba(0, 22, 58, 0.9)' }),
               backgroundStroke: new ol.style.Stroke({ color: '#ffffff', width: 1.5 }),
               padding: [6, 10, 6, 10],
-              offsetY: -35,
+              offsetY: -45,
               textAlign: 'center'
             })
           }));
@@ -5904,12 +5908,14 @@ window.DUNIYA_SEED = {
       if (feature) {
         map.getTargetElement().style.cursor = 'pointer';
         var data = feature.get('data');
-        var line = data.st.count
-          ? DD.money(data.st.spent) + ' spent of ' + DD.money(data.st.budget)
-          : DD.money(data.st.budget) + ' budgeted';
+        var line = data.place.days ? 'Days: ' + data.place.days + ' &middot; ' : '';
+        line += data.st.count
+          ? 'Budget: ' + DD.money(data.st.budget) + ' | Spent: ' + DD.money(data.st.spent)
+          : 'Budget: ' + DD.money(data.st.budget);
           
         popupElement.innerHTML = '<b style="font-size:18px; display:block; margin-bottom:4px; color:var(--brand-100, #d8e7fb); font-family:var(--serif, \'Playfair Display\', serif);">' + data.place.name + '</b><span style="font-size:15px; letter-spacing: 0.05em;">' + line + '</span>';
         popupOverlay.setPosition(evt.coordinate);
+        popupOverlay.setOffset([0, -25]);
         popupElement.style.display = 'block';
       } else {
         map.getTargetElement().style.cursor = '';
@@ -5972,6 +5978,49 @@ window.DUNIYA_SEED = {
         started ? started + ' places under way' : 'nothing started', spent > budget ? 'neg' : 'pos'),
       DD.stat('Per day', DD.money(days ? budget / days : 0), 'across the whole plan')
     ]));
+
+    /* ---- global charts ---- */
+    if (all.length > 0 && budget > 0) {
+      host.appendChild(DD.sectionHead('Overview', 'Total across all trips'));
+      
+      var globalMode = spent > 0 ? 'spent' : 'budget';
+      var globalBody = el('div', { class: 'card card-pad' });
+      var globalInner = el('div', { style: { display: 'flex', gap: '24px', alignItems: 'center', flexWrap: 'wrap' } });
+      
+      var paintGlobal = function(which) {
+        DD.clear(globalInner);
+        var gData = all.map(function(tr, i) {
+          var tb = S.tripBudget(tr), ta = S.actuals(tr);
+          var val = which === 'spent' ? ta.total : tb.total;
+          return { id: tr.id, label: tr.name, budget: tb.total, actual: ta.total, value: val, colour: DD.charts.colourFor('t_' + i, i) };
+        }).filter(function(d) { return d.value > 0; }).sort(DD.by('value', 'desc'));
+        
+        globalInner.appendChild(el('div', { style: { flex: '0 0 auto', margin: '0 auto' } }, [
+          DD.charts.donut(gData, {
+            centre: DD.money(DD.sum(gData, function (d) { return d.value; }), { compact: true }),
+            centreSub: which === 'spent' ? 'spent' : 'budget'
+          })
+        ]));
+        
+        var barsData = all.map(function(tr) {
+          var tb = S.tripBudget(tr), ta = S.actuals(tr);
+          return { label: tr.name, budget: tb.total, actual: ta.total };
+        }).filter(function(r) { return r.budget > 0 || r.actual > 0; });
+        
+        var detailsCol = el('div', { style: { flex: '1 1 240px', minWidth: '0' } });
+        detailsCol.appendChild(DD.charts.compareBars(barsData));
+        globalInner.appendChild(detailsCol);
+      };
+      
+      paintGlobal(globalMode);
+      if (spent > 0) {
+        DD.append(globalBody, el('div', { style: { marginBottom: '14px' } }, [
+          DD.segmented([['budget', 'Budget'], ['spent', 'Spent']], globalMode, paintGlobal)
+        ]));
+      }
+      globalBody.appendChild(globalInner);
+      host.appendChild(globalBody);
+    }
 
     /* ---- where you are today, if a trip is running ---- */
     var live = null;
@@ -6041,7 +6090,14 @@ window.DUNIYA_SEED = {
             centreSub: which === 'spent' ? 'spent' : 'budget'
           })
         ]));
-        inner.appendChild(el('div', { style: { flex: '1 1 240px', minWidth: '0' } }, [DD.charts.legend(data)]));
+        
+        var barsData = t.categories.map(function(c) {
+          return { label: c.label, budget: tb.byCat[c.id] || 0, actual: ta.byCat[c.id] || 0 };
+        }).filter(function(r) { return r.budget > 0 || r.actual > 0; });
+        
+        var rightCol = el('div', { style: { flex: '1 1 240px', minWidth: '0' } });
+        rightCol.appendChild(DD.charts.compareBars(barsData));
+        inner.appendChild(rightCol);
       }
       paint(mode);
       DD.append(body, ta.count
@@ -6448,6 +6504,46 @@ window.DUNIYA_SEED = {
           String(w.dayInPlace), ' of ', String(w.daysHere), '. ',
           el('button', { class: 'btn xs', onclick: function () { editor(t, w.place); } }, 'Open it')])
       ]));
+    }
+
+    /* ---- trip level charts ---- */
+    if (b.total > 0) {
+      host.appendChild(DD.sectionHead('Overview', 'Category breakdown'));
+      var tripMode = a.total > 0 ? 'spent' : 'budget';
+      var tripBody = el('div', { class: 'card card-pad', style: { marginBottom: '16px' } });
+      var tripInner = el('div', { style: { display: 'flex', gap: '24px', alignItems: 'center', flexWrap: 'wrap' } });
+      
+      var paintTrip = function(which) {
+        DD.clear(tripInner);
+        var src = which === 'spent' ? a.byCat : b.byCat;
+        var data = t.categories.map(function(c, i) {
+          return { id: c.id, label: c.label, value: src[c.id] || 0, colour: DD.charts.colourFor(c.id, i) };
+        }).filter(function(d) { return d.value > 0; }).sort(DD.by('value', 'desc'));
+        
+        tripInner.appendChild(el('div', { style: { flex: '0 0 auto', margin: '0 auto' } }, [
+          DD.charts.donut(data, {
+            centre: DD.money(DD.sum(data, function (d) { return d.value; }), { compact: true }),
+            centreSub: which === 'spent' ? 'spent' : 'budget'
+          })
+        ]));
+        
+        var barsData = t.categories.map(function(c) {
+          return { label: c.label, budget: b.byCat[c.id] || 0, actual: a.byCat[c.id] || 0 };
+        }).filter(function(r) { return r.budget > 0 || r.actual > 0; });
+        
+        var detailsCol = el('div', { style: { flex: '1 1 240px', minWidth: '0' } });
+        detailsCol.appendChild(DD.charts.compareBars(barsData));
+        tripInner.appendChild(detailsCol);
+      };
+      
+      paintTrip(tripMode);
+      if (a.total > 0) {
+        DD.append(tripBody, el('div', { style: { marginBottom: '14px' } }, [
+          DD.segmented([['budget', 'Budget'], ['spent', 'Spent']], tripMode, paintTrip)
+        ]));
+      }
+      tripBody.appendChild(tripInner);
+      host.appendChild(tripBody);
     }
 
     /* ---- the trip's own map ---- */
@@ -6972,6 +7068,46 @@ window.DUNIYA_SEED = {
       DD.stat(st.spent > st.budget ? 'Over' : 'Left', DD.money(Math.abs(st.budget - st.spent)), '',
         st.spent > st.budget ? 'neg' : 'pos')
     ]));
+
+    var pB = S.placeBudget(t, p);
+    if (pB.total > 0) {
+      var pChartMode = st.spent > 0 ? 'spent' : 'budget';
+      var pChartWrap = el('div', { class: 'card card-pad', style: { margin: '20px 0' } });
+      var placeCharts = el('div', { style: { display: 'flex', gap: '24px', alignItems: 'center', flexWrap: 'wrap' } });
+      
+      var paintPlace = function(which) {
+        DD.clear(placeCharts);
+        var src = which === 'spent' ? st.byCat : p.budget;
+        var totalVal = which === 'spent' ? st.spent : pB.total;
+        var placeData = t.categories.map(function(c, i) {
+          return { id: c.id, label: c.label, value: src[c.id] || 0, colour: DD.charts.colourFor(c.id, i) };
+        }).filter(function(d) { return d.value > 0; }).sort(DD.by('value', 'desc'));
+        
+        placeCharts.appendChild(el('div', { style: { flex: '0 0 auto', margin: '0 auto' } }, [
+          DD.charts.donut(placeData, {
+            centre: DD.money(totalVal, { compact: true }),
+            centreSub: which === 'spent' ? 'spent' : 'budget'
+          })
+        ]));
+        
+        var pBarsData = t.categories.map(function(c) {
+          return { label: c.label, budget: p.budget[c.id] || 0, actual: st.byCat[c.id] || 0 };
+        }).filter(function(r) { return r.budget > 0 || r.actual > 0; });
+        
+        var pDetailsCol = el('div', { style: { flex: '1 1 240px', minWidth: '0' } });
+        pDetailsCol.appendChild(DD.charts.compareBars(pBarsData));
+        placeCharts.appendChild(pDetailsCol);
+      };
+      
+      paintPlace(pChartMode);
+      if (st.spent > 0) {
+        DD.append(pChartWrap, el('div', { style: { marginBottom: '14px' } }, [
+          DD.segmented([['budget', 'Budget'], ['spent', 'Spent']], pChartMode, paintPlace)
+        ]));
+      }
+      pChartWrap.appendChild(placeCharts);
+      host.appendChild(pChartWrap);
+    }
     host.appendChild(el('div', { style: { margin: '14px 0' } }, [
       el('button', { class: 'btn pri block', onclick: function () {
         DD.logForm({ trip: t, placeId: p.id, after: function () { spendRefresh(t, p, host); } });

@@ -76,20 +76,24 @@
         var showText = currentZoom >= 4.5;
         
         var markerColor = feature.get('markerColor');
+        var pinSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="36" viewBox="0 0 24 36"><path fill="' + markerColor + '" stroke="#fff" stroke-width="2" d="M12,1 C5.925,1 1,5.925 1,12 C1,20.25 12,35 12,35 C12,35 23,20.25 23,12 C23,5.925 18.075,1 12,1 Z"/><circle cx="12" cy="12" r="4.5" fill="#fff"/></svg>';
+        var pinSrc = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(pinSvg);
+
         var styles = [
           new ol.style.Style({
-            image: new ol.style.Circle({
-              radius: 8,
-              fill: new ol.style.Fill({ color: markerColor }),
-              stroke: new ol.style.Stroke({ color: '#fff', width: 2 })
+            image: new ol.style.Icon({
+              src: pinSrc,
+              anchor: [0.5, 1],
+              scale: 0.9
             })
           })
         ];
         
         if (showText) {
-          var line = data.st.count
-            ? DD.money(data.st.spent) + ' spent of ' + DD.money(data.st.budget)
-            : DD.money(data.st.budget) + ' budgeted';
+          var line = data.place.days ? 'Days: ' + data.place.days + '\n' : '';
+          line += data.st.count
+            ? 'Budget: ' + DD.money(data.st.budget) + ' | Spent: ' + DD.money(data.st.spent)
+            : 'Budget: ' + DD.money(data.st.budget);
             
           styles.push(new ol.style.Style({
             text: new ol.style.Text({
@@ -99,7 +103,7 @@
               backgroundFill: new ol.style.Fill({ color: 'rgba(0, 22, 58, 0.9)' }),
               backgroundStroke: new ol.style.Stroke({ color: '#ffffff', width: 1.5 }),
               padding: [6, 10, 6, 10],
-              offsetY: -35,
+              offsetY: -45,
               textAlign: 'center'
             })
           }));
@@ -165,12 +169,14 @@
       if (feature) {
         map.getTargetElement().style.cursor = 'pointer';
         var data = feature.get('data');
-        var line = data.st.count
-          ? DD.money(data.st.spent) + ' spent of ' + DD.money(data.st.budget)
-          : DD.money(data.st.budget) + ' budgeted';
+        var line = data.place.days ? 'Days: ' + data.place.days + ' &middot; ' : '';
+        line += data.st.count
+          ? 'Budget: ' + DD.money(data.st.budget) + ' | Spent: ' + DD.money(data.st.spent)
+          : 'Budget: ' + DD.money(data.st.budget);
           
         popupElement.innerHTML = '<b style="font-size:18px; display:block; margin-bottom:4px; color:var(--brand-100, #d8e7fb); font-family:var(--serif, \'Playfair Display\', serif);">' + data.place.name + '</b><span style="font-size:15px; letter-spacing: 0.05em;">' + line + '</span>';
         popupOverlay.setPosition(evt.coordinate);
+        popupOverlay.setOffset([0, -25]);
         popupElement.style.display = 'block';
       } else {
         map.getTargetElement().style.cursor = '';
