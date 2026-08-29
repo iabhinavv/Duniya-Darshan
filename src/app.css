@@ -284,12 +284,12 @@ select{
 }
 .map-legend i{width:15px;height:9px;display:inline-block;margin-right:6px;vertical-align:-1px;border-radius:1px}
 .map-tip{
-  position:absolute;pointer-events:none;background:var(--ink);color:var(--paper);
-  padding:6px 10px;border-radius:var(--r);font-family:var(--yeseva);font-size:14.5px;
-  white-space:nowrap;z-index:5;opacity:0;transition:opacity .12s;
+  position:absolute;pointer-events:none;background:var(--brand-900, #00163a);color:var(--paper);
+  padding:8px 12px;border-radius:var(--r);font-family:var(--yeseva);font-size:16px;
+  white-space:nowrap;z-index:5;opacity:0;transition:opacity .12s;box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
 .map-tip.on{opacity:1}
-.map-tip b{font-family:var(--serif);font-size:13px;display:block;letter-spacing:0}
+.map-tip b{font-family:var(--serif);font-size:15px;display:block;letter-spacing:0;color:var(--brand-100, #d8e7fb)}
 
 /* -------------------------------------------------------------- places */
 .places{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:0;

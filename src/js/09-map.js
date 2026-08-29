@@ -1,4 +1,4 @@
-/* 09-map — the world and India maps using Leaflet and Esri Satellite imagery. */
+/* 09-map — the world and India maps using OpenLayers and Esri Satellite imagery. */
 'use strict';
 
 (function () {
@@ -25,115 +25,152 @@
     var kind = opts.kind || 'world';
     var list = entries(kind, opts.trips || [S.trip()]);
 
-    // Create the container. We ensure it has a non-zero height for Leaflet.
     var wrap = el('div', { class: 'mapwrap', style: { height: '500px', width: '100%', borderRadius: '6px', overflow: 'hidden', position: 'relative', zIndex: 1 } });
 
-    // Leaflet needs the container to be in the DOM to measure its size.
     setTimeout(function() {
       if (!wrap.isConnected) {
-        // poll until it is in the DOM
         var attempts = 0;
         var int = setInterval(function() {
           if (wrap.isConnected) {
             clearInterval(int);
-            initLeaflet(wrap, kind, list, opts);
+            initOpenLayers(wrap, kind, list, opts);
           }
-          if (++attempts > 50) clearInterval(int); // giving up after 2.5s
+          if (++attempts > 50) clearInterval(int);
         }, 50);
       } else {
-        initLeaflet(wrap, kind, list, opts);
+        initOpenLayers(wrap, kind, list, opts);
       }
     }, 0);
 
     return wrap;
   }
 
-  function initLeaflet(wrap, kind, list, opts) {
-    // Initial center and zoom
-    var map = L.map(wrap, { zoomControl: true, attributionControl: true }).setView([20, 0], 2);
-    map.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank" style="color:var(--brand-300,#a3c4f7);text-decoration:none;">Leaflet</a>');
-    if (kind === 'india') {
-      map.setView([22.5, 79.5], 4.5);
-    }
+  function initOpenLayers(wrap, kind, list, opts) {
+    if (!window.ol) return; // Ensure OpenLayers is loaded
 
-    // Add Esri World Imagery (Satellite) tile layer
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      attribution: 'Tiles &copy; Esri',
-      maxZoom: 18
-    }).addTo(map);
-
-    var bounds = L.latLngBounds();
-    var hasValidPoints = false;
-
-    // Draw markers for each place in the trip(s)
+    var features = [];
+    
     list.forEach(function(e) {
       if (typeof e.place.lat === 'number' && typeof e.place.lon === 'number') {
-        var markerColor = e.st.state === 'over' ? 'var(--pink, #db0b69)' : e.st.state === 'done' ? 'var(--brand-900, #00163a)' : 'var(--brand-500, #75a7f1)';
+        var markerColor = e.st.state === 'over' ? '#db0b69' : e.st.state === 'done' ? '#00163a' : '#75a7f1';
         
-        var marker = L.circleMarker([e.place.lat, e.place.lon], {
-          radius: 6,
-          fillColor: markerColor,
-          color: '#fff',
-          weight: 2,
-          opacity: 1,
-          fillOpacity: 0.9
-        }).addTo(map);
-
-        var st = e.st;
-        var line = st.count
-          ? DD.money(st.spent) + ' spent of ' + DD.money(st.budget)
-          : DD.money(st.budget) + ' budgeted';
-
-        // Custom notepad popup styling - darker as requested
-        var popupContent = '<div style="background:var(--brand-800, #00254a); padding:8px 12px; border-radius:4px; font-family:var(--yeseva, \'Yeseva One\', serif); color:var(--paper, #ffffff); text-align:center; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">' +
-                           '<b style="font-size:16px; display:block; margin-bottom:4px; color:var(--brand-100, #d8e7fb);">' + e.place.name + '</b><span style="font-size:14px;">' + line + '</span></div>';
-
-        // Override leaflet tooltip default styles to blend with the app
-        marker.bindTooltip(popupContent, {
-          direction: 'top',
-          permanent: false,
-          opacity: 1,
-          className: 'notepad-popup',
-          offset: [0, -5]
+        var feature = new ol.Feature({
+          geometry: new ol.geom.Point(ol.proj.fromLonLat([e.place.lon, e.place.lat])),
+          data: e,
+          markerColor: markerColor
         });
-
-        if (opts.onPick) {
-          marker.on('click', function() {
-            opts.onPick(e);
-          });
-          // Change cursor on hover
-          marker.on('mouseover', function() {
-            marker._path.style.cursor = 'pointer';
-          });
-        }
-
-        bounds.extend([e.place.lat, e.place.lon]);
-        hasValidPoints = true;
+        
+        feature.setStyle(new ol.style.Style({
+          image: new ol.style.Circle({
+            radius: 8,
+            fill: new ol.style.Fill({ color: markerColor }),
+            stroke: new ol.style.Stroke({ color: '#fff', width: 2 })
+          })
+        }));
+        
+        features.push(feature);
       }
     });
 
-    if (hasValidPoints) {
-      // Fit to points, with some padding, but don't zoom in too far
-      map.fitBounds(bounds, { padding: [30, 30], maxZoom: 6 });
+    var vectorSource = new ol.source.Vector({ features: features });
+    var vectorLayer = new ol.layer.Vector({ source: vectorSource, zIndex: 2 });
+    
+    var rasterLayer = new ol.layer.Tile({
+      source: new ol.source.XYZ({
+        attributions: 'Tiles &copy; Esri',
+        url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        maxZoom: 18
+      }),
+      zIndex: 1
+    });
+
+    var center = kind === 'india' ? ol.proj.fromLonLat([79.5, 22.5]) : ol.proj.fromLonLat([0, 20]);
+    var zoom = kind === 'india' ? 4.5 : 2;
+
+    var map = new ol.Map({
+      target: wrap,
+      layers: [rasterLayer, vectorLayer],
+      view: new ol.View({
+        center: center,
+        zoom: zoom,
+        maxZoom: 18
+      })
+    });
+
+    if (features.length > 0) {
+      var extent = vectorSource.getExtent();
+      map.getView().fit(extent, { padding: [50, 50, 50, 50], maxZoom: 6, duration: 500 });
     }
 
-    // Add a custom control for "India" if opts.onIndia is provided
     if (kind === 'world' && opts.onIndia) {
-      var HomeControl = L.Control.extend({
-        options: { position: 'topright' },
-        onAdd: function (map) {
-          var btn = L.DomUtil.create('button', 'btn sm');
-          btn.innerHTML = 'India';
-          btn.style.margin = '10px';
-          btn.style.cursor = 'pointer';
-          btn.style.pointerEvents = 'auto';
-          L.DomEvent.on(btn, 'click', L.DomEvent.stopPropagation)
-                    .on(btn, 'click', L.DomEvent.preventDefault)
-                    .on(btn, 'click', opts.onIndia);
-          return btn;
+      var btn = el('button', { class: 'btn sm', text: 'India' }, 'India');
+      btn.style.margin = '10px';
+      btn.style.cursor = 'pointer';
+      btn.style.pointerEvents = 'auto';
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        opts.onIndia();
+      });
+      
+      var controlElement = el('div', { class: 'ol-unselectable ol-control' });
+      controlElement.style.top = '65px';
+      controlElement.style.right = '10px';
+      controlElement.style.position = 'absolute';
+      controlElement.appendChild(btn);
+      
+      map.addControl(new ol.control.Control({ element: controlElement }));
+    }
+
+    var popupElement = el('div', { class: 'notepad-popup', style: {
+      background: 'var(--brand-900, #00163a)',
+      padding: '10px 14px',
+      borderRadius: '4px',
+      fontFamily: 'var(--yeseva, "Yeseva One", serif)',
+      color: 'var(--paper, #ffffff)',
+      textAlign: 'center',
+      boxShadow: '0 4px 10px rgba(0,0,0,0.5)',
+      pointerEvents: 'none',
+      display: 'none'
+    } });
+    
+    var popupOverlay = new ol.Overlay({
+      element: popupElement,
+      positioning: 'bottom-center',
+      stopEvent: false,
+      offset: [0, -12]
+    });
+    map.addOverlay(popupOverlay);
+
+    map.on('pointermove', function(evt) {
+      if (evt.dragging) {
+        popupElement.style.display = 'none';
+        return;
+      }
+      var feature = map.forEachFeatureAtPixel(evt.pixel, function(f) { return f; });
+      if (feature) {
+        map.getTargetElement().style.cursor = 'pointer';
+        var data = feature.get('data');
+        var line = data.st.count
+          ? DD.money(data.st.spent) + ' spent of ' + DD.money(data.st.budget)
+          : DD.money(data.st.budget) + ' budgeted';
+          
+        popupElement.innerHTML = '<b style="font-size:18px; display:block; margin-bottom:4px; color:var(--brand-100, #d8e7fb); font-family:var(--serif, \'Playfair Display\', serif);">' + data.place.name + '</b><span style="font-size:15px; letter-spacing: 0.05em;">' + line + '</span>';
+        popupOverlay.setPosition(evt.coordinate);
+        popupElement.style.display = 'block';
+      } else {
+        map.getTargetElement().style.cursor = '';
+        popupElement.style.display = 'none';
+      }
+    });
+
+    if (opts.onPick) {
+      map.on('click', function(evt) {
+        var feature = map.forEachFeatureAtPixel(evt.pixel, function(f) { return f; });
+        if (feature) {
+          opts.onPick(feature.get('data'));
         }
       });
-      map.addControl(new HomeControl());
     }
   }
 
