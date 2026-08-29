@@ -64,6 +64,24 @@
       ]));
     }
 
+    /* ---- the trip's own map ---- */
+    var kind = isCity ? 'india' : 'world';
+    host.appendChild(DD.sectionHead(t.name, isCity ? 'The route through India' : 'The route',
+      el('button', { class: 'btn sm pri', onclick: addDialog }, [icon('plus', 14), 'Add ' + noun[0]])));
+    host.appendChild(el('p', { class: 'deck' }, isCity
+      ? 'States you are stopping in are filled; a dot marks each city. Colour deepens once you spend there.'
+      : 'Countries on the itinerary are filled, and deepen as you spend. Click an empty one to add it.'));
+    host.appendChild(DD.map.render({
+      kind: kind,
+      trips: [t],
+      onPick: function (e) { editor(t, e.place); },
+      onIndia: kind === 'world' ? DD.openHomeTrip : null,
+      onBlank: kind === 'world' ? function (key, name) { offerAdd(t, key, name); } : null
+    }));
+    host.appendChild(el('p', { class: 'tiny muted', style: { marginTop: '8px' } },
+      'Scroll or pinch to zoom, drag to move around.'
+      + (kind === 'world' ? ' India opens your travels at home.' : '')));
+
     /* ---- trip level charts ---- */
     if (b.total > 0) {
       host.appendChild(DD.sectionHead('Overview', 'Category breakdown'));
@@ -86,11 +104,11 @@
         ]));
         
         var barsData = t.categories.map(function(c) {
-          return { label: c.label, budget: b.byCat[c.id] || 0, actual: a.byCat[c.id] || 0 };
+          return { id: c.id, label: c.label, budget: b.byCat[c.id] || 0, actual: a.byCat[c.id] || 0 };
         }).filter(function(r) { return r.budget > 0 || r.actual > 0; });
         
         var detailsCol = el('div', { style: { flex: '1 1 240px', minWidth: '0' } });
-        detailsCol.appendChild(DD.charts.compareBars(barsData));
+        detailsCol.appendChild(DD.charts.verticalCompareBars(barsData));
         tripInner.appendChild(detailsCol);
       };
       
@@ -104,23 +122,6 @@
       host.appendChild(tripBody);
     }
 
-    /* ---- the trip's own map ---- */
-    var kind = isCity ? 'india' : 'world';
-    host.appendChild(DD.sectionHead(t.name, isCity ? 'The route through India' : 'The route',
-      el('button', { class: 'btn sm pri', onclick: addDialog }, [icon('plus', 14), 'Add ' + noun[0]])));
-    host.appendChild(el('p', { class: 'deck' }, isCity
-      ? 'States you are stopping in are filled; a dot marks each city. Colour deepens once you spend there.'
-      : 'Countries on the itinerary are filled, and deepen as you spend. Click an empty one to add it.'));
-    host.appendChild(DD.map.render({
-      kind: kind,
-      trips: [t],
-      onPick: function (e) { editor(t, e.place); },
-      onIndia: kind === 'world' ? DD.openHomeTrip : null,
-      onBlank: kind === 'world' ? function (key, name) { offerAdd(t, key, name); } : null
-    }));
-    host.appendChild(el('p', { class: 'tiny muted', style: { marginTop: '8px' } },
-      'Scroll or pinch to zoom, drag to move around.'
-      + (kind === 'world' ? ' India opens your travels at home.' : '')));
 
     /* ---- the places ---- */
     /* The grid repaints itself as you type or re-sort. A full DD.render() would
@@ -649,11 +650,11 @@
         ]));
         
         var pBarsData = t.categories.map(function(c) {
-          return { label: c.label, budget: p.budget[c.id] || 0, actual: st.byCat[c.id] || 0 };
+          return { id: c.id, label: c.label, budget: p.budget[c.id] || 0, actual: st.byCat[c.id] || 0 };
         }).filter(function(r) { return r.budget > 0 || r.actual > 0; });
         
         var pDetailsCol = el('div', { style: { flex: '1 1 240px', minWidth: '0' } });
-        pDetailsCol.appendChild(DD.charts.compareBars(pBarsData));
+        pDetailsCol.appendChild(DD.charts.verticalCompareBars(pBarsData));
         placeCharts.appendChild(pDetailsCol);
       };
       

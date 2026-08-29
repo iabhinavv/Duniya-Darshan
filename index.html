@@ -5525,7 +5525,54 @@ window.DUNIYA_SEED = {
     return wrap;
   }
 
-  DD.charts = { donut: donut, legend: legend, runningLine: runningLine, compareBars: compareBars, colourFor: colourFor };
+  /* Vertical grouped bar chart for budget vs actual */
+  function verticalCompareBars(rows, opts) {
+    var o = opts || {};
+    var wrap = DD.el('div', { style: { display: 'flex', gap: '12px', alignItems: 'flex-end', height: o.height || '220px', paddingBottom: '10px', overflowX: 'auto', paddingTop: '10px' } });
+    var max = 0;
+    rows.forEach(function (r) { max = Math.max(max, r.budget, r.actual); });
+    if (max <= 0) max = 1;
+    
+    rows.forEach(function (r, i) {
+      var col = DD.el('div', { style: { display: 'flex', flexDirection: 'column', alignItems: 'center', flex: '1', minWidth: '40px', height: '100%' } });
+      
+      var barsArea = DD.el('div', { style: { display: 'flex', gap: '2px', alignItems: 'flex-end', flex: '1', width: '100%', justifyContent: 'center' } });
+      
+      var colColor = r.id ? colourFor(r.id, i) : 'var(--brand-500)';
+      var over = r.actual > r.budget && r.budget > 0;
+      
+      var bBar = DD.el('div', { 
+        title: r.label + ' Budget: ' + DD.money(r.budget),
+        style: { width: '16px', height: Math.max(1, (r.budget / max * 100)) + '%', background: '#e3edfc', borderRadius: '3px 3px 0 0', cursor: 'help' } 
+      });
+      
+      var aBar = null;
+      if (r.actual > 0) {
+        aBar = DD.el('div', { 
+          title: r.label + ' Spent: ' + DD.money(r.actual),
+          style: { width: '16px', height: Math.max(1, (r.actual / max * 100)) + '%', background: over ? 'var(--pink)' : colColor, borderRadius: '3px 3px 0 0', cursor: 'help' } 
+        });
+      }
+      
+      barsArea.appendChild(bBar);
+      if (aBar) barsArea.appendChild(aBar);
+      col.appendChild(barsArea);
+      
+      var labelDiv = DD.el('div', { 
+        style: { marginTop: '6px', fontSize: '11px', textAlign: 'center', color: 'var(--ink-2)', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }, 
+        text: r.label 
+      });
+      labelDiv.title = r.label;
+      col.appendChild(labelDiv);
+      
+      wrap.appendChild(col);
+    });
+    
+    if (!rows.length) wrap.appendChild(DD.el('div', { class: 'muted small', text: o.empty || 'Nothing to compare yet.' }));
+    return wrap;
+  }
+
+  DD.charts = { donut: donut, legend: legend, runningLine: runningLine, compareBars: compareBars, verticalCompareBars: verticalCompareBars, colourFor: colourFor };
 })();
 
 
@@ -5979,6 +6026,24 @@ window.DUNIYA_SEED = {
       DD.stat('Per day', DD.money(days ? budget / days : 0), 'across the whole plan')
     ]));
 
+    /* ---- the map ---- */
+    var worldTrips = all.filter(function (t) { return t.kind !== 'domestic'; });
+    if (worldTrips.length) {
+      host.appendChild(DD.sectionHead('The world, so far', 'Where the money goes',
+        el('span', { class: 'chip brand', text: DD.plural(started, 'place') + ' under way' })));
+      host.appendChild(el('p', { class: 'deck' },
+        'Filled countries are on the itinerary. They deepen once you start spending there — click any one to open it.'));
+      host.appendChild(DD.map.render({
+        kind: 'world',
+        trips: worldTrips,
+        onPick: function (e) { openPlace(e); },
+        onIndia: openHomeTrip,
+        onBlank: function (key, name) { offerAdd(key, name); }
+      }));
+      host.appendChild(el('p', { class: 'tiny muted', style: { marginTop: '8px' } },
+        'Scroll or pinch to zoom, drag to move around. India opens your travels at home.'));
+    }
+
     /* ---- global charts ---- */
     if (all.length > 0 && budget > 0) {
       host.appendChild(DD.sectionHead('Overview', 'Total across all trips'));
@@ -5989,26 +6054,34 @@ window.DUNIYA_SEED = {
       
       var paintGlobal = function(which) {
         DD.clear(globalInner);
-        var gData = all.map(function(tr, i) {
+        
+        var allCats = {};
+        all.forEach(function(tr) {
           var tb = S.tripBudget(tr), ta = S.actuals(tr);
-          var val = which === 'spent' ? ta.total : tb.total;
-          return { id: tr.id, label: tr.name, budget: tb.total, actual: ta.total, value: val, colour: DD.charts.colourFor('t_' + i, i) };
+          tr.categories.forEach(function(c) {
+            if (!allCats[c.id]) allCats[c.id] = { id: c.id, label: c.label, budget: 0, actual: 0 };
+            allCats[c.id].budget += (tb.byCat[c.id] || 0);
+            allCats[c.id].actual += (ta.byCat[c.id] || 0);
+          });
+        });
+        var gData = Object.keys(allCats).map(function(k) { return allCats[k]; });
+        
+        var donutData = gData.map(function(c, i) {
+          var val = which === 'spent' ? c.actual : c.budget;
+          return { id: c.id, label: c.label, value: val, colour: DD.charts.colourFor(c.id, i) };
         }).filter(function(d) { return d.value > 0; }).sort(DD.by('value', 'desc'));
         
         globalInner.appendChild(el('div', { style: { flex: '0 0 auto', margin: '0 auto' } }, [
-          DD.charts.donut(gData, {
-            centre: DD.money(DD.sum(gData, function (d) { return d.value; }), { compact: true }),
+          DD.charts.donut(donutData, {
+            centre: DD.money(DD.sum(donutData, function (d) { return d.value; }), { compact: true }),
             centreSub: which === 'spent' ? 'spent' : 'budget'
           })
         ]));
         
-        var barsData = all.map(function(tr) {
-          var tb = S.tripBudget(tr), ta = S.actuals(tr);
-          return { label: tr.name, budget: tb.total, actual: ta.total };
-        }).filter(function(r) { return r.budget > 0 || r.actual > 0; });
+        var barsData = gData.filter(function(r) { return r.budget > 0 || r.actual > 0; });
         
         var detailsCol = el('div', { style: { flex: '1 1 240px', minWidth: '0' } });
-        detailsCol.appendChild(DD.charts.compareBars(barsData));
+        detailsCol.appendChild(DD.charts.verticalCompareBars(barsData));
         globalInner.appendChild(detailsCol);
       };
       
@@ -6037,24 +6110,6 @@ window.DUNIYA_SEED = {
     if (pace && pace.state !== 'before') {
       host.appendChild(DD.sectionHead(paceTrip.name, 'Are you on budget?'));
       host.appendChild(paceBar(paceTrip, pace));
-    }
-
-    /* ---- the map ---- */
-    var worldTrips = all.filter(function (t) { return t.kind !== 'domestic'; });
-    if (worldTrips.length) {
-      host.appendChild(DD.sectionHead('The world, so far', 'Where the money goes',
-        el('span', { class: 'chip brand', text: DD.plural(started, 'place') + ' under way' })));
-      host.appendChild(el('p', { class: 'deck' },
-        'Filled countries are on the itinerary. They deepen once you start spending there — click any one to open it.'));
-      host.appendChild(DD.map.render({
-        kind: 'world',
-        trips: worldTrips,
-        onPick: function (e) { openPlace(e); },
-        onIndia: openHomeTrip,
-        onBlank: function (key, name) { offerAdd(key, name); }
-      }));
-      host.appendChild(el('p', { class: 'tiny muted', style: { marginTop: '8px' } },
-        'Scroll or pinch to zoom, drag to move around. India opens your travels at home.'));
     }
 
     /* ---- trips ---- */
@@ -6095,9 +6150,9 @@ window.DUNIYA_SEED = {
           return { label: c.label, budget: tb.byCat[c.id] || 0, actual: ta.byCat[c.id] || 0 };
         }).filter(function(r) { return r.budget > 0 || r.actual > 0; });
         
-        var rightCol = el('div', { style: { flex: '1 1 240px', minWidth: '0' } });
-        rightCol.appendChild(DD.charts.compareBars(barsData));
-        inner.appendChild(rightCol);
+        var detailsCol = el('div', { style: { flex: '1 1 240px', minWidth: '0' } });
+        detailsCol.appendChild(DD.charts.verticalCompareBars(barsData));
+        inner.appendChild(detailsCol);
       }
       paint(mode);
       DD.append(body, ta.count
@@ -6506,6 +6561,24 @@ window.DUNIYA_SEED = {
       ]));
     }
 
+    /* ---- the trip's own map ---- */
+    var kind = isCity ? 'india' : 'world';
+    host.appendChild(DD.sectionHead(t.name, isCity ? 'The route through India' : 'The route',
+      el('button', { class: 'btn sm pri', onclick: addDialog }, [icon('plus', 14), 'Add ' + noun[0]])));
+    host.appendChild(el('p', { class: 'deck' }, isCity
+      ? 'States you are stopping in are filled; a dot marks each city. Colour deepens once you spend there.'
+      : 'Countries on the itinerary are filled, and deepen as you spend. Click an empty one to add it.'));
+    host.appendChild(DD.map.render({
+      kind: kind,
+      trips: [t],
+      onPick: function (e) { editor(t, e.place); },
+      onIndia: kind === 'world' ? DD.openHomeTrip : null,
+      onBlank: kind === 'world' ? function (key, name) { offerAdd(t, key, name); } : null
+    }));
+    host.appendChild(el('p', { class: 'tiny muted', style: { marginTop: '8px' } },
+      'Scroll or pinch to zoom, drag to move around.'
+      + (kind === 'world' ? ' India opens your travels at home.' : '')));
+
     /* ---- trip level charts ---- */
     if (b.total > 0) {
       host.appendChild(DD.sectionHead('Overview', 'Category breakdown'));
@@ -6528,11 +6601,11 @@ window.DUNIYA_SEED = {
         ]));
         
         var barsData = t.categories.map(function(c) {
-          return { label: c.label, budget: b.byCat[c.id] || 0, actual: a.byCat[c.id] || 0 };
+          return { id: c.id, label: c.label, budget: b.byCat[c.id] || 0, actual: a.byCat[c.id] || 0 };
         }).filter(function(r) { return r.budget > 0 || r.actual > 0; });
         
         var detailsCol = el('div', { style: { flex: '1 1 240px', minWidth: '0' } });
-        detailsCol.appendChild(DD.charts.compareBars(barsData));
+        detailsCol.appendChild(DD.charts.verticalCompareBars(barsData));
         tripInner.appendChild(detailsCol);
       };
       
@@ -6546,23 +6619,6 @@ window.DUNIYA_SEED = {
       host.appendChild(tripBody);
     }
 
-    /* ---- the trip's own map ---- */
-    var kind = isCity ? 'india' : 'world';
-    host.appendChild(DD.sectionHead(t.name, isCity ? 'The route through India' : 'The route',
-      el('button', { class: 'btn sm pri', onclick: addDialog }, [icon('plus', 14), 'Add ' + noun[0]])));
-    host.appendChild(el('p', { class: 'deck' }, isCity
-      ? 'States you are stopping in are filled; a dot marks each city. Colour deepens once you spend there.'
-      : 'Countries on the itinerary are filled, and deepen as you spend. Click an empty one to add it.'));
-    host.appendChild(DD.map.render({
-      kind: kind,
-      trips: [t],
-      onPick: function (e) { editor(t, e.place); },
-      onIndia: kind === 'world' ? DD.openHomeTrip : null,
-      onBlank: kind === 'world' ? function (key, name) { offerAdd(t, key, name); } : null
-    }));
-    host.appendChild(el('p', { class: 'tiny muted', style: { marginTop: '8px' } },
-      'Scroll or pinch to zoom, drag to move around.'
-      + (kind === 'world' ? ' India opens your travels at home.' : '')));
 
     /* ---- the places ---- */
     /* The grid repaints itself as you type or re-sort. A full DD.render() would
@@ -7091,11 +7147,11 @@ window.DUNIYA_SEED = {
         ]));
         
         var pBarsData = t.categories.map(function(c) {
-          return { label: c.label, budget: p.budget[c.id] || 0, actual: st.byCat[c.id] || 0 };
+          return { id: c.id, label: c.label, budget: p.budget[c.id] || 0, actual: st.byCat[c.id] || 0 };
         }).filter(function(r) { return r.budget > 0 || r.actual > 0; });
         
         var pDetailsCol = el('div', { style: { flex: '1 1 240px', minWidth: '0' } });
-        pDetailsCol.appendChild(DD.charts.compareBars(pBarsData));
+        pDetailsCol.appendChild(DD.charts.verticalCompareBars(pBarsData));
         placeCharts.appendChild(pDetailsCol);
       };
       

@@ -141,5 +141,52 @@
     return wrap;
   }
 
-  DD.charts = { donut: donut, legend: legend, runningLine: runningLine, compareBars: compareBars, colourFor: colourFor };
+  /* Vertical grouped bar chart for budget vs actual */
+  function verticalCompareBars(rows, opts) {
+    var o = opts || {};
+    var wrap = DD.el('div', { style: { display: 'flex', gap: '12px', alignItems: 'flex-end', height: o.height || '220px', paddingBottom: '10px', overflowX: 'auto', paddingTop: '10px' } });
+    var max = 0;
+    rows.forEach(function (r) { max = Math.max(max, r.budget, r.actual); });
+    if (max <= 0) max = 1;
+    
+    rows.forEach(function (r, i) {
+      var col = DD.el('div', { style: { display: 'flex', flexDirection: 'column', alignItems: 'center', flex: '1', minWidth: '40px', height: '100%' } });
+      
+      var barsArea = DD.el('div', { style: { display: 'flex', gap: '2px', alignItems: 'flex-end', flex: '1', width: '100%', justifyContent: 'center' } });
+      
+      var colColor = r.id ? colourFor(r.id, i) : 'var(--brand-500)';
+      var over = r.actual > r.budget && r.budget > 0;
+      
+      var bBar = DD.el('div', { 
+        title: r.label + ' Budget: ' + DD.money(r.budget),
+        style: { width: '16px', height: Math.max(1, (r.budget / max * 100)) + '%', background: '#e3edfc', borderRadius: '3px 3px 0 0', cursor: 'help' } 
+      });
+      
+      var aBar = null;
+      if (r.actual > 0) {
+        aBar = DD.el('div', { 
+          title: r.label + ' Spent: ' + DD.money(r.actual),
+          style: { width: '16px', height: Math.max(1, (r.actual / max * 100)) + '%', background: over ? 'var(--pink)' : colColor, borderRadius: '3px 3px 0 0', cursor: 'help' } 
+        });
+      }
+      
+      barsArea.appendChild(bBar);
+      if (aBar) barsArea.appendChild(aBar);
+      col.appendChild(barsArea);
+      
+      var labelDiv = DD.el('div', { 
+        style: { marginTop: '6px', fontSize: '11px', textAlign: 'center', color: 'var(--ink-2)', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }, 
+        text: r.label 
+      });
+      labelDiv.title = r.label;
+      col.appendChild(labelDiv);
+      
+      wrap.appendChild(col);
+    });
+    
+    if (!rows.length) wrap.appendChild(DD.el('div', { class: 'muted small', text: o.empty || 'Nothing to compare yet.' }));
+    return wrap;
+  }
+
+  DD.charts = { donut: donut, legend: legend, runningLine: runningLine, compareBars: compareBars, verticalCompareBars: verticalCompareBars, colourFor: colourFor };
 })();
