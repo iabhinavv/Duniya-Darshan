@@ -207,6 +207,7 @@ STATE_META = {
     "Tamil Nadu":        ("Chennai", "MAA", 13.08, 80.27),
     "Goa":               ("Panaji", "GOI", 15.50, 73.83),
     "Maharashtra":       ("Mumbai", "BOM", 19.08, 72.88),
+    "Jammu & Kashmir":   ("Srinagar", "SXR", 34.08, 74.80),
 }
 
 
@@ -217,7 +218,7 @@ def read_india_places():
     ws = wb["India Tour"]
     places, order, current = [], 0, None
 
-    for row in range(6, 300):
+    for row in range(6, ws.max_row + 1):
         state = ws.cell(row=row, column=3).value
         day = ws.cell(row=row, column=2).value
         city = ws.cell(row=row, column=4).value

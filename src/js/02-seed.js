@@ -3466,11 +3466,118 @@ window.DUNIYA_SEED = {
        "done": false
       }
      ]
+    },
+    {
+     "id": "in_jammu---kashmir",
+     "name": "Jammu & Kashmir",
+     "country": "Jammu & Kashmir",
+     "city": "Srinagar",
+     "iso2": "IN",
+     "iata": "SXR",
+     "currency": "INR",
+     "lat": 34.08,
+     "lon": 74.8,
+     "days": 10,
+     "order": 29,
+     "notes": "",
+     "budget": {
+      "railway": 15000,
+      "intercity": 11000,
+      "lodging": 12000,
+      "food": 5500,
+      "activities": 4000,
+      "petrol": 0,
+      "misc": 2000
+     },
+     "images": [],
+     "driveLinks": [],
+     "itinerary": [
+      {
+       "id": "it_in_jammu---kashmir_1",
+       "day": 1,
+       "title": "Jammu",
+       "note": "Jammu — Raghunath Temple, Bahu Fort",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_jammu---kashmir_2",
+       "day": 2,
+       "title": "Srinagar",
+       "note": "Vande Bharat to Srinagar — houseboat check-in, evening Shikara ride on Dal Lake",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_jammu---kashmir_3",
+       "day": 3,
+       "title": "Srinagar",
+       "note": "Srinagar — Mughal Gardens (Nishat, Shalimar, Chashme Shahi), Shankaracharya Temple",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_jammu---kashmir_4",
+       "day": 4,
+       "title": "Gulmarg",
+       "note": "Gulmarg day trip — Gondola Phase 1 (₹800; Phase 2 is a ₹1,000 optional add-on, not in the base budget)",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_jammu---kashmir_5",
+       "day": 5,
+       "title": "Pahalgam",
+       "note": "5–6. Pahalgam — Betaab Valley, Aru Valley pony ride",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_jammu---kashmir_6",
+       "day": 6,
+       "title": "Pahalgam",
+       "note": "5–6. Pahalgam — Betaab Valley, Aru Valley pony ride",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_jammu---kashmir_7",
+       "day": 7,
+       "title": "Srinagar",
+       "note": "Back to Srinagar",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_jammu---kashmir_8",
+       "day": 8,
+       "title": "Sonmarg",
+       "note": "Sonmarg day trip — Thajiwas Glacier",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_jammu---kashmir_9",
+       "day": 9,
+       "title": "Srinagar",
+       "note": "Srinagar — old city, dawn floating market, shawl/saffron shopping",
+       "cost": 0,
+       "done": false
+      },
+      {
+       "id": "it_in_jammu---kashmir_10",
+       "day": 10,
+       "title": "Jammu",
+       "note": "Return: Vande Bharat to Jammu, same-day train to Chandigarh",
+       "cost": 0,
+       "done": false
+      }
+     ]
     }
    ],
    "expenses": []
   }
  ],
- "stamp": "544f065110c8",
- "stampNote": "36 countries, 28 states, 545 days"
+ "stamp": "333f23004659",
+ "stampNote": "36 countries, 29 states, 555 days"
 };
