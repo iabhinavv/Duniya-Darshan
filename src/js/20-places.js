@@ -83,32 +83,48 @@
       + (kind === 'world' ? ' India opens your travels at home.' : '')));
 
     /* ---- the places ---- */
-    var shown = arrange(t, list);
-    host.appendChild(DD.sectionHead(view.by === 'order' ? 'In order' : 'Sorted',
-      isCity ? 'The states' : 'The countries',
-      el('span', { class: 'chip', text: shown.length === list.length
+    /* The grid repaints itself as you type or re-sort. A full DD.render() would
+       rebuild the page, throw away the focused search box and jump back to the
+       top of the page on every keystroke. */
+    var countChip = el('span', { class: 'chip' });
+    var headNode = DD.sectionHead('In order', isCity ? 'The states' : 'The countries', countChip);
+    host.appendChild(headNode);
+
+    var bar = sortBar(t, list, noun, repaint);
+    host.appendChild(bar.node);
+
+    var gridWrap = el('div', {});
+    host.appendChild(gridWrap);
+    repaint();
+
+    function repaint() {
+      var shown = arrange(t, list);
+      var kicker = headNode.querySelector('.kicker');
+      if (kicker) kicker.textContent = view.by === 'order' ? 'In order' : 'Sorted';
+      countChip.textContent = shown.length === list.length
         ? DD.plural(list.length, noun[0], noun[1])
-        : shown.length + ' of ' + list.length })));
-    host.appendChild(sortBar(t, list, noun));
+        : shown.length + ' of ' + list.length;
+      bar.refresh();
 
-    if (!shown.length) {
-      host.appendChild(el('div', { class: 'card empty' }, [
-        el('p', { style: { margin: 0 }, text: 'Nothing matches “' + view.query + '”.' })
-      ]));
-      return;
+      DD.clear(gridWrap);
+      if (!shown.length) {
+        gridWrap.appendChild(el('div', { class: 'card empty' }, [
+          el('p', { style: { margin: 0 }, text: 'Nothing matches \u201c' + view.query + '\u201d.' })
+        ]));
+        return;
+      }
+      var grid = el('div', { class: 'places' });
+      shown.forEach(function (p) { grid.appendChild(card(t, p, list.indexOf(p), list.length)); });
+      gridWrap.appendChild(grid);
+      if (view.by === 'order') {
+        makeSortable(grid, t);
+        gridWrap.appendChild(el('p', { class: 'drag-hint', style: { marginTop: '9px' } },
+          'Drag a card to reorder the route. The arrows do the same thing on a phone.'));
+      } else {
+        gridWrap.appendChild(el('p', { class: 'drag-hint', style: { marginTop: '9px' } },
+          'Sorted view \u2014 switch back to route order to drag cards around.'));
+      }
     }
-
-    var grid = el('div', { class: 'places' });
-    shown.forEach(function (p) { grid.appendChild(card(t, p, list.indexOf(p), list.length)); });
-    if (view.by === 'order') {
-      makeSortable(grid, t);
-      host.appendChild(el('p', { class: 'drag-hint', style: { marginTop: '9px' } },
-        'Drag a card to reorder the route. The arrows do the same thing on a phone.'));
-    } else {
-      host.appendChild(el('p', { class: 'drag-hint', style: { marginTop: '9px' } },
-        'Sorted view — switch back to route order to drag cards around.'));
-    }
-    host.insertBefore(grid, host.lastChild);
 
     host.appendChild(el('div', { style: { marginTop: '16px', textAlign: 'center' } }, [
       el('button', { class: 'btn', onclick: addDialog }, [icon('plus', 14), 'Add another ' + noun[0]])
@@ -235,51 +251,61 @@
     });
   }
 
-  function sortBar(t, list, noun) {
+  function sortBar(t, list, noun, repaint) {
     normalise(t);
     var search = el('input', {
       type: 'text', value: view.query,
-      placeholder: 'Find a ' + noun[0] + '…',
-      oninput: DD.debounce(function () { view.query = search.value; DD.render(); }, 220)
+      placeholder: 'Find a ' + noun[0] + '\u2026',
+      oninput: DD.debounce(function () { view.query = search.value; repaint(); }, 180)
     });
 
-    var sel = DD.selectOf(metrics(t).map(function (m) { return [m.id, m.label]; }), view.by, function (v) {
-      view.by = v;
-      DD.render();
-    });
+    var sel = DD.selectOf(metrics(t).map(function (m) { return [m.id, m.label]; }), view.by,
+      function (v) { view.by = v; repaint(); });
 
-    var dir = DD.segmented([['asc', 'Cheapest first'], ['desc', 'Priciest first']], view.dir, function (v) {
-      view.dir = v;
-      DD.render();
-    });
-
+    var dirWrap = el('div', { class: 'sb-dir' });
+    var clearWrap = el('div', { class: 'sb-clear' });
     var summary = el('span', { class: 'drag-hint' });
-    if (view.by !== 'order') {
-      var m = metrics(t).filter(function (x) { return x.id === view.by; })[0];
-      var ranked = arrange(t, list);
-      var top = ranked[0];
-      if (top) {
-        summary.textContent = (view.dir === 'asc' ? 'Cheapest' : 'Dearest') + ' on ' + m.label.toLowerCase()
-          + ': ' + top.name + ' at ' + DD.money(valueOf(t, top, view.by));
+
+    var node = el('div', { class: 'sortbar' }, [
+      el('div', { class: 'sortbar-row' }, [
+        el('div', { class: 'sb-find' }, [search]),
+        el('label', { class: 'sb-by' }, [el('span', { class: 'lbl-cap', text: 'Sort by' }), sel]),
+        dirWrap,
+        clearWrap
+      ]),
+      summary
+    ]);
+
+    /* Only the bits that depend on the sort get rebuilt, so the search box
+       keeps its focus and caret while you type. */
+    function refresh() {
+      DD.clear(dirWrap);
+      if (view.by !== 'order') {
+        dirWrap.appendChild(DD.segmented([['asc', 'Cheapest first'], ['desc', 'Priciest first']],
+          view.dir, function (v) { view.dir = v; repaint(); }));
+      }
+
+      DD.clear(clearWrap);
+      if (view.query || view.by !== 'order') {
+        clearWrap.appendChild(el('button', { class: 'btn xs ghost', text: 'Clear', onclick: function () {
+          view.query = ''; view.by = 'order'; view.dir = 'asc';
+          search.value = '';
+          repaint();
+        } }));
+      }
+
+      summary.textContent = '';
+      if (view.by !== 'order') {
+        var m = metrics(t).filter(function (x) { return x.id === view.by; })[0];
+        var top = arrange(t, list)[0];
+        if (m && top) {
+          summary.textContent = (view.dir === 'asc' ? 'Cheapest' : 'Dearest') + ' on '
+            + m.label.toLowerCase() + ': ' + top.name + ' at ' + DD.money(valueOf(t, top, view.by));
+        }
       }
     }
 
-    return el('div', { class: 'sortbar' }, [
-      el('div', { class: 'sortbar-row' }, [
-        el('div', { class: 'sb-find' }, [search]),
-        el('label', { class: 'sb-by' }, [
-          el('span', { class: 'lbl-cap', text: 'Sort by' }), sel
-        ]),
-        view.by === 'order' ? null : el('div', { class: 'sb-dir' }, [dir]),
-        view.query || view.by !== 'order'
-          ? el('button', { class: 'btn xs ghost', text: 'Clear', onclick: function () {
-              view = { query: '', by: 'order', dir: 'asc' };
-              DD.render();
-            } })
-          : null
-      ]),
-      summary.textContent ? summary : null
-    ]);
+    return { node: node, refresh: refresh };
   }
 
   /* --------------------------------------------------------------- card */

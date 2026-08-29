@@ -8,6 +8,9 @@
   var el = DD.el, S = DD.store;
   var NS = 'http://www.w3.org/2000/svg';
 
+  /* A map pin, drawn with its point at the origin. */
+  var PIN = 'M0 0C-1.4-2.6-6-7.2-6-10.6A6 6 0 1 1 6-10.6C6-7.2 1.4-2.6 0 0Z';
+
   function s(tag, attrs) {
     var n = document.createElementNS(NS, tag);
     for (var k in attrs) if (attrs[k] !== null && attrs[k] !== undefined) n.setAttribute(k, attrs[k]);
@@ -38,6 +41,22 @@
     var m = window.DUNIYA_MAPS[kind];
     var p = (kind === 'world' ? robinson : mercator)(lon, lat);
     return [(p[0] - m.fit.minx) * m.fit.k + m.fit.pad, (p[1] - m.fit.miny) * m.fit.k + m.fit.pad];
+  }
+
+  /* Extent of a whole path, in map units — used to decide whether a label can
+     sit inside the country at the current zoom. */
+  function pathBox(d) {
+    var nums = d.match(/-?\d+\.?\d*/g);
+    if (!nums || nums.length < 4) return null;
+    var minx = Infinity, maxx = -Infinity, miny = Infinity, maxy = -Infinity;
+    for (var i = 0; i < nums.length; i += 2) {
+      var x = +nums[i], y = +nums[i + 1];
+      if (x < minx) minx = x;
+      if (x > maxx) maxx = x;
+      if (y < miny) miny = y;
+      if (y > maxy) maxy = y;
+    }
+    return { w: maxx - minx, h: maxy - miny };
   }
 
   /* Centre of the biggest ring in a path — good enough to hang a label on. */
@@ -140,26 +159,31 @@
       stage.appendChild(path);
     });
 
-    /* Dots for anywhere too small to fill — Singapore, the Faroes, any city. */
+    /* A pin marks every place we have coordinates for — and stands in entirely
+       for anywhere too small to fill, like Singapore or the Faroes. */
+    var pins = s('g', { class: 'map-pins' });
+    var pinNodes = [];
     list.forEach(function (e) {
       var p = e.place;
       if (typeof p.lat !== 'number' || typeof p.lon !== 'number') return;
       if (kind === 'world' && e.key && bigEnough(m, e.key)) return;
       var xy = toScreen(kind, p.lon, p.lat);
-      var r = kind === 'world' ? 4 : 5.5;
-      var dot = s('circle', { cx: xy[0].toFixed(1), cy: xy[1].toFixed(1), r: r,
-        class: 'map-dot ' + e.st.state });
-      dot.addEventListener('click', function () { pick(e); });
-      bindTip(dot, e);
-      stage.appendChild(dot);
+      var g = s('g', { class: 'map-pin ' + e.st.state });
+      g.appendChild(s('path', { class: 'pin-body', d: PIN }));
+      g.appendChild(s('circle', { class: 'pin-eye', cx: 0, cy: -9.4, r: 2.2 }));
+      g.addEventListener('click', function () { pick(e); });
+      bindTip(g, e);
+      pins.appendChild(g);
+      pinNodes.push({ node: g, x: xy[0], y: xy[1] });
     });
+    stage.appendChild(pins);
 
     var labels = labelLayer(kind, m, list, byKey);
-    stage.appendChild(labels);
+    stage.appendChild(labels.node);
 
     wrap.appendChild(svg);
     wrap.appendChild(tip);
-    wrap.appendChild(zoomable(wrap, svg, stage, m, labels));
+    wrap.appendChild(zoomable(wrap, svg, stage, m, labels, pinNodes));
     wrap.appendChild(legend(list));
 
     function pick(e) {
@@ -197,7 +221,7 @@
   /* Pan and zoom. Wheel or pinch to scale about the pointer, drag to pan,
      buttons for anyone who would rather not. Purely visual — the underlying
      coordinates never change. */
-  function zoomable(wrap, svg, stage, m, labels) {
+  function zoomable(wrap, svg, stage, m, labels, pinNodes) {
     var k = 1, tx = 0, ty = 0;
     var MIN = 1, MAX = 14;
 
@@ -206,19 +230,59 @@
       stage.setAttribute('transform', 'translate(' + tx.toFixed(2) + ' ' + ty.toFixed(2) + ') scale(' + k.toFixed(4) + ')');
       wrap.classList.toggle('zoomed', k > 1.01);
       reset.disabled = k <= 1.01;
+      paintPins();
       paintLabels();
     }
 
+    /* Pins keep their size on screen, so they are scaled against the zoom. */
+    function paintPins() {
+      if (!pinNodes) return;
+      var inv = (1 / k).toFixed(4);
+      for (var i = 0; i < pinNodes.length; i++) {
+        pinNodes[i].node.setAttribute('transform',
+          'translate(' + pinNodes[i].x.toFixed(1) + ' ' + pinNodes[i].y.toFixed(1) + ') scale(' + inv + ')');
+      }
+    }
+
     /* Nothing at rest; a name once you lean in; the money and the detail as you
-       keep going. Type is divided by the zoom so it holds its size on screen. */
+       keep going — but never more than the country itself has room for. */
     function paintLabels() {
       if (!labels) return;
-      var level = k >= 5.5 ? 4 : k >= 3.4 ? 3 : k >= 2 ? 2 : k >= 1.35 ? 1 : 0;
-      labels.setAttribute('data-level', level);
-      labels.style.display = level ? '' : 'none';
-      if (!level) return;
-      labels.setAttribute('font-size', (10 / k).toFixed(3));
-      labels.setAttribute('stroke-width', (2.6 / k).toFixed(3));
+      var want = k >= 5.5 ? 4 : k >= 3.6 ? 3 : k >= 2.2 ? 2 : k >= 1.4 ? 1 : 0;
+      labels.node.style.display = want ? '' : 'none';
+      if (!want) return;
+
+      measure(labels.items);
+      var inv = (1 / k).toFixed(4);
+
+      labels.items.forEach(function (it) {
+        it.inner.setAttribute('transform', 'scale(' + inv + ')');
+        var room = it.box.w * k;          /* the country's width, in map units at font-size 10 */
+        var tall = it.box.h * k;
+        var level = 0;
+        for (var L = want; L >= 1; L--) {
+          var need = widestUpTo(it.w, L) + PAD_X * 2;
+          var high = TOP + 7 + (L - 1) * LINE_H + PAD_Y + 4;
+          if (room >= need && tall >= high + 6) { level = L; break; }
+        }
+        it.node.style.display = level ? '' : 'none';
+        if (!level) return;
+
+        for (var i = 0; i < it.lines.length; i++) {
+          it.lines[i].style.display = i < level ? '' : 'none';
+        }
+        var w = widestUpTo(it.w, level) + PAD_X * 2;
+        var h = (level - 1) * LINE_H + 10 + PAD_Y * 2;
+        it.paper.setAttribute('x', (-w / 2).toFixed(1));
+        it.paper.setAttribute('y', TOP.toFixed(1));
+        it.paper.setAttribute('width', w.toFixed(1));
+        it.paper.setAttribute('height', h.toFixed(1));
+        it.rule.setAttribute('x1', (-w / 2).toFixed(1));
+        it.rule.setAttribute('x2', (w / 2).toFixed(1));
+        it.rule.setAttribute('y1', (TOP + 10.5).toFixed(1));
+        it.rule.setAttribute('y2', (TOP + 10.5).toFixed(1));
+        it.rule.style.display = level > 1 ? '' : 'none';
+      });
     }
 
     /* Keep the map inside its frame: at k=1 it is pinned, beyond that it may
@@ -249,10 +313,17 @@
       apply();
     }
 
+    /* A continuous factor from the wheel delta, so a trackpad glides instead of
+       jumping a notch at a time. Line-mode wheels are scaled up to match. */
     svg.addEventListener('wheel', function (ev) {
       ev.preventDefault();
+      var d = ev.deltaY * (ev.deltaMode === 1 ? 16 : ev.deltaMode === 2 ? 100 : 1);
+      var f = Math.pow(1.0022, -Math.max(-160, Math.min(160, d)));
       var pt = toBox(ev.clientX, ev.clientY);
-      zoomAt(pt[0], pt[1], ev.deltaY < 0 ? 1.16 : 1 / 1.16);
+      /* The transition stays on here: a mouse notch eases, and a trackpad's
+         stream of small deltas is smoothed into one glide. Dragging turns it
+         off instead, where any lag would feel like the map sticking. */
+      zoomAt(pt[0], pt[1], f);
     }, { passive: false });
 
     /* Drag to pan, two fingers to pinch.
@@ -284,6 +355,7 @@
       var ids = Object.keys(pointers);
 
       if (ids.length >= 2) {
+        wrap.classList.add('panning');
         var now = gap(ids);
         if (pinchGap > 0 && now > 0) {
           var mid = midpoint(ids);
@@ -298,6 +370,7 @@
       if (ids.length === 1 && last && k > 1.01 && moved > DRAG_SLOP) {
         if (!dragging) {
           dragging = true;
+          wrap.classList.add('panning');
           try { svg.setPointerCapture(ev.pointerId); } catch (e) { /* fine without it */ }
         }
         var p = toBox(ev.clientX, ev.clientY);
@@ -314,7 +387,10 @@
         try { svg.releasePointerCapture(ev.pointerId); } catch (e) { /* already gone */ }
       }
       delete pointers[ev.pointerId];
-      if (!Object.keys(pointers).length) { last = null; pinchGap = 0; dragging = false; }
+      if (!Object.keys(pointers).length) {
+        last = null; pinchGap = 0; dragging = false;
+        wrap.classList.remove('panning');
+      }
     }
     svg.addEventListener('pointerup', release);
     svg.addEventListener('pointercancel', release);
@@ -356,45 +432,84 @@
     return controls;
   }
 
-  /* Labels that earn their place as you zoom: the name first, then the money,
-     then the detail. Kept in the zoom group so they travel with the map, with
-     their type scaled back down so it stays a readable size on screen. */
+  /* Labels that earn their place as you zoom. Each one is a little notepad
+     slip, and it only appears once the country is big enough on screen to hold
+     it — so nothing ever spills over a border or sits on the sea. */
+  var LINE_H = 8.6, PAD_X = 5, PAD_Y = 4, TOP = -11;
+
   function labelLayer(kind, m, list, byKey) {
     var g = s('g', { class: 'map-labels' });
+    var items = [];
 
     list.forEach(function (e) {
-      var at = null;
+      var at = null, box = null;
+      if (e.key && m.paths[e.key]) {
+        box = pathBox(m.paths[e.key]);
+        if (byKey[e.key] && byKey[e.key] !== e) return;   /* one label per shape */
+      }
       if (typeof e.place.lat === 'number' && typeof e.place.lon === 'number') {
         at = toScreen(kind, e.place.lon, e.place.lat);
       } else if (e.key && m.paths[e.key]) {
         at = pathCentre(m.paths[e.key]);
       }
       if (!at) return;
-      /* only one label per shape, matching the fill */
-      if (e.key && byKey[e.key] && byKey[e.key] !== e) return;
+      /* Nothing to sit inside, so allow a modest patch of its own. */
+      if (!box || !box.w) box = { w: 18, h: 18 };
 
       var st = e.st;
-      var node = s('g', { class: 'map-label ' + st.state, transform: 'translate(' + at[0].toFixed(1) + ' ' + at[1].toFixed(1) + ')' });
+      var texts = [
+        e.place.name,
+        DD.money(st.budget, { compact: true }) + ' budget',
+        st.count
+          ? DD.money(st.spent, { compact: true }) + ' spent · ' + DD.plural(st.count, 'entry', 'entries')
+          : 'not started · ' + DD.plural(e.place.days, 'day'),
+        st.count
+          ? DD.plural(e.place.days, 'day') + ' · ' + DD.pct(st.spent, st.budget) + '% used'
+          : DD.money(e.place.days ? st.budget / e.place.days : 0) + ' a day'
+      ];
 
-      /* sit the name above the marker so the dot stays visible */
-      node.appendChild(line(e.place.name, -6, 'nm'));
-      node.appendChild(line(DD.money(st.budget, { compact: true }) + ' budget', 9, 'l2'));
-      node.appendChild(line(st.count
-        ? DD.money(st.spent, { compact: true }) + ' spent · ' + DD.plural(st.count, 'entry', 'entries')
-        : 'not started · ' + DD.plural(e.place.days, 'day'), 17.5, 'l3'));
-      node.appendChild(line(st.count
-        ? DD.plural(e.place.days, 'day') + ' · ' + DD.pct(st.spent, st.budget) + '% used'
-        : DD.money(e.place.days ? st.budget / e.place.days : 0) + ' a day', 26, 'l4'));
+      /* Outer group carries the position, inner group the counter-scale, so the
+         slip stays the same size on screen however far in you zoom. */
+      var node = s('g', { class: 'map-label ' + st.state,
+        transform: 'translate(' + at[0].toFixed(1) + ' ' + at[1].toFixed(1) + ')' });
+      var inner = s('g', { class: 'lbl-inner' });
+      var paper = s('rect', { class: 'lbl-paper', rx: 1.5 });
+      var rule = s('line', { class: 'lbl-rule' });
+      inner.appendChild(paper);
+      inner.appendChild(rule);
 
+      var lines = texts.map(function (txt, i) {
+        var t = s('text', { class: i ? 'l' + (i + 1) : 'nm', x: 0,
+          y: (TOP + 7 + i * LINE_H).toFixed(1), 'text-anchor': 'middle' });
+        t.textContent = txt;
+        inner.appendChild(t);
+        return t;
+      });
+
+      node.appendChild(inner);
       g.appendChild(node);
+      items.push({ node: node, inner: inner, paper: paper, rule: rule, lines: lines, box: box, w: null });
     });
-    return g;
+
+    return { node: g, items: items };
   }
 
-  function line(text, dy, cls) {
-    var t = s('text', { class: cls, x: 0, y: dy, 'text-anchor': 'middle' });
-    t.textContent = text;
-    return t;
+  /* Widths are measured once, at a known font size, in map units. The label is
+     drawn at font-size 10/k, so its width in map units is constant — which makes
+     the fit test a straight comparison against the country's own width. */
+  function measure(items) {
+    items.forEach(function (it) {
+      if (it.w) return;
+      it.w = it.lines.map(function (t) {
+        try { return t.getComputedTextLength(); } catch (e) { return t.textContent.length * 5; }
+      });
+    });
+  }
+
+  function widestUpTo(w, level) {
+    var max = 0;
+    for (var i = 0; i < level; i++) max = Math.max(max, w[i]);
+    return max;
   }
 
   function rank(state) {

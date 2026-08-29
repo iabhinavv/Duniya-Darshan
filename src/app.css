@@ -238,7 +238,8 @@ select{
 .mapwrap svg{touch-action:none;cursor:grab}
 .mapwrap.zoomed svg{cursor:grab}
 .mapwrap.zoomed svg:active{cursor:grabbing}
-.map-stage{transition:transform .1s linear}
+.map-stage{transition:transform .19s cubic-bezier(.25,.7,.35,1)}
+.mapwrap.panning .map-stage{transition:none}
 .map-zoom{
   position:absolute;top:12px;right:14px;z-index:4;display:flex;flex-direction:column;gap:5px;
 }
@@ -250,22 +251,31 @@ select{
 /* India on the world map is a doorway to the trip at home */
 .map-land.map-home{fill:var(--red-bg);stroke:var(--pink);stroke-width:1.1;stroke-dasharray:3 2;cursor:pointer}
 .map-land.map-home:hover{fill:var(--pink)}
-/* map labels — revealed a tier at a time as you zoom in */
-.map-labels{
-  pointer-events:none;font-family:var(--sans);font-weight:600;
-  paint-order:stroke fill;stroke:#fff;stroke-linejoin:round;
+/* map labels — a notepad slip, shown only when the country has room for it */
+.map-labels{pointer-events:none;font-family:var(--sans);font-size:10px}
+.map-labels .lbl-paper{
+  fill:#fffdf3;stroke:var(--brand-800);stroke-width:.5;
+  filter:drop-shadow(0 1px 1.5px rgba(0,22,58,.28));
 }
-.map-labels text{fill:var(--brand-800)}
+.map-labels .lbl-rule{stroke:var(--brand-100);stroke-width:.4}
+.map-labels text{fill:var(--ink-2)}
 .map-labels .nm{font-weight:800;fill:var(--brand-900)}
-.map-labels .l2,.map-labels .l3,.map-labels .l4{font-weight:500;fill:var(--ink-3);display:none}
-.map-labels[data-level="2"] .l2,
-.map-labels[data-level="3"] .l2,
-.map-labels[data-level="4"] .l2{display:block}
-.map-labels[data-level="3"] .l3,
-.map-labels[data-level="4"] .l3{display:block}
-.map-labels[data-level="4"] .l4{display:block}
+.map-labels .l2{font-weight:700;fill:var(--brand-700)}
+.map-labels .l3,.map-labels .l4{font-weight:500;fill:var(--ink-3)}
 .map-label.over .nm{fill:var(--pink)}
-.map-label.done .nm,.map-label.active .nm{fill:var(--brand-900)}
+.map-label.over .lbl-paper{stroke:var(--pink)}
+
+/* location pins, held at a constant size by a counter-scale */
+.map-pins .map-pin{cursor:pointer}
+.map-pin .pin-body{fill:var(--brand-600);stroke:#fff;stroke-width:1.2}
+.map-pin .pin-eye{fill:#fff}
+.map-pin.planned .pin-body{fill:#fff;stroke:var(--brand-700);stroke-width:1.6}
+.map-pin.planned .pin-eye{fill:var(--brand-700)}
+.map-pin.active .pin-body{fill:var(--brand-500)}
+.map-pin.done .pin-body{fill:var(--brand-900)}
+.map-pin.over .pin-body{fill:var(--pink)}
+.map-pin:hover .pin-body{fill:var(--pink);stroke:#fff}
+
 .map-legend{
   display:flex;flex-wrap:wrap;gap:14px;align-items:center;padding-top:9px;margin-top:8px;
   border-top:1px solid var(--rule-3);font-family:var(--sans);font-size:10.5px;

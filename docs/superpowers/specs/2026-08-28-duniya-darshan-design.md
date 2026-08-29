@@ -219,3 +219,36 @@ Two real bugs and three changes of direction.
    number, and drag-to-reorder is disabled (and says so) while a sort is on.
    Category ids differ between trips, so `normalise()` drops a sort the current
    trip has no category for rather than throwing.
+
+
+---
+
+# Revision 5 — 2026-08-29
+
+Four small fixes, all inside 09-map.js, 20-places.js and app.css.
+
+1. **Search no longer jumps to the top.** The sort bar called `DD.render()` on
+   every keystroke, which rebuilt the page, dropped focus and reset the scroll.
+   `render()` now builds the header, bar and a grid container once and hands a
+   `repaint()` down; the bar rebuilds only its own direction toggle, Clear button
+   and summary. The `<input>` survives untouched.
+
+2. **Location pins instead of dots.** A teardrop path with its point at the
+   origin, in `.map-pins`, each counter-scaled by 1/k in `paintPins()` so it holds
+   its size on screen. Colours follow the place state, hover turns magenta.
+
+3. **Labels are notepad slips, and only show what fits.** Each label is an outer
+   `<g>` for position wrapping an inner `<g>` carrying `scale(1/k)`, so the whole
+   slip — paper, rule and type — stays a constant size on screen. The first
+   attempt scaled only the font and left the rect in map units, which ballooned it
+   at high zoom.
+   Line widths are measured once with `getComputedTextLength()`; `pathBox()` gives
+   the country's extent from the path string. A label shows the deepest level L
+   where `box.w * k >= widestLine(L) + padding` and the height also fits, so it
+   never overflows the country. Places with no polygon get a nominal 18x18 box.
+
+4. **Smoother zoom.** `.map-stage` eases on a 190ms cubic-bezier. The wheel
+   handler derives a continuous factor from the delta
+   (`pow(1.0022, -clamp(delta))`, with deltaMode scaling) rather than a fixed
+   notch, so trackpads glide. The transition is turned off — via `.panning` — only
+   while dragging or pinching, where lag would feel like the map sticking.

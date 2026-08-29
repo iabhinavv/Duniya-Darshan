@@ -129,24 +129,32 @@ work the same way.
 - **Deep teal** — 90% or more of its budget is spent. Call it done.
 - **Red** — spent past the budget.
 
-A dot marks each city, and stands in for countries too small to fill at this
-scale — Singapore, the Faroes. Hover for the figures; click to open the place.
+A **location pin** marks each city, and stands in for countries too small to fill
+at this scale — Singapore, the Faroes. Pins hold their size however far you zoom,
+and take the colour of whatever state the place is in. Hover for the figures; click to open the place.
 On the world map, **clicking an empty country offers to add it to the trip**, and
 **clicking India takes you to your travels at home** and its map of the states.
 
 **Both maps zoom, and tell you more as you go in.** Scroll or pinch to zoom about
-the pointer, drag to pan, or use the +/− and Reset buttons in the corner. A drag
-never counts as a click on the country underneath, and a click always reaches it.
+the pointer, drag to pan, or use the +/− and Reset buttons in the corner. Zooming
+is eased rather than stepped, so a mouse notch glides and a trackpad follows your
+fingers. A drag never counts as a click on the country underneath, and a click
+always reaches it.
 
-Labels arrive a tier at a time, so the map stays clean at rest:
+Details arrive on a little notepad slip, a line at a time:
 
 | Zoom | What appears |
 |---|---|
-| at rest | nothing — just the fills and dots |
+| at rest | nothing — just the fills and the pins |
 | lean in | the name |
 | further | + the budget |
 | further still | + spent, entries, days |
 | right in | + cost a day, or percentage used |
+
+**A slip only appears once the country is wide enough on screen to hold it.** Each
+line is measured against the country's own width at the current zoom, so a label
+never spills across a border or out to sea — Sri Lanka shows its name alone where
+Indonesia shows all four lines. Keep zooming and the smaller countries catch up.
 
 Boundaries are Natural Earth 1:110m and a public-domain set of Indian state
 outlines, baked into the file by `make_maps.py`. Nothing is fetched at runtime,
@@ -185,7 +193,9 @@ sheet, <kbd>I</kbd> itinerary, <kbd>L</kbd> log spend, <kbd>Esc</kbd> closes a d
 
 ### Finding the cheap ones
 
-Above the cards sits a search box and a **Sort by**. Rank by total budget, cost a
+Above the cards sits a search box and a **Sort by**. Typing filters the grid
+underneath without reloading the page — the box keeps its focus and the page keeps
+its place. Rank by total budget, cost a
 day, days, what you have actually spent, what is left — or by any single spend
 head. So "cheapest countries overall" is Total budget, cheapest first; "cheapest
 flights" is Flights, cheapest first; "where does food cost most in India" is
