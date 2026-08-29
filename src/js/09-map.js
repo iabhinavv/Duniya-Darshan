@@ -51,6 +51,7 @@
   function initLeaflet(wrap, kind, list, opts) {
     // Initial center and zoom
     var map = L.map(wrap, { zoomControl: true, attributionControl: true }).setView([20, 0], 2);
+    map.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank" style="color:var(--brand-300,#a3c4f7);text-decoration:none;">Leaflet</a>');
     if (kind === 'india') {
       map.setView([22.5, 79.5], 4.5);
     }
@@ -87,14 +88,14 @@
         var popupContent = '<div style="background:var(--brand-800, #00254a); padding:8px 12px; border-radius:4px; font-family:var(--yeseva, \'Yeseva One\', serif); color:var(--paper, #ffffff); text-align:center; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">' +
                            '<b style="font-size:16px; display:block; margin-bottom:4px; color:var(--brand-100, #d8e7fb);">' + e.place.name + '</b><span style="font-size:14px;">' + line + '</span></div>';
 
-        // Override leaflet popup default styles to blend with the app
-        var customPopup = L.popup({
-          closeButton: false,
+        // Override leaflet tooltip default styles to blend with the app
+        marker.bindTooltip(popupContent, {
+          direction: 'top',
+          permanent: false,
+          opacity: 1,
           className: 'notepad-popup',
           offset: [0, -5]
-        }).setContent(popupContent);
-
-        marker.bindTooltip(customPopup, { direction: 'top', permanent: false, opacity: 1 });
+        });
 
         if (opts.onPick) {
           marker.on('click', function() {
