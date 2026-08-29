@@ -40,6 +40,22 @@
     return [(p[0] - m.fit.minx) * m.fit.k + m.fit.pad, (p[1] - m.fit.miny) * m.fit.k + m.fit.pad];
   }
 
+  /* Centre of the biggest ring in a path — good enough to hang a label on. */
+  function pathCentre(d) {
+    var best = null, bestN = 0;
+    d.split('Z').forEach(function (ring) {
+      var nums = ring.match(/-?\d+\.?\d*/g);
+      if (!nums || nums.length < 6) return;
+      var n = nums.length / 2;
+      if (n <= bestN) return;
+      var sx = 0, sy = 0;
+      for (var i = 0; i < nums.length; i += 2) { sx += +nums[i]; sy += +nums[i + 1]; }
+      bestN = n;
+      best = [sx / n, sy / n];
+    });
+    return best;
+  }
+
   /* ---------------------------------------------------------- matching */
   function norm(v) {
     return String(v || '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z]/g, '');
@@ -138,9 +154,12 @@
       stage.appendChild(dot);
     });
 
+    var labels = labelLayer(kind, m, list, byKey);
+    stage.appendChild(labels);
+
     wrap.appendChild(svg);
     wrap.appendChild(tip);
-    wrap.appendChild(zoomable(wrap, svg, stage, m));
+    wrap.appendChild(zoomable(wrap, svg, stage, m, labels));
     wrap.appendChild(legend(list));
 
     function pick(e) {
@@ -178,7 +197,7 @@
   /* Pan and zoom. Wheel or pinch to scale about the pointer, drag to pan,
      buttons for anyone who would rather not. Purely visual — the underlying
      coordinates never change. */
-  function zoomable(wrap, svg, stage, m) {
+  function zoomable(wrap, svg, stage, m, labels) {
     var k = 1, tx = 0, ty = 0;
     var MIN = 1, MAX = 14;
 
@@ -187,6 +206,19 @@
       stage.setAttribute('transform', 'translate(' + tx.toFixed(2) + ' ' + ty.toFixed(2) + ') scale(' + k.toFixed(4) + ')');
       wrap.classList.toggle('zoomed', k > 1.01);
       reset.disabled = k <= 1.01;
+      paintLabels();
+    }
+
+    /* Nothing at rest; a name once you lean in; the money and the detail as you
+       keep going. Type is divided by the zoom so it holds its size on screen. */
+    function paintLabels() {
+      if (!labels) return;
+      var level = k >= 5.5 ? 4 : k >= 3.4 ? 3 : k >= 2 ? 2 : k >= 1.35 ? 1 : 0;
+      labels.setAttribute('data-level', level);
+      labels.style.display = level ? '' : 'none';
+      if (!level) return;
+      labels.setAttribute('font-size', (10 / k).toFixed(3));
+      labels.setAttribute('stroke-width', (2.6 / k).toFixed(3));
     }
 
     /* Keep the map inside its frame: at k=1 it is pinned, beyond that it may
@@ -322,6 +354,47 @@
 
     apply();
     return controls;
+  }
+
+  /* Labels that earn their place as you zoom: the name first, then the money,
+     then the detail. Kept in the zoom group so they travel with the map, with
+     their type scaled back down so it stays a readable size on screen. */
+  function labelLayer(kind, m, list, byKey) {
+    var g = s('g', { class: 'map-labels' });
+
+    list.forEach(function (e) {
+      var at = null;
+      if (typeof e.place.lat === 'number' && typeof e.place.lon === 'number') {
+        at = toScreen(kind, e.place.lon, e.place.lat);
+      } else if (e.key && m.paths[e.key]) {
+        at = pathCentre(m.paths[e.key]);
+      }
+      if (!at) return;
+      /* only one label per shape, matching the fill */
+      if (e.key && byKey[e.key] && byKey[e.key] !== e) return;
+
+      var st = e.st;
+      var node = s('g', { class: 'map-label ' + st.state, transform: 'translate(' + at[0].toFixed(1) + ' ' + at[1].toFixed(1) + ')' });
+
+      /* sit the name above the marker so the dot stays visible */
+      node.appendChild(line(e.place.name, -6, 'nm'));
+      node.appendChild(line(DD.money(st.budget, { compact: true }) + ' budget', 9, 'l2'));
+      node.appendChild(line(st.count
+        ? DD.money(st.spent, { compact: true }) + ' spent · ' + DD.plural(st.count, 'entry', 'entries')
+        : 'not started · ' + DD.plural(e.place.days, 'day'), 17.5, 'l3'));
+      node.appendChild(line(st.count
+        ? DD.plural(e.place.days, 'day') + ' · ' + DD.pct(st.spent, st.budget) + '% used'
+        : DD.money(e.place.days ? st.budget / e.place.days : 0) + ' a day', 26, 'l4'));
+
+      g.appendChild(node);
+    });
+    return g;
+  }
+
+  function line(text, dy, cls) {
+    var t = s('text', { class: cls, x: 0, y: dy, 'text-anchor': 'middle' });
+    t.textContent = text;
+    return t;
   }
 
   function rank(state) {

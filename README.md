@@ -134,9 +134,19 @@ scale — Singapore, the Faroes. Hover for the figures; click to open the place.
 On the world map, **clicking an empty country offers to add it to the trip**, and
 **clicking India takes you to your travels at home** and its map of the states.
 
-**Both maps zoom.** Scroll or pinch to zoom about the pointer, drag to pan, or use
-the +/− and Reset buttons in the corner. A drag never counts as a click on the
-country underneath, and a click always reaches it.
+**Both maps zoom, and tell you more as you go in.** Scroll or pinch to zoom about
+the pointer, drag to pan, or use the +/− and Reset buttons in the corner. A drag
+never counts as a click on the country underneath, and a click always reaches it.
+
+Labels arrive a tier at a time, so the map stays clean at rest:
+
+| Zoom | What appears |
+|---|---|
+| at rest | nothing — just the fills and dots |
+| lean in | the name |
+| further | + the budget |
+| further still | + spent, entries, days |
+| right in | + cost a day, or percentage used |
 
 Boundaries are Natural Earth 1:110m and a public-domain set of Indian state
 outlines, baked into the file by `make_maps.py`. Nothing is fetched at runtime,
@@ -159,7 +169,7 @@ rather than quietly following whatever you last opened.
 | | |
 |---|---|
 | **Front Page** | Everything at once: totals across all trips, the world map, Today, the pacing bar, the trips, where the money is budgeted, the latest spending, what is coming up |
-| **World Tour** | Its map, a card per country, and the trip's ledger. Drag a card to reorder the route |
+| **World Tour** | Its map, a card per country, and the trip's ledger. Search and sort the cards; drag one to reorder the route |
 | **Within India** | Two views of the same route: **States**, which carry the budget and fill the map, and **Cities**, all 131 towns in order with dates and notes — searchable, tickable, each row logging spend to its state |
 | **The Sheet** | Your spreadsheet — places down, categories across, Budget / Actual / Variance, CSV out. Switches between trips |
 | **Itinerary** | The whole route day by day, dated from the trip start. Switches between trips |
@@ -172,6 +182,19 @@ logs from anywhere, and the two trips sit either side of it.
 
 Keyboard on a desktop: <kbd>F</kbd> front page, <kbd>P</kbd> places, <kbd>S</kbd>
 sheet, <kbd>I</kbd> itinerary, <kbd>L</kbd> log spend, <kbd>Esc</kbd> closes a dialog.
+
+### Finding the cheap ones
+
+Above the cards sits a search box and a **Sort by**. Rank by total budget, cost a
+day, days, what you have actually spent, what is left — or by any single spend
+head. So "cheapest countries overall" is Total budget, cheapest first; "cheapest
+flights" is Flights, cheapest first; "where does food cost most in India" is
+Food, priciest first, on the Within India states. A line underneath names the
+winner: *Dearest on food: Himachal Pradesh at ₹5,500*.
+
+Sorting is a view, not a change — route order is untouched, and each card keeps
+its route number so you can see where it really sits. Switch back to **Route
+order** to drag cards around again.
 
 ### Why states and not cities at home
 
@@ -257,6 +280,12 @@ From the world sheet, four corrections on import:
 - Croatia's and Germany's Euro rate pointed at the GBP cell. Set to a real Euro rate.
 - Every country got a capital, a country code (for the flag) and an airport code
   (for the flight link).
+
+Two map corrections, both from the source data crossing the 180th meridian:
+**Russia** and **Fiji** were being drawn as a band smeared right across the map,
+Russia straight through Alaska. Rings that straddle the antimeridian are now cut
+into an eastern and a western piece, so Chukotka sits where it belongs, just west
+of Alaska.
 
 From the India sheet, one correction worth knowing about:
 

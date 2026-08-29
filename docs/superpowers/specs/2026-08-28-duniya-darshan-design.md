@@ -189,3 +189,33 @@ Two real bugs and three changes of direction.
    and theme colour: navy `#00254a`, blue `#75a7f1`, magenta `#db0b69`, black,
    white. Greys are tints of the navy on white, so nothing strays outside it.
    The old `--teal-*` ramp was renamed `--brand-*`.
+
+
+---
+
+# Revision 4 — 2026-08-29
+
+1. **Antimeridian fix.** Russia and Fiji smeared across the whole map — Russia's
+   band ran straight through Alaska. `make_maps.py` now unwraps each ring's
+   longitudes to be continuous, and where a ring straddles 180 degrees it emits
+   an eastern and a western piece, each Sutherland-Hodgman clipped to [-180,180].
+   Fiji went from a 988px smear to 8px; Russia's Chukotka now sits correctly west
+   of Alaska. Antarctica still spans the foot of the map, which is right.
+
+   Worth noting: the first attempt looked like it had failed because
+   `make_maps.py` writes `src/js/01-maps.js` but `build.py` had not been re-run,
+   so `index.html` still held the old data. Always rebuild after regenerating.
+
+2. **Tiered map labels.** A `.map-labels` group inside the zoom stage, with
+   font-size divided by the zoom so type holds its screen size. Levels at
+   k >= 1.35 / 2 / 3.4 / 5.5 reveal name, budget, spend + days, and rate a day.
+   Anchored on the place's lat/lon, falling back to the centroid of the largest
+   ring parsed straight out of the path string (no DOM measurement needed).
+
+3. **Filter and sort on the places grid.** A search box plus a Sort by covering
+   route order, total, cost a day, days, spent, remaining, and every one of the
+   trip's own categories, with a cheapest/priciest toggle and a line naming the
+   winner. Sorting is a view: route order is untouched, cards keep their route
+   number, and drag-to-reorder is disabled (and says so) while a sort is on.
+   Category ids differ between trips, so `normalise()` drops a sort the current
+   trip has no category for rather than throwing.

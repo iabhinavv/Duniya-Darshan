@@ -5,6 +5,10 @@
 (function () {
   var el = DD.el, S = DD.store, icon = DD.icon;
 
+  /* Filter and sort are remembered while the app is open, per trip kind, so
+     switching to the sheet and back does not lose your place. */
+  var view = { query: '', by: 'order', dir: 'asc' };
+
   var GRADIENT = 'linear-gradient(160deg,var(--brand-900),var(--brand-700) 60%,var(--brand-600))';
   function photoLayers(url) {
     return 'url("' + String(url).replace(/"/g, '%22') + '"), ' + GRADIENT;
@@ -79,14 +83,32 @@
       + (kind === 'world' ? ' India opens your travels at home.' : '')));
 
     /* ---- the places ---- */
-    host.appendChild(DD.sectionHead('In order', isCity ? 'The states' : 'The countries',
-      el('span', { class: 'chip', text: DD.plural(list.length, noun[0], noun[1]) })));
+    var shown = arrange(t, list);
+    host.appendChild(DD.sectionHead(view.by === 'order' ? 'In order' : 'Sorted',
+      isCity ? 'The states' : 'The countries',
+      el('span', { class: 'chip', text: shown.length === list.length
+        ? DD.plural(list.length, noun[0], noun[1])
+        : shown.length + ' of ' + list.length })));
+    host.appendChild(sortBar(t, list, noun));
+
+    if (!shown.length) {
+      host.appendChild(el('div', { class: 'card empty' }, [
+        el('p', { style: { margin: 0 }, text: 'Nothing matches “' + view.query + '”.' })
+      ]));
+      return;
+    }
+
     var grid = el('div', { class: 'places' });
-    list.forEach(function (p, i) { grid.appendChild(card(t, p, i, list.length)); });
-    makeSortable(grid, t);
-    host.appendChild(grid);
-    host.appendChild(el('p', { class: 'drag-hint', style: { marginTop: '9px' } },
-      'Drag a card to reorder the route. The arrows do the same thing on a phone.'));
+    shown.forEach(function (p) { grid.appendChild(card(t, p, list.indexOf(p), list.length)); });
+    if (view.by === 'order') {
+      makeSortable(grid, t);
+      host.appendChild(el('p', { class: 'drag-hint', style: { marginTop: '9px' } },
+        'Drag a card to reorder the route. The arrows do the same thing on a phone.'));
+    } else {
+      host.appendChild(el('p', { class: 'drag-hint', style: { marginTop: '9px' } },
+        'Sorted view — switch back to route order to drag cards around.'));
+    }
+    host.insertBefore(grid, host.lastChild);
 
     host.appendChild(el('div', { style: { marginTop: '16px', textAlign: 'center' } }, [
       el('button', { class: 'btn', onclick: addDialog }, [icon('plus', 14), 'Add another ' + noun[0]])
@@ -159,6 +181,105 @@
         }
       });
     });
+  }
+
+  /* ------------------------------------------------------ filter & sort */
+
+  /* What you can rank a place by. Categories come from the trip, so the India
+     trip offers Petrol and the world trip offers Visa. */
+  function metrics(t) {
+    var out = [
+      { id: 'order', label: 'Route order' },
+      { id: 'total', label: 'Total budget' },
+      { id: 'perDay', label: 'Cost a day' },
+      { id: 'days', label: 'Days' },
+      { id: 'spent', label: 'Actually spent' },
+      { id: 'left', label: 'Left to spend' }
+    ];
+    t.categories.forEach(function (c) { out.push({ id: 'cat:' + c.id, label: c.label }); });
+    return out;
+  }
+
+  function valueOf(t, p, by) {
+    var b = S.placeBudget(t, p);
+    if (by === 'total') return b.total;
+    if (by === 'perDay') return p.days ? b.total / p.days : 0;
+    if (by === 'days') return Number(p.days) || 0;
+    if (by === 'spent') return S.placeState(t, p).spent;
+    if (by === 'left') return b.total - S.placeState(t, p).spent;
+    if (by.indexOf('cat:') === 0) return Number(p.budget[by.slice(4)]) || 0;
+    return Number(p.order) || 0;
+  }
+
+  /* Categories differ between trips — the world has Visa, India has Petrol — so
+     a sort carried over from the other trip may not exist here. Fall back. */
+  function normalise(t) {
+    var ok = metrics(t).some(function (m) { return m.id === view.by; });
+    if (!ok) { view.by = 'order'; view.dir = 'asc'; }
+    return view.by;
+  }
+
+  function arrange(t, list) {
+    normalise(t);
+    var q = view.query.trim().toLowerCase();
+    var out = list.filter(function (p) {
+      if (!q) return true;
+      return (p.name + ' ' + (p.city || '') + ' ' + (p.country || '') + ' ' + p.currency)
+        .toLowerCase().indexOf(q) >= 0;
+    });
+    if (view.by === 'order') return out;
+    var sign = view.dir === 'desc' ? -1 : 1;
+    return out.slice().sort(function (a, b) {
+      var d = (valueOf(t, a, view.by) - valueOf(t, b, view.by)) * sign;
+      return d || (a.order - b.order);
+    });
+  }
+
+  function sortBar(t, list, noun) {
+    normalise(t);
+    var search = el('input', {
+      type: 'text', value: view.query,
+      placeholder: 'Find a ' + noun[0] + '…',
+      oninput: DD.debounce(function () { view.query = search.value; DD.render(); }, 220)
+    });
+
+    var sel = DD.selectOf(metrics(t).map(function (m) { return [m.id, m.label]; }), view.by, function (v) {
+      view.by = v;
+      DD.render();
+    });
+
+    var dir = DD.segmented([['asc', 'Cheapest first'], ['desc', 'Priciest first']], view.dir, function (v) {
+      view.dir = v;
+      DD.render();
+    });
+
+    var summary = el('span', { class: 'drag-hint' });
+    if (view.by !== 'order') {
+      var m = metrics(t).filter(function (x) { return x.id === view.by; })[0];
+      var ranked = arrange(t, list);
+      var top = ranked[0];
+      if (top) {
+        summary.textContent = (view.dir === 'asc' ? 'Cheapest' : 'Dearest') + ' on ' + m.label.toLowerCase()
+          + ': ' + top.name + ' at ' + DD.money(valueOf(t, top, view.by));
+      }
+    }
+
+    return el('div', { class: 'sortbar' }, [
+      el('div', { class: 'sortbar-row' }, [
+        el('div', { class: 'sb-find' }, [search]),
+        el('label', { class: 'sb-by' }, [
+          el('span', { class: 'lbl-cap', text: 'Sort by' }), sel
+        ]),
+        view.by === 'order' ? null : el('div', { class: 'sb-dir' }, [dir]),
+        view.query || view.by !== 'order'
+          ? el('button', { class: 'btn xs ghost', text: 'Clear', onclick: function () {
+              view = { query: '', by: 'order', dir: 'asc' };
+              DD.render();
+            } })
+          : null
+      ]),
+      summary.textContent ? summary : null
+    ]);
   }
 
   /* --------------------------------------------------------------- card */

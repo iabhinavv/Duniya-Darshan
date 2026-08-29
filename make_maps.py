@@ -48,18 +48,76 @@ def ring_points(arcs, indexes):
     return pts
 
 
+def unwrap(ring):
+    """Make a ring's longitudes continuous, so a shape that steps over the
+    antimeridian reads as 170..190 rather than jumping 179 -> -179."""
+    out = [list(ring[0])]
+    for lon, lat in ring[1:]:
+        prev = out[-1][0]
+        while lon - prev > 180:
+            lon -= 360
+        while prev - lon > 180:
+            lon += 360
+        out.append([lon, lat])
+    return out
+
+
+def clip_lon(ring, lo, hi):
+    """Sutherland-Hodgman against two vertical lines."""
+    def half(pts, inside, bound):
+        out = []
+        for i in range(len(pts)):
+            a, b = pts[i], pts[(i + 1) % len(pts)]
+            a_in, b_in = inside(a[0]), inside(b[0])
+            if a_in:
+                out.append(a)
+            if a_in != b_in and b[0] != a[0]:
+                t = (bound - a[0]) / (b[0] - a[0])
+                out.append([bound, a[1] + t * (b[1] - a[1])])
+        return out
+
+    ring = half(ring, lambda x: x >= lo, lo)
+    if len(ring) < 3:
+        return []
+    ring = half(ring, lambda x: x <= hi, hi)
+    return ring if len(ring) >= 3 else []
+
+
+def split_antimeridian(ring):
+    """Russia and Fiji straddle 180 degrees. Left alone they get drawn as a
+    smear right across the map, so cut them into an eastern and a western
+    piece and keep whatever falls inside the frame."""
+    ring = unwrap(ring)
+    lons = [p[0] for p in ring]
+    if min(lons) >= -180 and max(lons) <= 180:
+        return [ring]
+    pieces = []
+    for shift in (0, -360, 360):
+        moved = [[p[0] + shift, p[1]] for p in ring]
+        xs = [q[0] for q in moved]
+        if max(xs) < -180 or min(xs) > 180:
+            continue
+        cut = clip_lon(moved, -180, 180)
+        if cut:
+            pieces.append(cut)
+    return pieces or [ring]
+
+
 def polygons_of(geom, arcs):
     """Every ring of a Polygon or MultiPolygon, as point lists."""
     t = geom.get("type")
+    raw = []
     if t == "Polygon":
-        return [ring_points(arcs, ring) for ring in geom["arcs"]]
-    if t == "MultiPolygon":
-        rings = []
+        raw = [ring_points(arcs, ring) for ring in geom["arcs"]]
+    elif t == "MultiPolygon":
         for poly in geom["arcs"]:
             for ring in poly:
-                rings.append(ring_points(arcs, ring))
-        return rings
-    return []
+                raw.append(ring_points(arcs, ring))
+    rings = []
+    for r in raw:
+        if len(r) >= 3:
+            rings.extend(split_antimeridian(r))
+    return rings
 
 
 # ---------------------------------------------------------------- projection

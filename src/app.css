@@ -250,6 +250,22 @@ select{
 /* India on the world map is a doorway to the trip at home */
 .map-land.map-home{fill:var(--red-bg);stroke:var(--pink);stroke-width:1.1;stroke-dasharray:3 2;cursor:pointer}
 .map-land.map-home:hover{fill:var(--pink)}
+/* map labels — revealed a tier at a time as you zoom in */
+.map-labels{
+  pointer-events:none;font-family:var(--sans);font-weight:600;
+  paint-order:stroke fill;stroke:#fff;stroke-linejoin:round;
+}
+.map-labels text{fill:var(--brand-800)}
+.map-labels .nm{font-weight:800;fill:var(--brand-900)}
+.map-labels .l2,.map-labels .l3,.map-labels .l4{font-weight:500;fill:var(--ink-3);display:none}
+.map-labels[data-level="2"] .l2,
+.map-labels[data-level="3"] .l2,
+.map-labels[data-level="4"] .l2{display:block}
+.map-labels[data-level="3"] .l3,
+.map-labels[data-level="4"] .l3{display:block}
+.map-labels[data-level="4"] .l4{display:block}
+.map-label.over .nm{fill:var(--pink)}
+.map-label.done .nm,.map-label.active .nm{fill:var(--brand-900)}
 .map-legend{
   display:flex;flex-wrap:wrap;gap:14px;align-items:center;padding-top:9px;margin-top:8px;
   border-top:1px solid var(--rule-3);font-family:var(--sans);font-size:10.5px;
@@ -453,6 +469,15 @@ td.under{color:var(--green)}
 }
 .fx-line b{font-family:var(--num);color:var(--ink);font-size:12px;letter-spacing:0}
 
+/* filter and sort bar above the place grid */
+.sortbar{margin:0 0 14px}
+.sortbar-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+.sortbar .sb-find{flex:1 1 220px;min-width:0}
+.sortbar .sb-by{flex:0 1 210px;min-width:0;display:block;margin:0}
+.sortbar .sb-by .lbl-cap{margin-bottom:5px}
+.sortbar .sb-dir{flex:0 0 auto}
+.sortbar .drag-hint{display:block;margin-top:8px}
+
 /* drag to reorder */
 .place[draggable=true]{cursor:grab}
 .place.dragging{opacity:.4}
@@ -517,6 +542,11 @@ td.under{color:var(--green)}
   .modal-foot{padding-bottom:calc(15px + env(safe-area-inset-bottom))}
   #toast{bottom:calc(80px + env(safe-area-inset-bottom))}
   .drive-embed{height:260px}
+  .sortbar-row{gap:8px}
+  .sortbar .sb-by{flex:1 1 100%}
+  .sortbar .sb-dir{flex:1 1 100%}
+  .sortbar .sb-dir .seg{width:100%}
+  .sortbar .sb-dir .seg button{flex:1}
   .today-col{border-left:0;border-top:1px solid var(--rule-3);flex:1 1 50%}
   .today-mark h3{font-size:25px}
   .map-zoom{top:8px;right:10px}
