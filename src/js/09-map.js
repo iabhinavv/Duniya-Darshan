@@ -60,20 +60,53 @@
           markerColor: markerColor
         });
         
-        feature.setStyle(new ol.style.Style({
-          image: new ol.style.Circle({
-            radius: 8,
-            fill: new ol.style.Fill({ color: markerColor }),
-            stroke: new ol.style.Stroke({ color: '#fff', width: 2 })
-          })
-        }));
-        
         features.push(feature);
       }
     });
 
     var vectorSource = new ol.source.Vector({ features: features });
-    var vectorLayer = new ol.layer.Vector({ source: vectorSource, zIndex: 2 });
+    
+    var map; // To be assigned below, captured in style function
+    var vectorLayer = new ol.layer.Vector({ 
+      source: vectorSource, 
+      zIndex: 2,
+      style: function(feature, resolution) {
+        var data = feature.get('data');
+        var currentZoom = map ? map.getView().getZoomForResolution(resolution) : 2;
+        var showText = currentZoom >= 4.5;
+        
+        var markerColor = feature.get('markerColor');
+        var styles = [
+          new ol.style.Style({
+            image: new ol.style.Circle({
+              radius: 8,
+              fill: new ol.style.Fill({ color: markerColor }),
+              stroke: new ol.style.Stroke({ color: '#fff', width: 2 })
+            })
+          })
+        ];
+        
+        if (showText) {
+          var line = data.st.count
+            ? DD.money(data.st.spent) + ' spent of ' + DD.money(data.st.budget)
+            : DD.money(data.st.budget) + ' budgeted';
+            
+          styles.push(new ol.style.Style({
+            text: new ol.style.Text({
+              text: data.place.name + '\n' + line,
+              font: '14px "Yeseva One", serif',
+              fill: new ol.style.Fill({ color: '#ffffff' }),
+              backgroundFill: new ol.style.Fill({ color: 'rgba(0, 22, 58, 0.9)' }),
+              backgroundStroke: new ol.style.Stroke({ color: '#ffffff', width: 1.5 }),
+              padding: [6, 10, 6, 10],
+              offsetY: -35,
+              textAlign: 'center'
+            })
+          }));
+        }
+        return styles;
+      }
+    });
     
     var rasterLayer = new ol.layer.Tile({
       source: new ol.source.XYZ({
@@ -87,7 +120,7 @@
     var center = kind === 'india' ? ol.proj.fromLonLat([79.5, 22.5]) : ol.proj.fromLonLat([0, 20]);
     var zoom = kind === 'india' ? 4.5 : 2;
 
-    var map = new ol.Map({
+    map = new ol.Map({
       target: wrap,
       layers: [rasterLayer, vectorLayer],
       view: new ol.View({
@@ -102,25 +135,6 @@
       map.getView().fit(extent, { padding: [50, 50, 50, 50], maxZoom: 6, duration: 500 });
     }
 
-    if (kind === 'world' && opts.onIndia) {
-      var btn = el('button', { class: 'btn sm', text: 'India' }, 'India');
-      btn.style.margin = '10px';
-      btn.style.cursor = 'pointer';
-      btn.style.pointerEvents = 'auto';
-      btn.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        opts.onIndia();
-      });
-      
-      var controlElement = el('div', { class: 'ol-unselectable ol-control' });
-      controlElement.style.top = '65px';
-      controlElement.style.right = '10px';
-      controlElement.style.position = 'absolute';
-      controlElement.appendChild(btn);
-      
-      map.addControl(new ol.control.Control({ element: controlElement }));
-    }
 
     var popupElement = el('div', { class: 'notepad-popup', style: {
       background: 'var(--brand-900, #00163a)',

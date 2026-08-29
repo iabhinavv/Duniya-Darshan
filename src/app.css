@@ -27,7 +27,7 @@
   --serif:"Playfair Display","Playfair Display Fallback",Georgia,"Times New Roman",serif;
   --sans:"Playfair Display",serif;
   --yeseva:"Yeseva One",serif;
-  --num:"Playfair Display",Georgia,serif;
+  --num:"Yeseva One",serif;
   --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
 
   --r:3px; --r-lg:4px;
@@ -217,7 +217,7 @@ select{
 
 /* ---------------------------------------------------------------- map */
 .mapwrap{
-  position:relative;background:var(--card);border:1px solid var(--rule-2);
+  position:relative;background:var(--card);border:2px solid var(--brand-800);
   border-radius:var(--r-lg);padding:10px 12px 12px;overflow:hidden;
 }
 .mapwrap svg{display:block;width:100%;height:auto;max-height:clamp(260px,56vh,540px);margin:0 auto}
