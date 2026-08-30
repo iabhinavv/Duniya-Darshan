@@ -333,7 +333,10 @@ select{
 .place-nums{display:flex;align-items:baseline;gap:8px}
 .place-nums .big{font-size:23px;font-weight:800;font-family:var(--num);letter-spacing:-.03em}
 .place-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.place-acts{display:flex;gap:6px;margin-top:auto;padding-top:4px;flex-wrap:wrap}
+.place-acts{display:flex;gap:6px;margin-top:auto;padding-top:4px;flex-wrap:wrap;align-items:center}
+/* pushes the booking links to the end on a wide card; on a narrow one the
+   row just wraps, and a stretching gap would only make it lopsided. */
+.acts-gap{flex:1 0 0}
 
 .stepper{display:inline-flex;align-items:center;border:1px solid var(--rule-3);border-radius:var(--r);background:var(--card)}
 .stepper button{border:0;background:none;width:25px;height:24px;cursor:pointer;color:var(--ink-2);font-size:15px;line-height:1}
@@ -514,6 +517,9 @@ td.under{color:var(--green)}
 .chart-side{flex:0 0 auto;display:flex;flex-direction:column;gap:12px;align-items:center;min-width:0}
 .chart-side .donut{margin:0 auto}
 
+.roadmap{border:1px solid var(--rule-2);border-radius:var(--r-lg);overflow:hidden;background:var(--paper-2)}
+.roadmap .ol-viewport{border-radius:var(--r-lg)}
+
 /* the little card that hangs off a pin on hover or tap */
 .map-pop{
   display:none;background:var(--brand-900);color:#fff;border-radius:4px;
@@ -625,6 +631,7 @@ td.under{color:var(--green)}
   .place-photo .cap .c{font-size:10px}
   .place-body{padding:10px 11px 12px;gap:8px}
   .place-nums .big{font-size:17px}
+  .acts-gap{display:none}
   .stats{grid-template-columns:1fr 1fr}
   .stat{border-bottom:1px solid var(--rule-3)}
   .stat:nth-child(2n){border-right:0}

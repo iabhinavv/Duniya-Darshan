@@ -137,8 +137,11 @@ plan into the real thing.
 
 ## 4. The maps
 
-The front page carries a world map; a trip at home carries a map of India. Both
-are satellite imagery (Esri) drawn with OpenLayers, and both work the same way.
+Three of them. The front page carries a world map and a trip at home carries a
+map of India — both satellite imagery (Esri) drawn with OpenLayers. Each place
+also has its own **road map**, under Road map in its panel: streets rather than
+satellite, centred on the town, with links out to Google Maps for directions and
+for what to do there.
 
 A **location pin** marks every place, coloured by how it is going:
 
@@ -195,8 +198,27 @@ rather than quietly following whatever you last opened.
 | **Almanac** | Backup, exchange rates, categories, booking links, reset. Categories are per trip, so it switches too |
 
 **There is no separate Log section.** Spending belongs to a trip, so you log it
-from a place card, from the **Spending** tab inside a place, or from the ledger at
-the foot of the trip's page. On a phone the **+** in the middle of the tab bar
+from a place card, from the **Log** tab inside a place, or from the ledger at the
+foot of the trip's page.
+
+### Inside a country or state
+
+Clicking a card opens its panel, and it opens on **Log** — the tab you want while
+you are actually travelling:
+
+| Tab | |
+|---|---|
+| **Log** | What this place has cost so far, its own budget-vs-spent charts, and the button to add an entry |
+| **Budget** | The figures per category, and the days |
+| **Road map** | The streets around it, with **Open in Google Maps**, **Directions** and **Things to do** |
+| **Photos** | Wikipedia and Commons photos, or your own URLs |
+| **Albums** | Your Drive and Dropbox links |
+| **Plan** | The day-by-day itinerary |
+| **Details** | Names, codes, coordinates, notes |
+
+On the card itself: **Log** first, then **Map**, then the reorder arrows, with
+**Skyscanner** and **Booking.com** at the end. There is no Open button — clicking
+the card is what opens it. On a phone the **+** in the middle of the tab bar
 logs from anywhere, and the two trips sit either side of it.
 
 Keyboard on a desktop: <kbd>F</kbd> front page, <kbd>P</kbd> places, <kbd>S</kbd>

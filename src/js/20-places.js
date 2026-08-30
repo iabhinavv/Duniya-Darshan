@@ -390,16 +390,20 @@
         el('span', { class: 'chip', text: DD.money(p.days ? bud.total / p.days : 0) + '/day' })
       ]),
       fxLine(p),
+      /* Log leads. Open is gone — the whole card already opens the place.
+         The booking links bring up the rear, where you go once the plan is set. */
       el('div', { class: 'place-acts' }, [
         el('button', { class: 'btn xs pri', onclick: function () { DD.logForm({ trip: t, placeId: p.id }); } },
           [icon('plus', 12), 'Log']),
-        el('button', { class: 'btn xs', onclick: function () { editor(t, p); } }, 'Open'),
-        el('button', { class: 'btn xs', onclick: function () { DD.links.open('flights', p); } }, DD.links.label('flights')),
-        el('button', { class: 'btn xs', onclick: function () { DD.links.open('stays', p); } }, DD.links.label('stays')),
+        el('button', { class: 'btn xs', title: 'Streets and Google Maps',
+          onclick: function () { editor(t, p, { tab: 'map' }); } }, [icon('map', 12), 'Map']),
         idx > 0 ? el('button', { class: 'btn xs ghost', title: 'Move earlier',
           onclick: function () { S.movePlace(t, p.id, -1); DD.render(); } }, '↑') : null,
         idx < total - 1 ? el('button', { class: 'btn xs ghost', title: 'Move later',
-          onclick: function () { S.movePlace(t, p.id, 1); DD.render(); } }, '↓') : null
+          onclick: function () { S.movePlace(t, p.id, 1); DD.render(); } }, '↓') : null,
+        el('span', { class: 'acts-gap' }),
+        el('button', { class: 'btn xs', onclick: function () { DD.links.open('flights', p); } }, DD.links.label('flights')),
+        el('button', { class: 'btn xs', onclick: function () { DD.links.open('stays', p); } }, DD.links.label('stays'))
       ])
     ]);
 
@@ -605,13 +609,15 @@
   }
 
   /* ------------------------------------------------------------- editor */
-  function editor(t, p) {
+  function editor(t, p, opts) {
     var body = el('div', {});
     var tabs = el('div', { class: 'seg', style: { marginBottom: '16px', flexWrap: 'wrap' } });
     var pane = el('div', {});
-    var TABS = [['budget', 'Budget'], ['spend', 'Spending'], ['photos', 'Photos'],
-                ['drive', 'Albums'], ['plan', 'Plan'], ['about', 'Details']];
-    var activeTab = 'budget';
+    /* Logging is what you open this for while you are actually travelling, so
+       it leads; the budget you set once sits behind it. */
+    var TABS = [['spend', 'Log'], ['budget', 'Budget'], ['map', 'Road map'],
+                ['photos', 'Photos'], ['drive', 'Albums'], ['plan', 'Plan'], ['about', 'Details']];
+    var activeTab = opts && opts.tab ? opts.tab : 'spend';
 
     function paint() {
       DD.clear(tabs);
@@ -622,7 +628,7 @@
         }));
       });
       DD.clear(pane);
-      ({ budget: budgetPane, spend: spendPane, photos: photosPane,
+      ({ budget: budgetPane, spend: spendPane, map: mapPane, photos: photosPane,
          drive: drivePane, plan: planPane, about: aboutPane })[activeTab](t, p, pane);
     }
     body.appendChild(tabs);
@@ -722,32 +728,38 @@
     ]));
 
     var pB = S.placeBudget(t, p);
+    /* placeState() carries totals only; the per-category split comes from
+       actuals(). Reading st.byCat gave undefined the moment a place had
+       spending, which the Log tab now shows straight away. */
+    var act = S.actuals(t, p.id);
+    var colours = DD.charts.distinctColours(t.categories.map(function (c) { return c.id; }));
     if (pB.total > 0) {
-      var pChartMode = st.spent > 0 ? 'spent' : 'budget';
+      var pChartMode = act.total > 0 ? 'spent' : 'budget';
       var pChartWrap = el('div', { class: 'card card-pad', style: { margin: '20px 0' } });
       var placeCharts = el('div', { style: { display: 'flex', gap: '24px', alignItems: 'center', flexWrap: 'wrap' } });
       
       var paintPlace = function(which) {
         DD.clear(placeCharts);
-        var src = which === 'spent' ? st.byCat : p.budget;
-        var totalVal = which === 'spent' ? st.spent : pB.total;
-        var placeData = t.categories.map(function(c, i) {
-          return { id: c.id, label: c.label, value: src[c.id] || 0, colour: DD.charts.colourFor(c.id, i) };
+        var src = which === 'spent' ? act.byCat : p.budget;
+        var totalVal = which === 'spent' ? act.total : pB.total;
+        var placeData = t.categories.map(function(c) {
+          return { id: c.id, label: c.label, value: (src && src[c.id]) || 0, colour: colours[c.id] };
         }).filter(function(d) { return d.value > 0; }).sort(DD.by('value', 'desc'));
-        
-        placeCharts.appendChild(el('div', { style: { flex: '0 0 auto', margin: '0 auto' } }, [
-          DD.charts.donut(placeData, {
-            centre: DD.money(totalVal, { compact: true }),
-            centreSub: which === 'spent' ? 'spent' : 'budget'
-          })
+
+        var pDonut = DD.charts.donut(placeData, {
+          centre: DD.money(totalVal, { compact: true }),
+          centreSub: which === 'spent' ? 'spent' : 'budget'
+        });
+        placeCharts.appendChild(el('div', { class: 'chart-side' }, [
+          pDonut, DD.charts.legend(placeData, pDonut)
         ]));
-        
+
         var pBarsData = t.categories.map(function(c) {
-          return { id: c.id, label: c.label, budget: p.budget[c.id] || 0, actual: st.byCat[c.id] || 0 };
-        }).filter(function(r) { return r.budget > 0 || r.actual > 0; });
-        
-        var pDetailsCol = el('div', { style: { flex: '1 1 240px', minWidth: '0' } });
-        pDetailsCol.appendChild(DD.charts.verticalCompareBars(pBarsData));
+          return { id: c.id, label: c.label, budget: p.budget[c.id] || 0, actual: act.byCat[c.id] || 0 };
+        }).filter(function(r) { return r.budget > 0 || r.actual > 0; }).sort(DD.by('budget', 'desc'));
+
+        var pDetailsCol = el('div', { style: { flex: '1 1 260px', minWidth: '0' } });
+        pDetailsCol.appendChild(DD.charts.verticalCompareBars(pBarsData, { colours: colours }));
         placeCharts.appendChild(pDetailsCol);
       };
       
@@ -771,6 +783,37 @@
   function spendRefresh(t, p, host) {
     DD.clear(host);
     spendPane(t, p, host);
+  }
+
+  /* ----- road map ----- */
+  function mapPane(t, p, host) {
+    var where = [p.city, p.country !== p.name ? p.country : null, p.name]
+      .filter(function (v, i, a) { return v && a.indexOf(v) === i; }).join(', ');
+
+    host.appendChild(el('p', { class: 'deck', style: { marginTop: 0 } },
+      'Streets around ' + (p.city || p.name) + '. Drag to move, scroll to zoom.'));
+
+    if (typeof p.lat === 'number' && typeof p.lon === 'number') {
+      host.appendChild(DD.map.road(p, { height: 340, zoom: t.kind === 'domestic' ? 11 : 10 }));
+    } else {
+      host.appendChild(el('div', { class: 'banner' }, [
+        el('div', {}, ['No coordinates for ' + p.name + ' yet, so there is nothing to centre on. '
+          + 'Find a photo under Photos and they are filled in for you, or type them under Details.'])
+      ]));
+    }
+
+    host.appendChild(el('div', { class: 'chip-row', style: { marginTop: '13px' } }, [
+      el('a', { class: 'btn sm pri', href: DD.map.googleUrl(p), target: '_blank', rel: 'noopener' },
+        [icon('map', 14), 'Open in Google Maps']),
+      el('a', { class: 'btn sm', href: DD.map.directionsUrl(p), target: '_blank', rel: 'noopener' },
+        [icon('route', 14), 'Directions']),
+      el('a', { class: 'btn sm', target: '_blank', rel: 'noopener',
+        href: 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('things to do in ' + where) },
+        'Things to do')
+    ]));
+
+    host.appendChild(el('p', { class: 'tiny muted', style: { marginTop: '11px', marginBottom: 0 } },
+      'Road tiles from Esri. The Google links open in a new tab, so you can send them to your phone.'));
   }
 
   /* ----- photos ----- */

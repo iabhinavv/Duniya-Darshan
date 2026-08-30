@@ -352,7 +352,10 @@ select{
 .place-nums{display:flex;align-items:baseline;gap:8px}
 .place-nums .big{font-size:23px;font-weight:800;font-family:var(--num);letter-spacing:-.03em}
 .place-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.place-acts{display:flex;gap:6px;margin-top:auto;padding-top:4px;flex-wrap:wrap}
+.place-acts{display:flex;gap:6px;margin-top:auto;padding-top:4px;flex-wrap:wrap;align-items:center}
+/* pushes the booking links to the end on a wide card; on a narrow one the
+   row just wraps, and a stretching gap would only make it lopsided. */
+.acts-gap{flex:1 0 0}
 
 .stepper{display:inline-flex;align-items:center;border:1px solid var(--rule-3);border-radius:var(--r);background:var(--card)}
 .stepper button{border:0;background:none;width:25px;height:24px;cursor:pointer;color:var(--ink-2);font-size:15px;line-height:1}
@@ -533,6 +536,9 @@ td.under{color:var(--green)}
 .chart-side{flex:0 0 auto;display:flex;flex-direction:column;gap:12px;align-items:center;min-width:0}
 .chart-side .donut{margin:0 auto}
 
+.roadmap{border:1px solid var(--rule-2);border-radius:var(--r-lg);overflow:hidden;background:var(--paper-2)}
+.roadmap .ol-viewport{border-radius:var(--r-lg)}
+
 /* the little card that hangs off a pin on hover or tap */
 .map-pop{
   display:none;background:var(--brand-900);color:#fff;border-radius:4px;
@@ -644,6 +650,7 @@ td.under{color:var(--green)}
   .place-photo .cap .c{font-size:10px}
   .place-body{padding:10px 11px 12px;gap:8px}
   .place-nums .big{font-size:17px}
+  .acts-gap{display:none}
   .stats{grid-template-columns:1fr 1fr}
   .stat{border-bottom:1px solid var(--rule-3)}
   .stat:nth-child(2n){border-right:0}
@@ -5989,6 +5996,21 @@ window.DUNIYA_SEED = {
 (function () {
   var el = DD.el, S = DD.store;
 
+  /* OpenLayers measures its container once, at construction. Inside a card that
+     is still laying out — or a modal that is still opening — it latches on to
+     the wrong width and paints tiles for only part of the viewport. Watch the
+     element and re-measure whenever it changes shape. */
+  function watchSize(map, wrap) {
+    map.updateSize();
+    if (window.ResizeObserver) {
+      var ro = new ResizeObserver(function () { map.updateSize(); });
+      ro.observe(wrap);
+    }
+    [120, 400, 1000].forEach(function (ms) {
+      setTimeout(function () { map.updateSize(); }, ms);
+    });
+  }
+
   function keyFor(kind, place) {
     if (kind === 'world') return String(place.iso2 || '').toUpperCase();
     return place.city || place.name;
@@ -6129,6 +6151,8 @@ window.DUNIYA_SEED = {
       })
     });
 
+    watchSize(map, wrap);
+
     if (features.length > 0) {
       var extent = vectorSource.getExtent();
       map.getView().fit(extent, { padding: [50, 50, 50, 50], maxZoom: 6, duration: 500 });
@@ -6226,7 +6250,84 @@ window.DUNIYA_SEED = {
     });
   }
 
-  DD.map = { render: render, keyFor: keyFor, entries: entries, toScreen: function(){} };
+  /* ------------------------------------------------------------ road map
+     A street map of one place, for the panel inside a country or state. Roads
+     rather than satellite, because this is the one you read to get about. */
+  function road(place, opts) {
+    opts = opts || {};
+    var wrap = el('div', {
+      class: 'roadmap',
+      style: { height: (opts.height || 320) + 'px', width: '100%', position: 'relative' }
+    });
+
+    var lat = typeof place.lat === 'number' ? place.lat : null;
+    var lon = typeof place.lon === 'number' ? place.lon : null;
+    if (lat === null || lon === null || !window.ol) return wrap;
+
+    /* The panel is built before it is in the document, and OpenLayers needs a
+       laid-out element to size itself against. Wait for it to land. */
+    var tries = 0;
+    var timer = setInterval(function () {
+      if (wrap.isConnected && wrap.clientWidth) { clearInterval(timer); build(); }
+      else if (++tries > 60) clearInterval(timer);
+    }, 50);
+
+    function build() {
+      var centre = ol.proj.fromLonLat([lon, lat]);
+      var pin = '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="38" viewBox="0 0 24 36">'
+        + '<path fill="#db0b69" stroke="#fff" stroke-width="2" d="M12,1 C5.925,1 1,5.925 1,12 C1,20.25 12,35 12,35 C12,35 23,20.25 23,12 C23,5.925 18.075,1 12,1 Z"/>'
+        + '<circle cx="12" cy="12" r="4.5" fill="#fff"/></svg>';
+
+      var marker = new ol.Feature({ geometry: new ol.geom.Point(centre) });
+      marker.setStyle(new ol.style.Style({
+        image: new ol.style.Icon({
+          src: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(pin),
+          anchor: [0.5, 1]
+        })
+      }));
+
+      var m = new ol.Map({
+        target: wrap,
+        layers: [
+          /* Esri's street tiles rather than ol.source.OSM: that default still
+             points at the a/b/c.tile.openstreetmap.org subdomains, which no
+             longer serve, so the map came up blank. Same provider as the
+             satellite layer, so one attribution covers both. */
+          new ol.layer.Tile({
+            source: new ol.source.XYZ({
+              attributions: 'Tiles &copy; Esri',
+              url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+              maxZoom: 19
+            })
+          }),
+          new ol.layer.Vector({ source: new ol.source.Vector({ features: [marker] }) })
+        ],
+        view: new ol.View({ center: centre, zoom: opts.zoom || 11, maxZoom: 19 })
+      });
+      watchSize(m, wrap);
+    }
+    return wrap;
+  }
+
+  /* Whatever we know about the place, in the form Google Maps searches best. */
+  function googleUrl(place) {
+    if (typeof place.lat === 'number' && typeof place.lon === 'number') {
+      return 'https://www.google.com/maps/search/?api=1&query='
+        + place.lat + '%2C' + place.lon;
+    }
+    var q = [place.city, place.country || place.name].filter(Boolean).join(', ') || place.name;
+    return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
+  }
+
+  function directionsUrl(place) {
+    var q = (typeof place.lat === 'number' && typeof place.lon === 'number')
+      ? place.lat + '%2C' + place.lon
+      : encodeURIComponent([place.city, place.country || place.name].filter(Boolean).join(', '));
+    return 'https://www.google.com/maps/dir/?api=1&destination=' + q;
+  }
+
+  DD.map = { render: render, keyFor: keyFor, entries: entries, toScreen: function(){},
+    road: road, googleUrl: googleUrl, directionsUrl: directionsUrl };
 })();
 
 
@@ -7144,16 +7245,20 @@ window.DUNIYA_SEED = {
         el('span', { class: 'chip', text: DD.money(p.days ? bud.total / p.days : 0) + '/day' })
       ]),
       fxLine(p),
+      /* Log leads. Open is gone — the whole card already opens the place.
+         The booking links bring up the rear, where you go once the plan is set. */
       el('div', { class: 'place-acts' }, [
         el('button', { class: 'btn xs pri', onclick: function () { DD.logForm({ trip: t, placeId: p.id }); } },
           [icon('plus', 12), 'Log']),
-        el('button', { class: 'btn xs', onclick: function () { editor(t, p); } }, 'Open'),
-        el('button', { class: 'btn xs', onclick: function () { DD.links.open('flights', p); } }, DD.links.label('flights')),
-        el('button', { class: 'btn xs', onclick: function () { DD.links.open('stays', p); } }, DD.links.label('stays')),
+        el('button', { class: 'btn xs', title: 'Streets and Google Maps',
+          onclick: function () { editor(t, p, { tab: 'map' }); } }, [icon('map', 12), 'Map']),
         idx > 0 ? el('button', { class: 'btn xs ghost', title: 'Move earlier',
           onclick: function () { S.movePlace(t, p.id, -1); DD.render(); } }, '↑') : null,
         idx < total - 1 ? el('button', { class: 'btn xs ghost', title: 'Move later',
-          onclick: function () { S.movePlace(t, p.id, 1); DD.render(); } }, '↓') : null
+          onclick: function () { S.movePlace(t, p.id, 1); DD.render(); } }, '↓') : null,
+        el('span', { class: 'acts-gap' }),
+        el('button', { class: 'btn xs', onclick: function () { DD.links.open('flights', p); } }, DD.links.label('flights')),
+        el('button', { class: 'btn xs', onclick: function () { DD.links.open('stays', p); } }, DD.links.label('stays'))
       ])
     ]);
 
@@ -7359,13 +7464,15 @@ window.DUNIYA_SEED = {
   }
 
   /* ------------------------------------------------------------- editor */
-  function editor(t, p) {
+  function editor(t, p, opts) {
     var body = el('div', {});
     var tabs = el('div', { class: 'seg', style: { marginBottom: '16px', flexWrap: 'wrap' } });
     var pane = el('div', {});
-    var TABS = [['budget', 'Budget'], ['spend', 'Spending'], ['photos', 'Photos'],
-                ['drive', 'Albums'], ['plan', 'Plan'], ['about', 'Details']];
-    var activeTab = 'budget';
+    /* Logging is what you open this for while you are actually travelling, so
+       it leads; the budget you set once sits behind it. */
+    var TABS = [['spend', 'Log'], ['budget', 'Budget'], ['map', 'Road map'],
+                ['photos', 'Photos'], ['drive', 'Albums'], ['plan', 'Plan'], ['about', 'Details']];
+    var activeTab = opts && opts.tab ? opts.tab : 'spend';
 
     function paint() {
       DD.clear(tabs);
@@ -7376,7 +7483,7 @@ window.DUNIYA_SEED = {
         }));
       });
       DD.clear(pane);
-      ({ budget: budgetPane, spend: spendPane, photos: photosPane,
+      ({ budget: budgetPane, spend: spendPane, map: mapPane, photos: photosPane,
          drive: drivePane, plan: planPane, about: aboutPane })[activeTab](t, p, pane);
     }
     body.appendChild(tabs);
@@ -7476,32 +7583,38 @@ window.DUNIYA_SEED = {
     ]));
 
     var pB = S.placeBudget(t, p);
+    /* placeState() carries totals only; the per-category split comes from
+       actuals(). Reading st.byCat gave undefined the moment a place had
+       spending, which the Log tab now shows straight away. */
+    var act = S.actuals(t, p.id);
+    var colours = DD.charts.distinctColours(t.categories.map(function (c) { return c.id; }));
     if (pB.total > 0) {
-      var pChartMode = st.spent > 0 ? 'spent' : 'budget';
+      var pChartMode = act.total > 0 ? 'spent' : 'budget';
       var pChartWrap = el('div', { class: 'card card-pad', style: { margin: '20px 0' } });
       var placeCharts = el('div', { style: { display: 'flex', gap: '24px', alignItems: 'center', flexWrap: 'wrap' } });
       
       var paintPlace = function(which) {
         DD.clear(placeCharts);
-        var src = which === 'spent' ? st.byCat : p.budget;
-        var totalVal = which === 'spent' ? st.spent : pB.total;
-        var placeData = t.categories.map(function(c, i) {
-          return { id: c.id, label: c.label, value: src[c.id] || 0, colour: DD.charts.colourFor(c.id, i) };
+        var src = which === 'spent' ? act.byCat : p.budget;
+        var totalVal = which === 'spent' ? act.total : pB.total;
+        var placeData = t.categories.map(function(c) {
+          return { id: c.id, label: c.label, value: (src && src[c.id]) || 0, colour: colours[c.id] };
         }).filter(function(d) { return d.value > 0; }).sort(DD.by('value', 'desc'));
-        
-        placeCharts.appendChild(el('div', { style: { flex: '0 0 auto', margin: '0 auto' } }, [
-          DD.charts.donut(placeData, {
-            centre: DD.money(totalVal, { compact: true }),
-            centreSub: which === 'spent' ? 'spent' : 'budget'
-          })
+
+        var pDonut = DD.charts.donut(placeData, {
+          centre: DD.money(totalVal, { compact: true }),
+          centreSub: which === 'spent' ? 'spent' : 'budget'
+        });
+        placeCharts.appendChild(el('div', { class: 'chart-side' }, [
+          pDonut, DD.charts.legend(placeData, pDonut)
         ]));
-        
+
         var pBarsData = t.categories.map(function(c) {
-          return { id: c.id, label: c.label, budget: p.budget[c.id] || 0, actual: st.byCat[c.id] || 0 };
-        }).filter(function(r) { return r.budget > 0 || r.actual > 0; });
-        
-        var pDetailsCol = el('div', { style: { flex: '1 1 240px', minWidth: '0' } });
-        pDetailsCol.appendChild(DD.charts.verticalCompareBars(pBarsData));
+          return { id: c.id, label: c.label, budget: p.budget[c.id] || 0, actual: act.byCat[c.id] || 0 };
+        }).filter(function(r) { return r.budget > 0 || r.actual > 0; }).sort(DD.by('budget', 'desc'));
+
+        var pDetailsCol = el('div', { style: { flex: '1 1 260px', minWidth: '0' } });
+        pDetailsCol.appendChild(DD.charts.verticalCompareBars(pBarsData, { colours: colours }));
         placeCharts.appendChild(pDetailsCol);
       };
       
@@ -7525,6 +7638,37 @@ window.DUNIYA_SEED = {
   function spendRefresh(t, p, host) {
     DD.clear(host);
     spendPane(t, p, host);
+  }
+
+  /* ----- road map ----- */
+  function mapPane(t, p, host) {
+    var where = [p.city, p.country !== p.name ? p.country : null, p.name]
+      .filter(function (v, i, a) { return v && a.indexOf(v) === i; }).join(', ');
+
+    host.appendChild(el('p', { class: 'deck', style: { marginTop: 0 } },
+      'Streets around ' + (p.city || p.name) + '. Drag to move, scroll to zoom.'));
+
+    if (typeof p.lat === 'number' && typeof p.lon === 'number') {
+      host.appendChild(DD.map.road(p, { height: 340, zoom: t.kind === 'domestic' ? 11 : 10 }));
+    } else {
+      host.appendChild(el('div', { class: 'banner' }, [
+        el('div', {}, ['No coordinates for ' + p.name + ' yet, so there is nothing to centre on. '
+          + 'Find a photo under Photos and they are filled in for you, or type them under Details.'])
+      ]));
+    }
+
+    host.appendChild(el('div', { class: 'chip-row', style: { marginTop: '13px' } }, [
+      el('a', { class: 'btn sm pri', href: DD.map.googleUrl(p), target: '_blank', rel: 'noopener' },
+        [icon('map', 14), 'Open in Google Maps']),
+      el('a', { class: 'btn sm', href: DD.map.directionsUrl(p), target: '_blank', rel: 'noopener' },
+        [icon('route', 14), 'Directions']),
+      el('a', { class: 'btn sm', target: '_blank', rel: 'noopener',
+        href: 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('things to do in ' + where) },
+        'Things to do')
+    ]));
+
+    host.appendChild(el('p', { class: 'tiny muted', style: { marginTop: '11px', marginBottom: 0 } },
+      'Road tiles from Esri. The Google links open in a new tab, so you can send them to your phone.'));
   }
 
   /* ----- photos ----- */

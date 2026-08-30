@@ -4,6 +4,21 @@
 (function () {
   var el = DD.el, S = DD.store;
 
+  /* OpenLayers measures its container once, at construction. Inside a card that
+     is still laying out — or a modal that is still opening — it latches on to
+     the wrong width and paints tiles for only part of the viewport. Watch the
+     element and re-measure whenever it changes shape. */
+  function watchSize(map, wrap) {
+    map.updateSize();
+    if (window.ResizeObserver) {
+      var ro = new ResizeObserver(function () { map.updateSize(); });
+      ro.observe(wrap);
+    }
+    [120, 400, 1000].forEach(function (ms) {
+      setTimeout(function () { map.updateSize(); }, ms);
+    });
+  }
+
   function keyFor(kind, place) {
     if (kind === 'world') return String(place.iso2 || '').toUpperCase();
     return place.city || place.name;
@@ -144,6 +159,8 @@
       })
     });
 
+    watchSize(map, wrap);
+
     if (features.length > 0) {
       var extent = vectorSource.getExtent();
       map.getView().fit(extent, { padding: [50, 50, 50, 50], maxZoom: 6, duration: 500 });
@@ -241,5 +258,82 @@
     });
   }
 
-  DD.map = { render: render, keyFor: keyFor, entries: entries, toScreen: function(){} };
+  /* ------------------------------------------------------------ road map
+     A street map of one place, for the panel inside a country or state. Roads
+     rather than satellite, because this is the one you read to get about. */
+  function road(place, opts) {
+    opts = opts || {};
+    var wrap = el('div', {
+      class: 'roadmap',
+      style: { height: (opts.height || 320) + 'px', width: '100%', position: 'relative' }
+    });
+
+    var lat = typeof place.lat === 'number' ? place.lat : null;
+    var lon = typeof place.lon === 'number' ? place.lon : null;
+    if (lat === null || lon === null || !window.ol) return wrap;
+
+    /* The panel is built before it is in the document, and OpenLayers needs a
+       laid-out element to size itself against. Wait for it to land. */
+    var tries = 0;
+    var timer = setInterval(function () {
+      if (wrap.isConnected && wrap.clientWidth) { clearInterval(timer); build(); }
+      else if (++tries > 60) clearInterval(timer);
+    }, 50);
+
+    function build() {
+      var centre = ol.proj.fromLonLat([lon, lat]);
+      var pin = '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="38" viewBox="0 0 24 36">'
+        + '<path fill="#db0b69" stroke="#fff" stroke-width="2" d="M12,1 C5.925,1 1,5.925 1,12 C1,20.25 12,35 12,35 C12,35 23,20.25 23,12 C23,5.925 18.075,1 12,1 Z"/>'
+        + '<circle cx="12" cy="12" r="4.5" fill="#fff"/></svg>';
+
+      var marker = new ol.Feature({ geometry: new ol.geom.Point(centre) });
+      marker.setStyle(new ol.style.Style({
+        image: new ol.style.Icon({
+          src: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(pin),
+          anchor: [0.5, 1]
+        })
+      }));
+
+      var m = new ol.Map({
+        target: wrap,
+        layers: [
+          /* Esri's street tiles rather than ol.source.OSM: that default still
+             points at the a/b/c.tile.openstreetmap.org subdomains, which no
+             longer serve, so the map came up blank. Same provider as the
+             satellite layer, so one attribution covers both. */
+          new ol.layer.Tile({
+            source: new ol.source.XYZ({
+              attributions: 'Tiles &copy; Esri',
+              url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+              maxZoom: 19
+            })
+          }),
+          new ol.layer.Vector({ source: new ol.source.Vector({ features: [marker] }) })
+        ],
+        view: new ol.View({ center: centre, zoom: opts.zoom || 11, maxZoom: 19 })
+      });
+      watchSize(m, wrap);
+    }
+    return wrap;
+  }
+
+  /* Whatever we know about the place, in the form Google Maps searches best. */
+  function googleUrl(place) {
+    if (typeof place.lat === 'number' && typeof place.lon === 'number') {
+      return 'https://www.google.com/maps/search/?api=1&query='
+        + place.lat + '%2C' + place.lon;
+    }
+    var q = [place.city, place.country || place.name].filter(Boolean).join(', ') || place.name;
+    return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
+  }
+
+  function directionsUrl(place) {
+    var q = (typeof place.lat === 'number' && typeof place.lon === 'number')
+      ? place.lat + '%2C' + place.lon
+      : encodeURIComponent([place.city, place.country || place.name].filter(Boolean).join(', '));
+    return 'https://www.google.com/maps/dir/?api=1&destination=' + q;
+  }
+
+  DD.map = { render: render, keyFor: keyFor, entries: entries, toScreen: function(){},
+    road: road, googleUrl: googleUrl, directionsUrl: directionsUrl };
 })();

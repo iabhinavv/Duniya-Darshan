@@ -302,3 +302,46 @@ to twelve. Donut and bars are given the same map so a slice matches its bar.
   `stopEvent: true` so the buttons are clickable, a grace period so moving from
   pin to popup does not dismiss it, and the same popup on tap for touch.
 - Dropped the "Price: free" line from the masthead.
+
+
+---
+
+# Revision 7 — 2026-08-29
+
+## Road maps
+
+`DD.map.road(place, opts)` renders a street map of one place, plus
+`googleUrl()` and `directionsUrl()`. It sits behind a **Road map** tab in the
+place panel, with buttons out to Google Maps, Directions and Things to do.
+
+Tiles come from Esri's `World_Street_Map`, not `ol.source.OSM`: OpenLayers'
+default OSM source still points at the `a/b/c.tile.openstreetmap.org`
+subdomains, which no longer serve, so the map came up blank. Using Esri also
+means one provider and one attribution across all three maps.
+
+## Panel order
+
+Tabs are now Log, Budget, Road map, Photos, Albums, Plan, Details, opening on
+Log — the tab that matters while travelling. `editor(t, p, opts)` takes an
+`opts.tab` so the card's Map button can open straight to the road map.
+
+On the card: Log, Map, reorder arrows, then Skyscanner and Booking.com pushed to
+the end by a `.acts-gap` spacer (suppressed under 900px, where the row wraps and
+a stretching gap only unbalances it). The Open button is gone — the card already
+opens on click.
+
+## Bug found by the reorder
+
+`spendPane` read `st.byCat`, but `placeState()` returns only totals
+(`state, budget, spent, ratio, count`) — there is no `byCat` on it. The pane
+threw `Cannot read properties of undefined` as soon as a place had any spending.
+It had been hiding behind a tab nobody opened first; making Log the default
+surfaced it immediately. It now takes the split from `actuals(t, p.id)`, and
+uses `distinctColours()` like the other charts.
+
+## Map sizing
+
+Both maps now go through `watchSize(map, wrap)`: an initial `updateSize()`, a
+`ResizeObserver` on the container, and a few delayed re-measures. OpenLayers
+measures its target once at construction, which is wrong inside a card that is
+still laying out or a modal that is still opening.
