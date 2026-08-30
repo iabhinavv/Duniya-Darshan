@@ -116,8 +116,7 @@
     head.appendChild(el('hr', { class: 'rule thick' }));
     head.appendChild(el('div', { class: 'mast-line' }, [
       el('span', { text: DD.niceDate(DD.today(), true) }),
-      el('span', { class: 'mid', text: DD.plural(totalTrips, 'trip') + ' · ' + DD.plural(logged, 'entry', 'entries') }),
-      el('span', { class: 'end', text: 'Price: free' })
+      el('span', { class: 'mid', text: DD.plural(totalTrips, 'trip') + ' · ' + DD.plural(logged, 'entry', 'entries') })
     ]));
     head.appendChild(el('hr', { class: 'rule hair' }));
     head.appendChild(title);

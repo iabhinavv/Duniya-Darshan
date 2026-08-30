@@ -67,13 +67,21 @@
     var vectorSource = new ol.source.Vector({ features: features });
     
     var map; // To be assigned below, captured in style function
+    /* declutter drops any label that would collide with one already drawn, so
+       the map thins itself out instead of stacking slips on top of each other. */
     var vectorLayer = new ol.layer.Vector({ 
       source: vectorSource, 
       zIndex: 2,
+      declutter: true,
       style: function(feature, resolution) {
         var data = feature.get('data');
         var currentZoom = map ? map.getView().getZoomForResolution(resolution) : 2;
-        var showText = currentZoom >= 4.5;
+        /* Both maps open at a zoom where every label would fit at once, which is
+           what made India unreadable. Hold them back until you have leaned in. */
+        var nameFrom = kind === 'india' ? 6 : 4.2;
+        var detailFrom = kind === 'india' ? 7.2 : 5.4;
+        var showText = currentZoom >= nameFrom;
+        var showDetail = currentZoom >= detailFrom;
         
         var markerColor = feature.get('markerColor');
         var pinSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="36" viewBox="0 0 24 36"><path fill="' + markerColor + '" stroke="#fff" stroke-width="2" d="M12,1 C5.925,1 1,5.925 1,12 C1,20.25 12,35 12,35 C12,35 23,20.25 23,12 C23,5.925 18.075,1 12,1 Z"/><circle cx="12" cy="12" r="4.5" fill="#fff"/></svg>';
@@ -90,20 +98,22 @@
         ];
         
         if (showText) {
-          var line = data.place.days ? 'Days: ' + data.place.days + '\n' : '';
-          line += data.st.count
-            ? 'Budget: ' + DD.money(data.st.budget) + ' | Spent: ' + DD.money(data.st.spent)
-            : 'Budget: ' + DD.money(data.st.budget);
-            
+          var label = data.place.name;
+          if (showDetail) {
+            label += '\n' + DD.plural(data.place.days, 'day')
+              + '  \u00b7  ' + DD.money(data.st.budget, { compact: true });
+            if (data.st.count) label += '\nspent ' + DD.money(data.st.spent, { compact: true });
+          }
+
           styles.push(new ol.style.Style({
             text: new ol.style.Text({
-              text: data.place.name + '\n' + line,
-              font: '14px "Yeseva One", serif',
+              text: label,
+              font: (showDetail ? '12px' : '13px') + ' "Yeseva One", serif',
               fill: new ol.style.Fill({ color: '#ffffff' }),
-              backgroundFill: new ol.style.Fill({ color: 'rgba(0, 22, 58, 0.9)' }),
-              backgroundStroke: new ol.style.Stroke({ color: '#ffffff', width: 1.5 }),
-              padding: [6, 10, 6, 10],
-              offsetY: -45,
+              backgroundFill: new ol.style.Fill({ color: 'rgba(0, 22, 58, 0.88)' }),
+              backgroundStroke: new ol.style.Stroke({ color: '#ffffff', width: 1.2 }),
+              padding: [5, 9, 5, 9],
+              offsetY: -46,
               textAlign: 'center'
             })
           }));
@@ -140,58 +150,95 @@
     }
 
 
-    var popupElement = el('div', { class: 'notepad-popup', style: {
-      background: 'var(--brand-900, #00163a)',
-      padding: '10px 14px',
-      borderRadius: '4px',
-      fontFamily: 'var(--yeseva, "Yeseva One", serif)',
-      color: 'var(--paper, #ffffff)',
-      textAlign: 'center',
-      boxShadow: '0 4px 10px rgba(0,0,0,0.5)',
-      pointerEvents: 'none',
-      display: 'none'
-    } });
-    
+    /* Hovering a pin used to repeat what the label already said. It now offers
+       the two things you would actually want: open the place, or log a spend. */
+    var popupElement = el('div', { class: 'map-pop' });
+
     var popupOverlay = new ol.Overlay({
       element: popupElement,
       positioning: 'bottom-center',
-      stopEvent: false,
-      offset: [0, -12]
+      stopEvent: true,
+      offset: [0, -34]
     });
     map.addOverlay(popupOverlay);
 
-    map.on('pointermove', function(evt) {
-      if (evt.dragging) {
-        popupElement.style.display = 'none';
-        return;
-      }
-      var feature = map.forEachFeatureAtPixel(evt.pixel, function(f) { return f; });
+    var hideTimer = null;
+    var openFor = null;
+
+    function showPop(data) {
+      clearTimeout(hideTimer);
+      if (openFor === data) { popupElement.style.display = 'block'; return; }
+      openFor = data;
+
+      var st = data.st;
+      DD.clear(popupElement);
+      popupElement.appendChild(el('b', { text: data.place.name }));
+      popupElement.appendChild(el('span', {
+        text: DD.plural(data.place.days, 'day') + '  ·  ' + DD.money(st.budget, { compact: true })
+          + (st.count ? '  ·  ' + DD.money(st.spent, { compact: true }) + ' spent' : '')
+      }));
+      popupElement.appendChild(el('div', { class: 'map-pop-acts' }, [
+        el('button', {
+          class: 'btn xs pri',
+          onclick: function (ev) {
+            ev.stopPropagation();
+            hidePop();
+            if (opts.onPick) opts.onPick(data);
+          }
+        }, 'Open'),
+        el('button', {
+          class: 'btn xs',
+          onclick: function (ev) {
+            ev.stopPropagation();
+            hidePop();
+            DD.logForm({ trip: data.trip, placeId: data.place.id });
+          }
+        }, [DD.icon('plus', 12), 'Log'])
+      ]));
+
+      var pt = data.__coord || null;
+      if (pt) popupOverlay.setPosition(pt);
+      popupElement.style.display = 'block';
+    }
+
+    function hidePop() {
+      popupElement.style.display = 'none';
+      openFor = null;
+    }
+    function scheduleHide() {
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(hidePop, 280);
+    }
+
+    popupElement.addEventListener('mouseenter', function () { clearTimeout(hideTimer); });
+    popupElement.addEventListener('mouseleave', scheduleHide);
+
+    function featureAt(pixel) {
+      return map.forEachFeatureAtPixel(pixel, function (f) { return f; }, { hitTolerance: 6 });
+    }
+
+    map.on('pointermove', function (evt) {
+      if (evt.dragging) { hidePop(); return; }
+      var feature = featureAt(evt.pixel);
       if (feature) {
         map.getTargetElement().style.cursor = 'pointer';
         var data = feature.get('data');
-        var line = data.place.days ? 'Days: ' + data.place.days + ' &middot; ' : '';
-        line += data.st.count
-          ? 'Budget: ' + DD.money(data.st.budget) + ' | Spent: ' + DD.money(data.st.spent)
-          : 'Budget: ' + DD.money(data.st.budget);
-          
-        popupElement.innerHTML = '<b style="font-size:18px; display:block; margin-bottom:4px; color:var(--brand-100, #d8e7fb); font-family:var(--serif, \'Playfair Display\', serif);">' + data.place.name + '</b><span style="font-size:15px; letter-spacing: 0.05em;">' + line + '</span>';
-        popupOverlay.setPosition(evt.coordinate);
-        popupOverlay.setOffset([0, -25]);
-        popupElement.style.display = 'block';
+        data.__coord = feature.getGeometry().getCoordinates();
+        showPop(data);
       } else {
         map.getTargetElement().style.cursor = '';
-        popupElement.style.display = 'none';
+        scheduleHide();
       }
     });
 
-    if (opts.onPick) {
-      map.on('click', function(evt) {
-        var feature = map.forEachFeatureAtPixel(evt.pixel, function(f) { return f; });
-        if (feature) {
-          opts.onPick(feature.get('data'));
-        }
-      });
-    }
+    /* A tap does the same thing, so touch gets the buttons too. */
+    map.on('click', function (evt) {
+      var feature = featureAt(evt.pixel);
+      if (!feature) { hidePop(); return; }
+      var data = feature.get('data');
+      data.__coord = feature.getGeometry().getCoordinates();
+      showPop(data);
+    });
   }
 
   DD.map = { render: render, keyFor: keyFor, entries: entries, toScreen: function(){} };

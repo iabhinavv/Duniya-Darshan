@@ -252,3 +252,53 @@ Four small fixes, all inside 09-map.js, 20-places.js and app.css.
    (`pow(1.0022, -clamp(delta))`, with deltaMode scaling) rather than a fixed
    notch, so trackpads glide. The transition is turned off — via `.panning` — only
    while dragging or pinching, where lag would feel like the map sticking.
+
+
+---
+
+# Revision 6 — 2026-08-29
+
+Written against the OpenLayers/Esri map the user had swapped in, not the baked
+SVG maps of earlier revisions.
+
+## The bug behind "the total pie has only one colour"
+
+Not a colour-assignment problem. `stroke-dasharray` was built as
+`(circ * frac - 1.5)`, which goes **negative** for any slice under about 0.4% of
+the total. An invalid dash array is treated as `none`, so that arc drew a
+complete circle in its own colour over the whole chart. Petrol at 0.03% of the
+combined ₹50.75 L was doing exactly that. The segment is now clamped with
+`Math.max(0.8, ...)` and the gap derived from it.
+
+A second, real issue sat underneath: merging two trips puts Flights beside
+Flights & Rail, and Transportation beside Intercity Travel — pairs that share a
+colour in `CAT_COLOURS`. `distinctColours(ids)` now hands out the preferred
+colour first and the next unused one after that, and the palette ramp was widened
+to twelve. Donut and bars are given the same map so a slice matches its bar.
+
+## Charts
+
+- `donut()` is interactive: arcs and legend rows both drive a focus/blur that
+  thickens one slice, dims the rest, and swaps the centre for that slice's
+  figure, name and share.
+- `verticalCompareBars()` was rebuilt with a rupee scale down the left
+  (`niceTop()` rounds the top of the scale), gridlines, and a tooltip on hover or
+  keyboard focus carrying budget, spent, left/over and percent used. Budget bars
+  now take a 34% tint of the category colour so the chart reads even with nothing
+  logged.
+
+## Elsewhere
+
+- Place cards are posters (4:5, 3:4 on mobile, two-up). A place with several
+  photos crossfades between two stacked layers on one shared 5.2s timer, with
+  pips. The timer clears itself once no rotating card is still in the document.
+- The currency dropdown gained **＋ Add a currency…**, which opens a small dialog
+  and re-selects the new code on return. Shared by the add-place dialog and the
+  editor.
+- Map labels were showing at zoom 4.5 while India opens at 4.5 — so every label
+  appeared at once. Names now start at 6 (India) / 4.2 (world), detail at 7.2 /
+  5.4, and the vector layer sets `declutter: true`.
+- The hover popup repeated the label. It now offers **Open** and **+ Log**, with
+  `stopEvent: true` so the buttons are clickable, a grace period so moving from
+  pin to popup does not dismiss it, and the same popup on tap for touch.
+- Dropped the "Price: free" line from the masthead.

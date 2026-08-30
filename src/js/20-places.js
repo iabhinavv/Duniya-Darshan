@@ -358,9 +358,9 @@
     var photo = el('div', {
       class: 'place-photo',
       title: 'Open ' + p.name,
-      style: img ? { backgroundImage: photoLayers(img.url) } : {},
       onclick: function () { editor(t, p); }
     }, [
+      poster(p),
       el('div', { class: 'ord', text: String(idx + 1).padStart(2, '0') }),
       st.count
         ? el('div', { class: 'state ' + st.state,
@@ -424,6 +424,50 @@
     ]);
   }
 
+  /* The poster: two stacked layers so a place with several photos can fade from
+     one to the next. One timer drives every visible card. */
+  var rotators = [];
+  var rotateTimer = null;
+
+  function poster(p) {
+    var urls = (p.images || []).map(function (im) { return im.url; }).filter(Boolean);
+    var wrap = el('div', { class: 'pp' });
+    var a = el('div', { class: 'pp-layer on' });
+    var b = el('div', { class: 'pp-layer' });
+    wrap.appendChild(a);
+    wrap.appendChild(b);
+
+    if (urls.length) a.style.backgroundImage = 'url("' + urls[0].replace(/"/g, '%22') + '")';
+
+    if (urls.length > 1) {
+      var pips = el('div', { class: 'pp-pips' });
+      urls.forEach(function (u, i) { pips.appendChild(el('i', { class: i ? '' : 'on' })); });
+      wrap.appendChild(pips);
+      rotators.push({ node: wrap, urls: urls, layers: [a, b], pips: pips, i: 0, front: 0 });
+      startRotation();
+    }
+    return wrap;
+  }
+
+  function startRotation() {
+    if (rotateTimer) return;
+    rotateTimer = setInterval(function () {
+      rotators = rotators.filter(function (r) { return r.node.isConnected; });
+      if (!rotators.length) { clearInterval(rotateTimer); rotateTimer = null; return; }
+      rotators.forEach(advance);
+    }, 5200);
+  }
+
+  function advance(r) {
+    r.i = (r.i + 1) % r.urls.length;
+    var back = r.layers[1 - r.front];
+    back.style.backgroundImage = 'url("' + r.urls[r.i].replace(/"/g, '%22') + '")';
+    back.classList.add('on');
+    r.layers[r.front].classList.remove('on');
+    r.front = 1 - r.front;
+    DD.$$('i', r.pips).forEach(function (pip, n) { pip.classList.toggle('on', n === r.i); });
+  }
+
   /* Whichever of city / region is not already the card's title. */
   function subtitle(p) {
     var extra = [p.city, p.country].filter(function (v) { return v && v !== p.name; })[0];
@@ -445,7 +489,9 @@
 
   function tryPhoto(p, node) {
     DD.images.ensureLead(p, function (got) {
-      if (got && p.images[0]) node.style.backgroundImage = photoLayers(p.images[0].url);
+      if (!got || !p.images[0]) return;
+      var layer = node.querySelector('.pp-layer');
+      if (layer) layer.style.backgroundImage = 'url("' + p.images[0].url.replace(/"/g, '%22') + '")';
     });
   }
 
@@ -467,7 +513,7 @@
     var nameIn = el('input', { type: 'text', placeholder: isCity ? 'Rajasthan' : 'Portugal', autocapitalize: 'words' });
     var cityIn = el('input', { type: 'text', placeholder: isCity ? 'Jaipur' : 'Lisbon' });
     var daysIn = el('input', { type: 'number', min: '1', value: String(t.defaultDays) });
-    var curIn = DD.selectOf(currencyOptions(), 'INR', null);
+    var curIn = currencySelect('INR', null);
     var isoIn = el('input', { type: 'text', maxlength: '2', placeholder: 'PT', style: { textTransform: 'uppercase' } });
     var iataIn = el('input', { type: 'text', maxlength: '3', placeholder: 'LIS', style: { textTransform: 'uppercase' } });
 
@@ -502,6 +548,53 @@
         DD.render();
         DD.toast(name + ' added');
         DD.images.ensureLead(p, function (got) { if (got) DD.render(); });
+      }
+    });
+  }
+
+  /* The currency dropdown, with a way to add one that is not listed. */
+  function currencySelect(value, onPick) {
+    var sel = DD.selectOf(currencyOptions().concat([['__add', '+  Add a currency\u2026']]), value,
+      function (v) {
+        if (v !== '__add') { value = v; if (onPick) onPick(v); return; }
+        sel.value = value;                       /* put it back while the dialog is open */
+        addCurrency(function (code) {
+          value = code;
+          DD.clear(sel);
+          currencyOptions().concat([['__add', '+  Add a currency\u2026']]).forEach(function (o) {
+            sel.appendChild(el('option', { value: o[0], selected: o[0] === code }, o[1]));
+          });
+          sel.value = code;
+          if (onPick) onPick(code);
+        });
+      });
+    return sel;
+  }
+
+  function addCurrency(done) {
+    var code = el('input', { type: 'text', maxlength: '4', placeholder: 'AUD', style: { textTransform: 'uppercase' } });
+    var name = el('input', { type: 'text', placeholder: 'Australian Dollar' });
+    var rate = el('input', { type: 'number', step: 'any', min: '0', placeholder: '0.018' });
+    DD.modal({
+      title: 'Add a currency',
+      body: el('div', {}, [
+        el('div', { class: 'grid3' }, [
+          DD.field('Code', code), DD.field('Name', name), DD.field('Units per \u20b91', rate)
+        ]),
+        el('p', { class: 'tiny muted', style: { margin: 0 } },
+          'How many of it you get for one rupee \u2014 the same way column B of your sheet reads. '
+          + 'You can change it later under Almanac \u2192 Exchange rates.')
+      ]),
+      okLabel: 'Add',
+      ok: function (close) {
+        var c = code.value.trim().toUpperCase();
+        var r = Number(rate.value);
+        if (!c || !r || r <= 0) { DD.toast('Need a code and a rate above zero', true); return; }
+        S.db().currencies[c] = { name: name.value.trim() || c, perINR: r };
+        S.save();
+        close();
+        DD.toast(c + ' added');
+        done(c);
       }
     });
   }
@@ -599,7 +692,7 @@
       oninput: function () { p.days = Math.max(1, Number(daysIn.value) || 1); recalc(); saveSoon(); } });
     host.appendChild(el('div', { class: 'grid2', style: { marginTop: '14px' } }, [
       DD.field('Days here', daysIn),
-      DD.field('Local currency', DD.selectOf(currencyOptions(), p.currency,
+      DD.field('Local currency', currencySelect(p.currency,
         function (v) { p.currency = v; S.save(); }))
     ]));
 
@@ -907,4 +1000,5 @@
   DD.placesAddDialog = addDialog;
   DD.placeEditor = editor;
   DD.currencyOptions = currencyOptions;
+  DD.currencySelect = currencySelect;
 })();

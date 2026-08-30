@@ -91,7 +91,23 @@ backup** puts it back.
 ## 3. The front page
 
 Opening the app puts everything on one page: the totals across every trip, the
-world map, and the trips themselves. Click a trip to go straight to its places.
+world map, the charts, and the trips themselves. Click a trip to go straight to
+its places.
+
+### The charts
+
+Two of them, side by side, for the whole ledger and again for whichever trip is
+open. A **Budget / Spent** switch appears once anything is logged.
+
+- **The ring** — hover a slice, or its row in the list beside it, and that slice
+  lifts out while the rest dim. The middle swaps from the total to that
+  category's own figure, its name, and its share of the whole.
+- **The bars** — budget and spent side by side per category, against a **rupee
+  scale down the left**. Hover or tab to a column for the exact figures: budget,
+  spent, what is left or how far over, and the percentage used.
+
+Every category gets its own colour, and the two are kept in step, so a slice and
+its bar always match.
 
 Two trips come set up:
 
@@ -121,44 +137,39 @@ plan into the real thing.
 
 ## 4. The maps
 
-The front page carries a world map; a trip at home carries a map of India. They
-work the same way.
+The front page carries a world map; a trip at home carries a map of India. Both
+are satellite imagery (Esri) drawn with OpenLayers, and both work the same way.
 
-- **Pale teal** — the place is on the itinerary, nothing spent yet.
-- **Teal gradient** — money has been logged there. It is under way.
-- **Deep teal** — 90% or more of its budget is spent. Call it done.
-- **Red** — spent past the budget.
+A **location pin** marks every place, coloured by how it is going:
 
-A **location pin** marks each city, and stands in for countries too small to fill
-at this scale — Singapore, the Faroes. Pins hold their size however far you zoom,
-and take the colour of whatever state the place is in. Hover for the figures; click to open the place.
-On the world map, **clicking an empty country offers to add it to the trip**, and
-**clicking India takes you to your travels at home** and its map of the states.
-
-**Both maps zoom, and tell you more as you go in.** Scroll or pinch to zoom about
-the pointer, drag to pan, or use the +/− and Reset buttons in the corner. Zooming
-is eased rather than stepped, so a mouse notch glides and a trackpad follows your
-fingers. A drag never counts as a click on the country underneath, and a click
-always reaches it.
-
-Details arrive on a little notepad slip, a line at a time:
-
-| Zoom | What appears |
+| | |
 |---|---|
-| at rest | nothing — just the fills and the pins |
-| lean in | the name |
-| further | + the budget |
-| further still | + spent, entries, days |
-| right in | + cost a day, or percentage used |
+| pale blue | on the itinerary, nothing spent yet |
+| navy | done — 90% or more of the budget is spent |
+| magenta | spent past the budget |
 
-**A slip only appears once the country is wide enough on screen to hold it.** Each
-line is measured against the country's own width at the current zoom, so a label
-never spills across a border or out to sea — Sri Lanka shows its name alone where
-Indonesia shows all four lines. Keep zooming and the smaller countries catch up.
+### What shows at which zoom
 
-Boundaries are Natural Earth 1:110m and a public-domain set of Indian state
-outlines, baked into the file by `make_maps.py`. Nothing is fetched at runtime,
-so the maps work with no network at all.
+The maps open showing **pins only**. Names and figures arrive as you lean in, so
+the map is never a wall of overlapping labels:
+
+| Zoom | World | India |
+|---|---|---|
+| opening view | pins only | pins only |
+| names appear | 4.2 | 6 |
+| days, budget, spent appear | 5.4 | 7.2 |
+
+Labels also **declutter**: if two would collide, the second is dropped rather
+than stacked on top. Keep zooming and the crowded ones separate out and appear.
+
+### Hover or tap a pin
+
+You get a small card with the place, its days and its budget, and two buttons:
+
+- **Open** — the place, with its budget, photos, albums and plan.
+- **+ Log** — straight into logging a spend there.
+
+It works the same on a phone: tap a pin, the card appears, tap a button.
 
 ---
 
@@ -241,6 +252,12 @@ under each image. You can paste any image URL instead.
 
 Photos are stored as links, not files, so the data file stays small and the whole
 thing still commits cleanly.
+
+**Cards show them as posters.** Each country or state card is a tall poster with
+the name across the bottom. Where a place has more than one photo the card
+**fades from one to the next every few seconds**, with small pips showing how many
+there are. One timer drives every visible card, and it stops itself when you
+leave the page.
 
 **Drive** on the same place takes your own album links. A Google Drive folder or
 file shared as "anyone with the link" is embedded and browsable right there.

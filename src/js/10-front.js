@@ -78,23 +78,30 @@
           });
         });
         var gData = Object.keys(allCats).map(function(k) { return allCats[k]; });
-        
-        var donutData = gData.map(function(c, i) {
+
+        /* Two trips share several category ids by colour — Flights and Flights &
+           Rail are both navy — so hand out a distinct colour per merged head. */
+        var colours = DD.charts.distinctColours(gData.map(function (c) { return c.id; }));
+
+        var donutData = gData.map(function(c) {
           var val = which === 'spent' ? c.actual : c.budget;
-          return { id: c.id, label: c.label, value: val, colour: DD.charts.colourFor(c.id, i) };
+          return { id: c.id, label: c.label, value: val, colour: colours[c.id] };
         }).filter(function(d) { return d.value > 0; }).sort(DD.by('value', 'desc'));
-        
-        globalInner.appendChild(el('div', { style: { flex: '0 0 auto', margin: '0 auto' } }, [
-          DD.charts.donut(donutData, {
-            centre: DD.money(DD.sum(donutData, function (d) { return d.value; }), { compact: true }),
-            centreSub: which === 'spent' ? 'spent' : 'budget'
-          })
+
+        var gDonut = DD.charts.donut(donutData, {
+          centre: DD.money(DD.sum(donutData, function (d) { return d.value; }), { compact: true }),
+          centreSub: which === 'spent' ? 'spent' : 'budget'
+        });
+        globalInner.appendChild(el('div', { class: 'chart-side' }, [
+          gDonut,
+          DD.charts.legend(donutData, gDonut)
         ]));
-        
-        var barsData = gData.filter(function(r) { return r.budget > 0 || r.actual > 0; });
-        
-        var detailsCol = el('div', { style: { flex: '1 1 240px', minWidth: '0' } });
-        detailsCol.appendChild(DD.charts.verticalCompareBars(barsData));
+
+        var barsData = gData.filter(function(r) { return r.budget > 0 || r.actual > 0; })
+          .sort(DD.by('budget', 'desc'));
+
+        var detailsCol = el('div', { style: { flex: '1 1 300px', minWidth: '0' } });
+        detailsCol.appendChild(DD.charts.verticalCompareBars(barsData, { colours: colours }));
         globalInner.appendChild(detailsCol);
       };
       
@@ -149,22 +156,26 @@
       function paint(which) {
         DD.clear(inner);
         var src = which === 'spent' ? ta.byCat : tb.byCat;
-        var data = t.categories.map(function (c, i) {
-          return { id: c.id, label: c.label, value: src[c.id] || 0, colour: DD.charts.colourFor(c.id, i) };
+        var colours = DD.charts.distinctColours(t.categories.map(function (c) { return c.id; }));
+        var data = t.categories.map(function (c) {
+          return { id: c.id, label: c.label, value: src[c.id] || 0, colour: colours[c.id] };
         }).filter(function (d) { return d.value > 0; }).sort(DD.by('value', 'desc'));
-        inner.appendChild(el('div', { style: { flex: '0 0 auto', margin: '0 auto' } }, [
-          DD.charts.donut(data, {
-            centre: DD.money(DD.sum(data, function (d) { return d.value; }), { compact: true }),
-            centreSub: which === 'spent' ? 'spent' : 'budget'
-          })
+
+        var tDonut = DD.charts.donut(data, {
+          centre: DD.money(DD.sum(data, function (d) { return d.value; }), { compact: true }),
+          centreSub: which === 'spent' ? 'spent' : 'budget'
+        });
+        inner.appendChild(el('div', { class: 'chart-side' }, [
+          tDonut,
+          DD.charts.legend(data, tDonut)
         ]));
-        
+
         var barsData = t.categories.map(function(c) {
-          return { label: c.label, budget: tb.byCat[c.id] || 0, actual: ta.byCat[c.id] || 0 };
-        }).filter(function(r) { return r.budget > 0 || r.actual > 0; });
-        
-        var detailsCol = el('div', { style: { flex: '1 1 240px', minWidth: '0' } });
-        detailsCol.appendChild(DD.charts.verticalCompareBars(barsData));
+          return { id: c.id, label: c.label, budget: tb.byCat[c.id] || 0, actual: ta.byCat[c.id] || 0 };
+        }).filter(function(r) { return r.budget > 0 || r.actual > 0; }).sort(DD.by('budget', 'desc'));
+
+        var detailsCol = el('div', { style: { flex: '1 1 300px', minWidth: '0' } });
+        detailsCol.appendChild(DD.charts.verticalCompareBars(barsData, { colours: colours }));
         inner.appendChild(detailsCol);
       }
       paint(mode);
